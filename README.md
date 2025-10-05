@@ -52,6 +52,7 @@ Better Lyrics upgrades your YouTube Music experience by providing beautiful time
 - [Discord Community](#discord-community)
 - [Contributing](#contributing)
 - [License](#license)
+- [Privacy](#privacy)
 - [Contributors ✨](#contributors-)
 
 > [!TIP]
@@ -246,6 +247,16 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 ## License
 
 This project is licensed under the [GNU GPLv3 License](LICENSE). As long as you attribute me or [Better Lyrics](https://better-lyrics.boidu.dev) as the original creator and comply with the rest of the license terms, you can use this project for personal or commercial purposes.
+
+## Privacy
+
+We take your privacy very seriously. Better Lyrics is built to be privacy-conscious by design.
+
+- We only collect the absolute minimum standard data needed for the extension to work (e.g., song metadata to fetch lyrics, and your IP address for security, authentication and service delivery).
+- API request logs are kept for a maximum of 7 days for debugging purposes.
+- **We never have and never will sell or monetize your personal data.**
+
+For a complete overview, please read our full [**Privacy Policy**](PRIVACY.md).
 
 ## Contributors ✨
 
