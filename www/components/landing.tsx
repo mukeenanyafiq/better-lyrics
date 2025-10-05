@@ -61,7 +61,7 @@ export function Landing() {
     setImageLoaded(true);
   };
 
-  const src = "https://res.cloudinary.com/boidu/image/upload/t_banner/v1759536833/bl/banner.png";
+  const src = "https://i.ibb.co/QFHpVfy/Screenshot-2024-06-04-at-22-33-35.png";
 
   React.useEffect(() => {
     const img = new Image();
