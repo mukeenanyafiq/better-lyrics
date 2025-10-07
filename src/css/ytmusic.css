@@ -201,6 +201,10 @@ ytmusic-message-renderer.ytmusic-tab-renderer {
     top: 0;
     width: 100%;
   }
+	ytmusic-player-bar[player-fullscreened] #play-pause-button>.yt-icon-button>yt-icon {
+		width: 32px;
+		height: 32px;
+	}
 }
 
 @media (max-width: 936px) {
