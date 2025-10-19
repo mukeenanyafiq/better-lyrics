@@ -1,6 +1,7 @@
 // Function to save user options
 import Sortable from "sortablejs";
 
+
 interface Options {
   isLogsEnabled: boolean;
   isAutoSwitchEnabled: boolean;

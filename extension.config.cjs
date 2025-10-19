@@ -1,16 +1,30 @@
 module.exports = {
   dev: {
     browser: "chrome",
-    polyfill: true,
   },
   browser: {
     chrome: {
       preferences: { theme: "dark" },
-      browserFlags: ["--starting-url", "https://music.youtube.com/watch?v=Emq17wn71jA&list=RDAMVMxe9j9hPn6Bc", "--remote-debugging-port=9222"],
+      excludeBrowserFlags: [ // this appears to not work
+        '--hide-scrollbars', // Allow scrollbars to be visible
+        '--mute-audio', // Allow audio to play
+        '--disable-component-extensions-with-background-pages' // Allow component extensions to load
+      ],
+      browserFlags: [
+        "https://music.youtube.com/watch?v=Emq17wn71jA&list=RDAMVMxe9j9hPn6Bc",
+      ],
       profile: "dist/chrome-profile",
     },
     firefox: {
-      preferences: { darkMode: true },
+      preferences: { theme: "dark" },
+      excludeBrowserFlags: [
+        '--hide-scrollbars', // Allow scrollbars to be visible
+        '--disable-component-extensions-with-background-pages' // Allow component extensions to load
+      ],
+      browserFlags: [
+        "https://music.youtube.com/watch?v=Emq17wn71jA&list=RDAMVMxe9j9hPn6Bc",
+      ],
+      profile: "dist/firefox-profile",
     },
   },
   output: {
