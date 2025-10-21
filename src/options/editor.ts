@@ -137,7 +137,7 @@ function createEditorView(state: EditorState, parent: Element) {
   return new EditorView({ state, parent });
 }
 
-const themeSelector = document.getElementById("theme-selector") as (HTMLSelectElement | null);
+const themeSelector = document.getElementById("theme-selector") as HTMLSelectElement | null;
 const syncIndicator = document.getElementById("sync-indicator")!;
 
 function onChange(state: string) {
@@ -282,7 +282,7 @@ function saveToStorage(isTheme = false) {
 
 async function loadCustomCSS(): Promise<string> {
   // Enhanced loading function to check both storage types
-  let css: string|null = null;
+  let css: string | null = null;
   try {
     // First check which storage type was used
     const syncData = await chrome.storage.sync.get(["cssStorageType", "customCSS"]);
@@ -293,7 +293,7 @@ async function loadCustomCSS(): Promise<string> {
       css = localData.customCSS;
     } else {
       // Load from sync storage or fallback to sync if no type is set
-      css =  syncData.customCSS;
+      css = syncData.customCSS;
     }
   } catch (error) {
     console.error("Error loading CSS:", error);
@@ -301,7 +301,7 @@ async function loadCustomCSS(): Promise<string> {
     try {
       const localData = await chrome.storage.local.get("customCSS");
       if (localData.customCSS) {
-        css = localData.customCSS
+        css = localData.customCSS;
       }
 
       const syncData = await chrome.storage.sync.get("customCSS");
@@ -314,7 +314,7 @@ async function loadCustomCSS(): Promise<string> {
 }
 
 async function setThemeName() {
-  await chrome.storage.sync.get("themeName").then((syncData) => {
+  await chrome.storage.sync.get("themeName").then(syncData => {
     if (syncData.themeName && themeSelector) {
       const themeIndex = THEMES.findIndex(theme => theme.name === syncData.themeName);
       if (themeIndex !== -1) {
@@ -342,11 +342,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     themeSelector?.appendChild(option);
   });
 
-
   let setSelectedThemePromise = setThemeName();
 
   let loadCustomCssPromise = loadCustomCSS().then(result => {
-    console.log("Loaded Custom CSS:",  result)
+    console.log("Loaded Custom CSS:", result);
     editor.setState(createEditorState(result));
   });
 
@@ -497,19 +496,17 @@ document.getElementById("file-export-btn")!.addEventListener("click", () => {
 
 chrome.storage.onChanged.addListener(async (changes, namespace) => {
   console.log("storage", changes, namespace);
-  if(Object.hasOwn(changes, "customCSS")) {
+  if (Object.hasOwn(changes, "customCSS")) {
     if (saveCount == 0) {
       await loadCustomCSS().then(result => {
-        console.log("Got a CSS Update")
+        console.log("Got a CSS Update");
         editor.setState(createEditorState(result));
       });
     }
     saveCount = Math.max(saveCount - 1, 0);
-
-
   }
 
-  if(Object.hasOwn(changes, "themeName")) {
+  if (Object.hasOwn(changes, "themeName")) {
     console.log("Got a Theme Name Update");
     await setThemeName();
   }
