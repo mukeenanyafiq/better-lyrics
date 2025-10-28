@@ -1,6 +1,6 @@
 import * as Utils from "@core/utils";
 import type { LyricPart, LyricsArray } from "./shared";
-import {parseJsonNumber} from "ajv/dist/runtime/parseJson";
+import { parseJsonNumber } from "ajv/dist/runtime/parseJson";
 
 const possibleIdTags = ["ti", "ar", "al", "au", "lr", "length", "by", "offset", "re", "tool", "ve", "#"];
 
@@ -12,7 +12,7 @@ export function parseTime(timeStr: string | number): number {
 
   if (typeof timeStr === "number") return timeStr;
 
-  const parts = timeStr.split(':');
+  const parts = timeStr.split(":");
   let totalMs = 0;
 
   try {
@@ -23,13 +23,13 @@ export function parseTime(timeStr: string | number): number {
       // Format: mm:ss.mmm
       const minutes = parseInt(parts[0], 10);
       const seconds = parseFloat(parts[1]);
-      totalMs = (minutes * 60 * 1000) + (seconds * 1000);
+      totalMs = minutes * 60 * 1000 + seconds * 1000;
     } else if (parts.length === 3) {
       // Format: hh:mm:ss.mmm
       const hours = parseInt(parts[0], 10);
       const minutes = parseInt(parts[1], 10);
       const seconds = parseFloat(parts[2]);
-      totalMs = (hours * 3600 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+      totalMs = hours * 3600 * 1000 + minutes * 60 * 1000 + seconds * 1000;
     }
 
     // Return a rounded integer
