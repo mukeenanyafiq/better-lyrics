@@ -1,13 +1,13 @@
-import * as Utils from "./core/utils";
-import * as DOM from "./modules/ui/dom";
-import * as Observer from "./modules/ui/observer";
-import * as Settings from "./modules/settings/settings";
-import * as Constants from "./core/constants";
-import * as RequestSniffing from "./modules/lyrics/requestSniffer";
-import * as Lyrics from "./modules/lyrics/lyrics";
-import * as Storage from "./core/storage";
-import type { LyricsData } from "./modules/lyrics/lyrics";
-import { initProviders } from "./modules/lyrics/providers/shared";
+import * as Utils from "@utils";
+import * as DOM from "@modules/ui/dom";
+import * as Observer from "@modules/ui/observer";
+import * as Settings from "@modules/settings/settings";
+import * as Constants from "@constants";
+import * as RequestSniffing from "@modules/lyrics/requestSniffer";
+import * as Lyrics from "@modules/lyrics/lyrics";
+import * as Storage from "@core/storage";
+import type { LyricsData } from "@modules/lyrics/lyrics";
+import { initProviders } from "@modules/lyrics/providers/shared";
 
 export interface PlayerDetails {
   currentTime: number;

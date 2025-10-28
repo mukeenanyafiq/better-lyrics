@@ -1,5 +1,5 @@
-import * as Utils from "../../../core/utils";
-import * as Constants from "../../../core/constants";
+import * as Utils from "@utils";
+import * as Constants from "@constants";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";

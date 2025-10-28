@@ -1,7 +1,7 @@
-import * as Utils from "../../core/utils";
-import * as Constants from "../../core/constants";
+import * as Utils from "@utils";
+import * as Constants from "@constants";
 import * as Observer from "./observer";
-import { AppState } from "../../index";
+import { AppState } from "@/index";
 
 let backgroundChangeObserver: MutationObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;

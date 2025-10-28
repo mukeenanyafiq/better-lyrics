@@ -1,4 +1,4 @@
-import * as Utils from "../../../core/utils";
+import * as Utils from "@core/utils";
 import type { LyricPart, LyricsArray } from "./shared";
 
 const possibleIdTags = ["ti", "ar", "al", "au", "lr", "length", "by", "offset", "re", "tool", "ve", "#"];

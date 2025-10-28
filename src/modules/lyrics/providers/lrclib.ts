@@ -1,6 +1,6 @@
 import { type ProviderParameters } from "./shared";
-import * as Constants from "../../../core/constants";
-import * as Utils from "../../../core/utils";
+import * as Constants from "@constants";
+import * as Utils from "@utils";
 import { parseLRC, parsePlainLyrics } from "./lrcUtils";
 
 export default async function lyricLib(providerParameters: ProviderParameters): Promise<void> {

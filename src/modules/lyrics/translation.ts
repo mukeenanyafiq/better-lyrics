@@ -1,6 +1,6 @@
-import * as Constants from "../../core/constants";
-import * as Utils from "../../core/utils";
-import * as Storage from "../../core/storage";
+import * as Constants from "@constants";
+import * as Utils from "@utils";
+import * as Storage from "@core/storage";
 
 interface TranslationResult {
   originalLanguage: string;

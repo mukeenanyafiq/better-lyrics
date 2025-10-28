@@ -1,4 +1,4 @@
-import * as Utils from "../../core/utils";
+import * as Utils from "@utils";
 
 interface Segment {
   primaryVideoStartTimeMilliseconds: number;

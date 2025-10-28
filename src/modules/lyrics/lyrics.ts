@@ -5,16 +5,16 @@
 
 /** @import {SegmentMap, ProviderParameters} from './providers.js' */
 
-import * as Utils from "../../core/utils";
-import * as Constants from "../../core/constants";
+import * as Utils from "@utils";
+import * as Constants from "@constants";
 import * as RequestSniffer from "./requestSniffer";
-import * as DOM from "../ui/dom";
+import * as DOM from "@modules/ui/dom";
 import * as Translation from "./translation";
 import * as LyricProviders from "./providers/shared";
 import * as RequestSniffing from "./requestSniffer";
-import * as Storage from "../../core/storage";
-import { AppState } from "../../index";
-import type { PlayerDetails } from "../../index";
+import * as Storage from "@core/storage";
+import { AppState } from "@/index";
+import type { PlayerDetails } from "@/index";
 import type { SegmentMap } from "./requestSniffer";
 import type { LyricSourceResult, ProviderParameters } from "./providers/shared";
 import type { CubeyLyricSourceResult } from "./providers/cubey";

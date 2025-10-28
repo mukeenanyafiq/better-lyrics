@@ -1,5 +1,5 @@
 import type { Lyric, LyricPart, LyricsArray, LyricSourceResult, ProviderParameters } from "./shared";
-import * as Constants from "../../../core/constants";
+import * as Constants from "@constants";
 interface BLyricsApiResponse {
   error: any;
   isRtlLanguage: boolean;

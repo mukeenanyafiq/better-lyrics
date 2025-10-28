@@ -1,10 +1,10 @@
-import * as Settings from "../settings/settings";
+import * as Settings from "@modules/settings/settings";
 import * as Dom from "./dom";
-import * as Constants from "../../core/constants";
-import * as BetterLyrics from "../../index";
-import * as Utils from "../../core/utils";
-import { AppState } from "../../index";
-import type { PlayerDetails } from "../../index";
+import * as Constants from "@constants";
+import * as BetterLyrics from "@/index";
+import * as Utils from "@utils";
+import { AppState } from "@/index";
+import type { PlayerDetails } from "@/index";
 
 /**
  * Enables the lyrics tab and prevents it from being disabled by YouTube Music.

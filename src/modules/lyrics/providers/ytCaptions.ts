@@ -1,6 +1,6 @@
-import type { LyricsArray, LyricSourceResult, ProviderParameters } from "./shared";
-import * as Utils from "../../../core/utils";
-import * as Constants from "../../../core/constants";
+import type { LyricsArray, ProviderParameters } from "./shared";
+import * as Utils from "@utils";
+import * as Constants from "@constants";
 
 export async function ytCaptions(providerParameters: ProviderParameters): Promise<void> {
   let audioTrackData = providerParameters.audioTrackData;

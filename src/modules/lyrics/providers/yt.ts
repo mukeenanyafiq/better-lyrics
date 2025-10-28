@@ -1,5 +1,5 @@
 import { type LyricSourceResult, type ProviderParameters } from "./shared";
-import * as RequestSniffing from "../requestSniffer";
+import * as RequestSniffing from "@modules/lyrics/requestSniffer";
 import { parsePlainLyrics } from "./lrcUtils";
 
 export type YTLyricSourceResult = LyricSourceResult & {
