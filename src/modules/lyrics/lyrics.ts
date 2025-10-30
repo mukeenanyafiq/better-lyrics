@@ -595,7 +595,19 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         let romanizedLine = document.createElement("div");
         romanizedLine.classList.add(Constants.ROMANIZED_LYRICS_CLASS);
 
-        if (item.timedRomanization) {
+        function removePreviousRomanizationIfNeeded() {
+          const existingRomanizedLine = lyricElement.querySelector("." + Constants.ROMANIZED_LYRICS_CLASS);
+          if (existingRomanizedLine) {
+            existingRomanizedLine.remove();
+          } else {
+            let breakElm: HTMLSpanElement = document.createElement("span");
+            breakElm.classList.add("blyrics--break");
+            breakElm.style.order = "4";
+            lyricElement.appendChild(breakElm);
+          }
+        }
+
+        if (item.timedRomanization && item.timedRomanization.length > 0) {
           let lyricElementsBuffer = [] as HTMLSpanElement[];
 
           item.timedRomanization.forEach(part => {
@@ -629,16 +641,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
           });
 
           groupByWordAndInsert(romanizedLine, lyricElementsBuffer);
-
-          const existingRomanizedLine = lyricElement.querySelector("." + Constants.ROMANIZED_LYRICS_CLASS);
-          if (existingRomanizedLine) {
-            existingRomanizedLine.remove();
-          } else {
-            let breakElm: HTMLSpanElement = document.createElement("span");
-            breakElm.classList.add("blyrics--break");
-            breakElm.style.order = "4";
-            lyricElement.appendChild(breakElm);
-          }
+          removePreviousRomanizationIfNeeded();
 
           romanizedLine.style.order = "5";
           lyricElement.appendChild(romanizedLine);
@@ -646,7 +649,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
           return;
         }
 
-        if (lyricElement.dataset.romanized === "true") return;
+        if (lyricElement.dataset.romanized === "true" && !item.romanization) return;
         let isNonLatin = containsNonLatin(item.words);
         if (Constants.romanizationLanguages.includes(source_language) || containsNonLatin(item.words)) {
           let usableLang = source_language;
@@ -662,10 +665,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
             }
 
             if (result) {
-              let breakElm: HTMLSpanElement = document.createElement("span");
-              breakElm.classList.add("blyrics--break");
-              breakElm.style.order = "4";
-              lyricElement.appendChild(breakElm);
+              removePreviousRomanizationIfNeeded();
 
               romanizedLine.textContent = result ? "\n" + result : "\n";
               romanizedLine.style.order = "5";
