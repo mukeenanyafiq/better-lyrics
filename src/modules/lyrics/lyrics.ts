@@ -3,7 +3,6 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-
 import * as Utils from "@utils";
 import * as Constants from "@constants";
 import * as RequestSniffer from "./requestSniffer";
@@ -262,8 +261,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         }
         if (lyric.timedRomanization) {
           lyric.timedRomanization.forEach(part => {
-            part.startTimeMs = Number(part.startTimeMs) + lastTimeChange
-          })
+            part.startTimeMs = Number(part.startTimeMs) + lastTimeChange;
+          });
         }
       }
     }
@@ -640,7 +639,6 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
             breakElm.style.order = "4";
             lyricElement.appendChild(breakElm);
           }
-
 
           romanizedLine.style.order = "5";
           lyricElement.appendChild(romanizedLine);
