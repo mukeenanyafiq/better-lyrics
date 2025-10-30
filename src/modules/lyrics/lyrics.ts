@@ -607,51 +607,51 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
           }
         }
 
-        if (item.timedRomanization && item.timedRomanization.length > 0) {
-          let lyricElementsBuffer = [] as HTMLSpanElement[];
-
-          item.timedRomanization.forEach(part => {
-            let span = document.createElement("span");
-            span.classList.add(Constants.WORD_CLASS);
-            if (Number(part.durationMs) === 0) {
-              span.classList.add(Constants.ZERO_DURATION_ANIMATION_CLASS);
-            }
-
-            let partData: PartData = {
-              time: part.startTimeMs / 1000,
-              duration: part.durationMs / 1000,
-              lyricElement: span,
-              animationStartTimeMs: Infinity,
-            };
-
-            span.textContent = part.words;
-            span.dataset.time = String(partData.time);
-            span.dataset.duration = String(partData.duration);
-            span.dataset.content = part.words;
-            span.style.setProperty("--blyrics-duration", part.durationMs + "ms");
-            if (part.isBackground) {
-              span.classList.add(BACKGROUND_LYRIC_CLASS);
-            }
-            if (part.words.trim().length === 0) {
-              span.style.display = "inline";
-            }
-            line.parts.push(partData);
-
-            lyricElementsBuffer.push(span);
-          });
-
-          groupByWordAndInsert(romanizedLine, lyricElementsBuffer);
-          removePreviousRomanizationIfNeeded();
-
-          romanizedLine.style.order = "5";
-          lyricElement.appendChild(romanizedLine);
-          DOM.lyricsElementAdded();
-          return;
-        }
-
         if (lyricElement.dataset.romanized === "true" && !item.romanization) return;
         let isNonLatin = containsNonLatin(item.words);
         if (Constants.romanizationLanguages.includes(source_language) || containsNonLatin(item.words)) {
+          if (item.timedRomanization && item.timedRomanization.length > 0) {
+            let lyricElementsBuffer = [] as HTMLSpanElement[];
+
+            item.timedRomanization.forEach(part => {
+              let span = document.createElement("span");
+              span.classList.add(Constants.WORD_CLASS);
+              if (Number(part.durationMs) === 0) {
+                span.classList.add(Constants.ZERO_DURATION_ANIMATION_CLASS);
+              }
+
+              let partData: PartData = {
+                time: part.startTimeMs / 1000,
+                duration: part.durationMs / 1000,
+                lyricElement: span,
+                animationStartTimeMs: Infinity,
+              };
+
+              span.textContent = part.words;
+              span.dataset.time = String(partData.time);
+              span.dataset.duration = String(partData.duration);
+              span.dataset.content = part.words;
+              span.style.setProperty("--blyrics-duration", part.durationMs + "ms");
+              if (part.isBackground) {
+                span.classList.add(BACKGROUND_LYRIC_CLASS);
+              }
+              if (part.words.trim().length === 0) {
+                span.style.display = "inline";
+              }
+              line.parts.push(partData);
+
+              lyricElementsBuffer.push(span);
+            });
+
+            groupByWordAndInsert(romanizedLine, lyricElementsBuffer);
+            removePreviousRomanizationIfNeeded();
+
+            romanizedLine.style.order = "5";
+            lyricElement.appendChild(romanizedLine);
+            DOM.lyricsElementAdded();
+            return;
+          }
+
           let usableLang = source_language;
           if (isNonLatin && !Constants.romanizationLanguages.includes(source_language)) {
             usableLang = "auto";
