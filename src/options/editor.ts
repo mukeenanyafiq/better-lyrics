@@ -690,12 +690,7 @@ async function populateThemeModal(): Promise<void> {
   }
 }
 
-function createThemeCard(options: {
-  name: string;
-  author: string;
-  isCustom: boolean;
-  index: number;
-}): HTMLElement {
+function createThemeCard(options: { name: string; author: string; isCustom: boolean; index: number }): HTMLElement {
   const card = document.createElement("div");
   card.className = "theme-card";
 
