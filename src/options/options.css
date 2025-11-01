@@ -677,6 +677,124 @@ hr {
 	width: 0.5em !important;
 }
 
+/* Theme Modal */
+.theme-modal {
+	max-width: 700px;
+	width: 95%;
+	max-height: 85vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.theme-modal-body {
+	padding: 1.5rem;
+	overflow-y: auto;
+	flex: 1;
+	max-height: calc(85vh - 80px);
+}
+
+@media (max-width: 600px) {
+	.theme-modal {
+		max-width: 95%;
+	}
+}
+
+.theme-modal-section {
+	margin-bottom: 2rem;
+}
+
+.theme-modal-section:last-child {
+	margin-bottom: 0;
+}
+
+.theme-modal-section-title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0 0 1rem 0;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-modal-items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.theme-card {
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.5rem;
+	padding: 0.625rem 0.75rem 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: fit-content;
+}
+
+.theme-card:hover {
+	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-card.selected {
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	box-shadow:rgba(0, 0, 0, 0.02) 0px 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px,
+    inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
+}
+
+.theme-card-info {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+.theme-card-name {
+	font-weight: 600;
+	font-size: 0.8125rem;
+	color: #fff;
+	margin-bottom: 0.125rem;
+	line-height: 1.2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.theme-card-author {
+	font-size: 0.6875rem;
+	color: rgba(255, 255, 255, 0.5);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.theme-modal-body::-webkit-scrollbar {
+	width: 8px;
+}
+
+.theme-modal-body::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 0 0 0.75rem 0;
+}
+
+.theme-modal-body::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 4px;
+}
+
+.theme-modal-body::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
 .theme-name-display {
   color: rgba(255, 255, 255, .75);
   align-items: center;
@@ -781,4 +899,198 @@ hr {
 .delete-theme-btn svg {
 	width: 0.875rem;
 	height: 0.875rem;
+}
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.25);
+	backdrop-filter: blur(8px);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+	display: flex;
+	opacity: 1;
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(16px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes slideDown {
+	from {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(16px) scale(0.98);
+	}
+}
+
+.modal {
+	background: #3e3e41;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.75rem;
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 25px -5px, rgba(0, 0, 0, 0.05) 0px 10px 10px -5px;
+	width: 90%;
+	max-width: 450px;
+	overflow: hidden;
+	animation: slideUp 0.2s ease;
+}
+
+.modal.closing {
+	animation: slideDown 0.2s ease;
+}
+
+.modal-header {
+	padding: 1.25rem 1.5rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.modal-title {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #fff;
+}
+
+.modal-close-btn {
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	padding: 0.25rem;
+	width: 2rem;
+	height: 2rem;
+	display: grid;
+	place-items: center;
+	border-radius: 0.375rem;
+	transition: all 0.2s;
+	margin: 0;
+}
+
+.modal-close-btn:hover {
+	color: rgba(255, 255, 255, 0.9);
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-close-btn svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.modal-body {
+	padding: 1.5rem;
+}
+
+.modal-message {
+	margin: 0 0 1rem 0;
+	font-size: 0.95rem;
+	color: rgba(255, 255, 255, 0.85);
+	line-height: 1.5;
+}
+
+.modal-message code {
+	background: rgba(0, 0, 0, 0.3);
+	padding: 0.2em 0.5em;
+	border-radius: 0.25rem;
+	font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+	font-size: 0.9em;
+	color: rgba(255, 255, 255, 0.95);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-input {
+	width: 100%;
+	background: rgba(0, 0, 0, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.5rem;
+	padding: 0.75rem 1rem;
+	color: #fff;
+	font-size: 0.95rem;
+	font-family: inherit;
+	outline: none;
+	transition: all 0.2s;
+	box-sizing: border-box;
+}
+
+.modal-input:focus {
+	border-color: rgba(255, 255, 255, 0.3);
+	background: rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+}
+
+.modal-input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+.modal-footer {
+	padding: 1rem 1.5rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	display: flex;
+	gap: 0.75rem;
+	justify-content: flex-end;
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-btn {
+	padding: 0.625rem 1.25rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: all 0.2s;
+	width: auto;
+	margin: 0;
+}
+
+.modal-btn-secondary {
+	background: rgba(255, 255, 255, 0.1);
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-btn-secondary:hover {
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+}
+
+.modal-btn-primary {
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+	box-shadow: inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.modal-btn-primary:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-btn-danger {
+	background: rgba(239, 68, 68, 0.9);
+	color: #fff;
+}
+
+.modal-btn-danger:hover {
+	background: rgb(220, 38, 38);
 }

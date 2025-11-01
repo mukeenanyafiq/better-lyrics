@@ -32,6 +32,158 @@ let isUserTyping = false;
 let saveCount = 0;
 const SAVE_DEBOUNCE_DELAY = 1000;
 
+const modalOverlay = document.getElementById("modal-overlay") as HTMLElement;
+const modalTitle = document.getElementById("modal-title") as HTMLElement;
+const modalMessage = document.getElementById("modal-message") as HTMLElement;
+const modalInput = document.getElementById("modal-input") as HTMLInputElement;
+const modalConfirmBtn = document.getElementById("modal-confirm") as HTMLButtonElement;
+const modalCancelBtn = document.getElementById("modal-cancel") as HTMLButtonElement;
+const modalCloseBtn = document.getElementById("modal-close") as HTMLButtonElement;
+
+interface ModalOptions {
+  title: string;
+  message: string;
+  inputPlaceholder?: string;
+  inputValue?: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmDanger?: boolean;
+  showInput?: boolean;
+}
+
+function showModal(options: ModalOptions): Promise<string | null> {
+  return new Promise(resolve => {
+    modalTitle.textContent = options.title;
+    modalMessage.innerHTML = options.message;
+    modalConfirmBtn.textContent = options.confirmText || "Confirm";
+    modalCancelBtn.textContent = options.cancelText || "Cancel";
+
+    if (options.confirmDanger) {
+      modalConfirmBtn.classList.add("modal-btn-danger");
+      modalConfirmBtn.classList.remove("modal-btn-primary");
+    } else {
+      modalConfirmBtn.classList.add("modal-btn-primary");
+      modalConfirmBtn.classList.remove("modal-btn-danger");
+    }
+
+    if (options.showInput) {
+      modalInput.style.display = "block";
+      modalInput.placeholder = options.inputPlaceholder || "";
+      modalInput.value = options.inputValue || "";
+      modalMessage.style.marginBottom = "1rem";
+    } else {
+      modalInput.style.display = "none";
+      modalMessage.style.marginBottom = "0";
+    }
+
+    modalOverlay.style.display = "flex";
+
+    requestAnimationFrame(() => {
+      modalOverlay.classList.add("active");
+    });
+
+    if (options.showInput) {
+      setTimeout(() => {
+        modalInput.focus();
+        modalInput.select();
+      }, 100);
+    }
+
+    const cleanup = (withAnimation = true) => {
+      if (withAnimation) {
+        const modal = modalOverlay.querySelector(".modal");
+        if (modal) {
+          modal.classList.add("closing");
+        }
+        modalOverlay.classList.remove("active");
+
+        setTimeout(() => {
+          modalOverlay.style.display = "none";
+          if (modal) {
+            modal.classList.remove("closing");
+          }
+        }, 200);
+      } else {
+        modalOverlay.classList.remove("active");
+        modalOverlay.style.display = "none";
+      }
+
+      modalConfirmBtn.onclick = null;
+      modalCancelBtn.onclick = null;
+      modalCloseBtn.onclick = null;
+      modalOverlay.onclick = null;
+      modalInput.onkeydown = null;
+      document.onkeydown = null;
+    };
+
+    const handleConfirm = () => {
+      const value = options.showInput ? modalInput.value : "confirmed";
+      cleanup();
+      resolve(value);
+    };
+
+    const handleCancel = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    modalConfirmBtn.onclick = handleConfirm;
+    modalCancelBtn.onclick = handleCancel;
+    modalCloseBtn.onclick = handleCancel;
+
+    modalOverlay.onclick = e => {
+      if (e.target === modalOverlay) {
+        handleCancel();
+      }
+    };
+
+    modalInput.onkeydown = e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleConfirm();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        handleCancel();
+      }
+    };
+
+    document.onkeydown = e => {
+      if (e.key === "Escape" && modalOverlay.classList.contains("active")) {
+        e.preventDefault();
+        handleCancel();
+      }
+    };
+  });
+}
+
+async function showPrompt(
+  title: string,
+  message: string,
+  defaultValue = "",
+  placeholder = "",
+  confirmText = "OK"
+): Promise<string | null> {
+  return showModal({
+    title,
+    message,
+    inputValue: defaultValue,
+    inputPlaceholder: placeholder,
+    showInput: true,
+    confirmText,
+  });
+}
+
+async function showConfirm(title: string, message: string, danger = false, confirmText?: string): Promise<boolean> {
+  const result = await showModal({
+    title,
+    message,
+    showInput: false,
+    confirmText: confirmText || (danger ? "Delete" : "OK"),
+    confirmDanger: danger,
+  });
+  return result !== null;
+}
+
 // Storage quota limits (in bytes)
 const SYNC_STORAGE_LIMIT = 7000; // Leave some buffer under 8KB limit
 const MAX_RETRY_ATTEMPTS = 3;
@@ -225,12 +377,15 @@ function createEditorView(state: EditorState, parent: Element) {
   return new EditorView({ state, parent });
 }
 
-const themeSelector = document.getElementById("theme-selector") as HTMLSelectElement | null;
 const syncIndicator = document.getElementById("sync-indicator")!;
 const themeNameDisplay = document.getElementById("theme-name-display");
 const themeNameText = document.getElementById("theme-name-text");
 const editThemeBtn = document.getElementById("edit-theme-btn");
 const deleteThemeBtn = document.getElementById("delete-theme-btn");
+const themeSelectorBtn = document.getElementById("theme-selector-btn") as HTMLButtonElement | null;
+const themeModalOverlay = document.getElementById("theme-modal-overlay") as HTMLElement | null;
+const themeModalClose = document.getElementById("theme-modal-close") as HTMLButtonElement | null;
+const themeModalGrid = document.getElementById("theme-modal-grid") as HTMLElement | null;
 
 let isCustomTheme = false;
 
@@ -282,12 +437,10 @@ function hideThemeName(): void {
 function onChange(state: string) {
   isUserTyping = true;
   if (currentThemeName !== null && !isCustomTheme) {
-    if (themeSelector) {
-      themeSelector.value = "";
-    }
     currentThemeName = null;
     chrome.storage.sync.remove("themeName");
     hideThemeName();
+    updateThemeSelectorButton();
   } else if (isCustomTheme && currentThemeName) {
     debounceSaveCustomTheme();
   }
@@ -351,8 +504,8 @@ const saveToStorageWithFallback = async (
     // Always handle theme name in sync storage (small data)
     if (!isTheme && isUserTyping && !isCustomTheme) {
       await chrome.storage.sync.remove("themeName");
-      if (themeSelector) {
-        themeSelector.value = "";
+      if (themeChoices) {
+        themeChoices.setChoiceByValue("");
       }
       currentThemeName = null;
     }
@@ -385,8 +538,8 @@ function saveToStorage(isTheme = false) {
   if (!isTheme && isUserTyping && !isCustomTheme) {
     // Only remove theme selection if it's not a theme save and the user is typing
     chrome.storage.sync.remove("themeName");
-    if (themeSelector) {
-      themeSelector.value = "";
+    if (themeChoices) {
+      themeChoices.setChoiceByValue("");
     }
     currentThemeName = null;
   }
@@ -475,32 +628,167 @@ async function loadCustomCSS(): Promise<string> {
   return css || "";
 }
 
-async function populateThemeSelector(): Promise<void> {
-  if (!themeSelector) return;
+function updateThemeSelectorButton() {
+  if (themeSelectorBtn) {
+    if (currentThemeName) {
+      themeSelectorBtn.textContent = currentThemeName;
+    } else {
+      themeSelectorBtn.textContent = "Choose a theme";
+    }
+  }
+}
 
-  themeSelector.innerHTML = "<option selected value>Choose a theme</option>";
+async function populateThemeModal(): Promise<void> {
+  if (!themeModalGrid) return;
 
-  const builtInGroup = document.createElement("optgroup");
-  builtInGroup.label = "Built-in Themes";
-  THEMES.forEach((theme, index) => {
-    const option = document.createElement("option");
-    option.value = `builtin-${index}`;
-    option.textContent = `${theme.name} by ${theme.author}`;
-    builtInGroup.appendChild(option);
-  });
-  themeSelector.appendChild(builtInGroup);
+  themeModalGrid.innerHTML = "";
 
   const customThemes = await getCustomThemes();
-  if (customThemes.length > 0) {
-    const customGroup = document.createElement("optgroup");
-    customGroup.label = "Custom Themes";
-    customThemes.forEach((theme, index) => {
-      const option = document.createElement("option");
-      option.value = `custom-${index}`;
-      option.textContent = theme.name;
-      customGroup.appendChild(option);
+
+  // Add built-in themes
+  const builtInSection = document.createElement("div");
+  builtInSection.className = "theme-modal-section";
+  builtInSection.innerHTML = '<h3 class="theme-modal-section-title">Built-in Themes</h3>';
+
+  const builtInGrid = document.createElement("div");
+  builtInGrid.className = "theme-modal-items";
+
+  THEMES.forEach((theme, index) => {
+    const card = createThemeCard({
+      name: theme.name,
+      author: theme.author,
+      isCustom: false,
+      index,
     });
-    themeSelector.appendChild(customGroup);
+    builtInGrid.appendChild(card);
+  });
+
+  builtInSection.appendChild(builtInGrid);
+  themeModalGrid.appendChild(builtInSection);
+
+  // Add custom themes if any
+  if (customThemes.length > 0) {
+    const customSection = document.createElement("div");
+    customSection.className = "theme-modal-section";
+    customSection.innerHTML = '<h3 class="theme-modal-section-title">Custom Themes</h3>';
+
+    const customGrid = document.createElement("div");
+    customGrid.className = "theme-modal-items";
+
+    customThemes.forEach((theme, index) => {
+      const card = createThemeCard({
+        name: theme.name,
+        author: "You",
+        isCustom: true,
+        index,
+      });
+      customGrid.appendChild(card);
+    });
+
+    customSection.appendChild(customGrid);
+    themeModalGrid.appendChild(customSection);
+  }
+}
+
+function createThemeCard(options: {
+  name: string;
+  author: string;
+  isCustom: boolean;
+  index: number;
+}): HTMLElement {
+  const card = document.createElement("div");
+  card.className = "theme-card";
+
+  if (currentThemeName === options.name) {
+    card.classList.add("selected");
+  }
+
+  const info = document.createElement("div");
+  info.className = "theme-card-info";
+
+  const name = document.createElement("div");
+  name.className = "theme-card-name";
+  name.textContent = options.name;
+  name.title = options.name;
+
+  const author = document.createElement("div");
+  author.className = "theme-card-author";
+  author.textContent = `by ${options.author}`;
+  author.title = `by ${options.author}`;
+
+  info.appendChild(name);
+  info.appendChild(author);
+  card.appendChild(info);
+
+  card.addEventListener("click", () => {
+    selectTheme(options.isCustom, options.index, options.name);
+    closeThemeModal();
+  });
+
+  return card;
+}
+
+async function selectTheme(isCustom: boolean, index: number, themeName: string) {
+  if (isCustom) {
+    const customThemes = await getCustomThemes();
+    const selectedTheme = customThemes[index];
+    if (selectedTheme) {
+      const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${selectedTheme.css}\n`;
+      editor.setState(createEditorState(themeContent));
+
+      chrome.storage.sync.set({ themeName: selectedTheme.name });
+      currentThemeName = selectedTheme.name;
+      isUserTyping = false;
+      saveToStorage(true);
+      showThemeName(selectedTheme.name, true);
+      updateThemeSelectorButton();
+      showAlert(`Applied custom theme: ${selectedTheme.name}`);
+    }
+  } else {
+    const selectedTheme = THEMES[index];
+    if (selectedTheme) {
+      fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`))
+        .then(response => response.text())
+        .then(css => {
+          const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;
+          editor.setState(createEditorState(themeContent));
+
+          chrome.storage.sync.set({ themeName: selectedTheme.name });
+          currentThemeName = selectedTheme.name;
+          isUserTyping = false;
+          saveToStorage(true);
+          showThemeName(selectedTheme.name, false);
+          updateThemeSelectorButton();
+          showAlert(`Applied theme: ${selectedTheme.name}`);
+        });
+    }
+  }
+}
+
+function openThemeModal() {
+  if (themeModalOverlay) {
+    populateThemeModal();
+    themeModalOverlay.style.display = "flex";
+    requestAnimationFrame(() => {
+      themeModalOverlay.classList.add("active");
+    });
+  }
+}
+
+function closeThemeModal() {
+  if (themeModalOverlay) {
+    const modal = themeModalOverlay.querySelector(".theme-modal");
+    if (modal) {
+      modal.classList.add("closing");
+    }
+    themeModalOverlay.classList.remove("active");
+
+    setTimeout(() => {
+      themeModalOverlay.style.display = "none";
+      if (modal) {
+        modal.classList.remove("closing");
+      }
+    }, 200);
   }
 }
 
@@ -509,30 +797,22 @@ async function setThemeName() {
     if (syncData.themeName) {
       const builtInIndex = THEMES.findIndex(theme => theme.name === syncData.themeName);
       if (builtInIndex !== -1) {
-        if (themeSelector) {
-          themeSelector.value = `builtin-${builtInIndex}`;
-        }
         currentThemeName = syncData.themeName;
         showThemeName(syncData.themeName, false);
       } else {
         const customThemes = await getCustomThemes();
         const customIndex = customThemes.findIndex(theme => theme.name === syncData.themeName);
         if (customIndex !== -1) {
-          if (themeSelector) {
-            themeSelector.value = `custom-${customIndex}`;
-          }
           currentThemeName = syncData.themeName;
           showThemeName(syncData.themeName, true);
         } else {
-          if (themeSelector) {
-            themeSelector.value = "";
-          }
           hideThemeName();
         }
       }
     } else {
       hideThemeName();
     }
+    updateThemeSelectorButton();
   });
 }
 
@@ -543,8 +823,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("pages/standalone-editor.html") });
   });
 
-  await populateThemeSelector();
-
   let setSelectedThemePromise = setThemeName();
 
   let loadCustomCssPromise = loadCustomCSS().then(result => {
@@ -554,51 +832,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await Promise.allSettled([setSelectedThemePromise, loadCustomCssPromise]);
 
-  themeSelector?.addEventListener("change", async function () {
-    if (this.value === "") {
-      editor.setState(createEditorState(""));
-      saveToStorage();
-      chrome.storage.sync.remove("themeName");
-      currentThemeName = null;
-      hideThemeName();
-      showAlert("Cleared theme");
-      return;
+  // Theme modal event listeners
+  themeSelectorBtn?.addEventListener("click", openThemeModal);
+
+  themeModalClose?.addEventListener("click", closeThemeModal);
+
+  themeModalOverlay?.addEventListener("click", e => {
+    if (e.target === themeModalOverlay) {
+      closeThemeModal();
     }
+  });
 
-    const [type, indexStr] = this.value.split("-");
-    const index = parseInt(indexStr, 10);
-
-    if (type === "builtin") {
-      const selectedTheme = THEMES[index];
-      if (selectedTheme) {
-        fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`))
-          .then(response => response.text())
-          .then(css => {
-            const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;
-            editor.setState(createEditorState(themeContent));
-
-            chrome.storage.sync.set({ themeName: selectedTheme.name });
-            currentThemeName = selectedTheme.name;
-            isUserTyping = false;
-            saveToStorage(true);
-            showThemeName(selectedTheme.name, false);
-            showAlert(`Applied theme: ${selectedTheme.name}`);
-          });
-      }
-    } else if (type === "custom") {
-      const customThemes = await getCustomThemes();
-      const selectedTheme = customThemes[index];
-      if (selectedTheme) {
-        const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${selectedTheme.css}\n`;
-        editor.setState(createEditorState(themeContent));
-
-        chrome.storage.sync.set({ themeName: selectedTheme.name });
-        currentThemeName = selectedTheme.name;
-        isUserTyping = false;
-        saveToStorage(true);
-        showThemeName(selectedTheme.name, true);
-        showAlert(`Applied custom theme: ${selectedTheme.name}`);
-      }
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && themeModalOverlay?.classList.contains("active")) {
+      closeThemeModal();
     }
   });
 
@@ -609,9 +856,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const themeName = prompt("Enter a name for this theme:");
+    const themeName = await showPrompt("Save as Theme", "Enter a name for this theme:", "", "Theme name");
     if (!themeName || themeName.trim() === "") {
-      showAlert("Theme name cannot be empty!");
       return;
     }
 
@@ -619,18 +865,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       await saveCustomTheme(themeName.trim(), cleanCss);
-      await populateThemeSelector();
 
       chrome.storage.sync.set({ themeName: themeName.trim() });
       currentThemeName = themeName.trim();
 
-      const customThemes = await getCustomThemes();
-      const themeIndex = customThemes.findIndex(t => t.name === themeName.trim());
-      if (themeSelector && themeIndex !== -1) {
-        themeSelector.value = `custom-${themeIndex}`;
-      }
-
       showThemeName(themeName.trim(), true);
+      updateThemeSelectorButton();
       showAlert(`Saved custom theme: ${themeName.trim()}`);
     } catch (error) {
       console.error("Error saving theme:", error);
@@ -638,67 +878,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  themeSelector?.addEventListener("contextmenu", async e => {
-    e.preventDefault();
-    const selectElement = e.target as HTMLSelectElement;
-    const selectedValue = selectElement.value;
-
-    if (!selectedValue || !selectedValue.startsWith("custom-")) {
-      return;
-    }
-
-    const confirmed = confirm("Delete this custom theme?");
-    if (!confirmed) return;
-
-    const [, indexStr] = selectedValue.split("-");
-    const index = parseInt(indexStr, 10);
-
-    const customThemes = await getCustomThemes();
-    const themeToDelete = customThemes[index];
-
-    if (themeToDelete) {
-      try {
-        await deleteCustomTheme(themeToDelete.name);
-        await populateThemeSelector();
-
-        if (currentThemeName === themeToDelete.name) {
-          chrome.storage.sync.remove("themeName");
-          currentThemeName = null;
-          if (themeSelector) {
-            themeSelector.value = "";
-          }
-        }
-
-        showAlert(`Deleted custom theme: ${themeToDelete.name}`);
-      } catch (error) {
-        console.error("Error deleting theme:", error);
-        showAlert("Failed to delete theme!");
-      }
-    }
-  });
-
   const renameTheme = async () => {
     if (!currentThemeName || !isCustomTheme) return;
 
-    const newName = prompt("Enter new theme name:", currentThemeName);
+    const newName = await showPrompt(
+      "Rename Theme",
+      "Enter a new name for this theme:",
+      currentThemeName,
+      "Theme name"
+    );
     if (!newName || newName.trim() === "" || newName.trim() === currentThemeName) {
       return;
     }
 
     try {
       await renameCustomTheme(currentThemeName, newName.trim());
-      await populateThemeSelector();
 
       currentThemeName = newName.trim();
       chrome.storage.sync.set({ themeName: currentThemeName });
 
-      const customThemes = await getCustomThemes();
-      const themeIndex = customThemes.findIndex(t => t.name === currentThemeName);
-      if (themeSelector && themeIndex !== -1) {
-        themeSelector.value = `custom-${themeIndex}`;
-      }
-
       showThemeName(currentThemeName, true);
+      updateThemeSelectorButton();
       showAlert(`Theme renamed to: ${currentThemeName}`);
     } catch (error: any) {
       console.error("Error renaming theme:", error);
@@ -710,20 +910,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   deleteThemeBtn?.addEventListener("click", async () => {
     if (!currentThemeName || !isCustomTheme) return;
 
-    const confirmed = confirm(`Delete custom theme "${currentThemeName}"?`);
+    const confirmed = await showConfirm(
+      "Delete Theme",
+      `Are you sure you want to delete the theme <code>${currentThemeName}</code>?`,
+      true
+    );
     if (!confirmed) return;
 
     try {
       await deleteCustomTheme(currentThemeName);
-      await populateThemeSelector();
 
       chrome.storage.sync.remove("themeName");
       currentThemeName = null;
-      if (themeSelector) {
-        themeSelector.value = "";
-      }
 
       hideThemeName();
+      updateThemeSelectorButton();
       showAlert("Custom theme deleted!");
     } catch (error) {
       console.error("Error deleting theme:", error);
@@ -829,8 +1030,8 @@ document.getElementById("file-import-btn")!.addEventListener("click", () => {
       .then(css => {
         editor.setState(createEditorState(css as string));
 
-        if (themeSelector) {
-          themeSelector.value = "";
+        if (themeChoices) {
+          themeChoices.setChoiceByValue("");
         }
         currentThemeName = null;
         chrome.storage.sync.remove("themeName");

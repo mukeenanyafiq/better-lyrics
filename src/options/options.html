@@ -454,13 +454,9 @@
 				<p>Customize the appearance of Better Lyrics.</p>
 				<div class="container">
 					<span>Theme</span>
-					<div class="btn-group">
-						<div class="select select-large">
-							<select id="theme-selector">
-								<option selected value>Choose a theme</option>
-							</select>
-						</div>
-					</div>
+					<button class="small-btn" id="theme-selector-btn">
+						Choose a theme
+					</button>
 				</div>
 				<div class="container">
 					<span>Custom CSS</span>
@@ -483,6 +479,64 @@
 			</div>
 		</div>
 		<div id="status"></div>
+
+		<div id="modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="modal-message" class="modal-message"></p>
+					<input
+						type="text"
+						id="modal-input"
+						class="modal-input"
+						placeholder=""
+					/>
+				</div>
+				<div class="modal-footer">
+					<button id="modal-cancel" class="modal-btn modal-btn-secondary">
+						Cancel
+					</button>
+					<button id="modal-confirm" class="modal-btn modal-btn-primary">
+						Confirm
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="theme-modal-overlay" class="modal-overlay">
+			<div class="modal theme-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Select a Theme</h3>
+					<button id="theme-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="theme-modal-body">
+					<div id="theme-modal-grid"></div>
+				</div>
+			</div>
+		</div>
 
 		<div id="css">
 			<div id="theme-name-display" class="theme-name-display">

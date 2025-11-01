@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { TStatus, cn, getApiStatus } from "../utils/functions";
+import { cn, getApiStatus, type TStatus } from "../utils/functions";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Card } from "./ui/card";
 
