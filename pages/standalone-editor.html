@@ -145,6 +145,11 @@
 				</button>
 			</div>
 			<p class="note" style="margin-left: 1em">
+				Tip: This is a standalone tab, you can move this editor to a separate
+				window or use split-screen view alongside YouTube Music to see your
+				changes in real-time.
+			</p>
+			<p class="note" style="margin-left: 1em; margin-top: 0; opacity: 0.8">
 				Note: You can use
 				<a
 					href="https://developer.mozilla.org/en-US/docs/Web/CSS"
@@ -160,6 +165,43 @@
 				>.
 			</p>
 			<div id="status-css"></div>
+		</div>
+
+		<div id="modal-overlay" class="modal-overlay">
+			<div id="modal" class="modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p id="modal-message" class="modal-message"></p>
+					<input
+						type="text"
+						id="modal-input"
+						class="modal-input"
+						placeholder="Enter new name"
+						style="display: none"
+					/>
+				</div>
+				<div class="modal-footer">
+					<button id="modal-cancel" class="modal-btn modal-btn-secondary">
+						Cancel
+					</button>
+					<button id="modal-confirm" class="modal-btn modal-btn-primary">
+						Confirm
+					</button>
+				</div>
+			</div>
 		</div>
 	</body>
 	<script type="module" defer src="../src/options/editor.ts"></script>
