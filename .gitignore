@@ -25,3 +25,6 @@ Thumbs.db
 
 .idea/*
 .claude
+
+# Ignore test coverage reports
+coverage/
