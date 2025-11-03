@@ -1,4 +1,4 @@
-import chrome from 'sinon-chrome';
+import chrome from "sinon-chrome";
 
 // Setup chrome API mocks globally
 (global as any).chrome = chrome;

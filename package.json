@@ -10,7 +10,7 @@
         "start": "extension start --polyfill",
         "build": "extension build --browser all --polyfill",
         "preview": "extension preview --polyfill",
-        "lint": "npx @biomejs/biome lint --write . && npx @biomejs/biome format --write .",
+        "lint": "biome lint --write . && biome format --write .",
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "tsc --noEmit",
         "test": "jest",

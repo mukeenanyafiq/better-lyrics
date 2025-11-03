@@ -18,7 +18,7 @@ let cache: Cache = {
 };
 
 export async function translateText(text: string, targetLanguage: string): Promise<TranslationResult | null> {
-  if (text.trim() === '') {
+  if (text.trim() === "") {
     return null;
   }
 
@@ -53,7 +53,7 @@ export async function translateText(text: string, targetLanguage: string): Promi
 }
 
 export async function translateTextIntoRomaji(lang: string, text: string): Promise<string | null> {
-  if (text.trim() === '') {
+  if (text.trim() === "") {
     return null;
   }
 

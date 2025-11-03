@@ -1,23 +1,29 @@
-import chrome from 'sinon-chrome';
-import type { Lyric, LyricPart, LyricSourceResult, ProviderParameters, SourceMapType } from '@/modules/lyrics/providers/shared';
+import chrome from "sinon-chrome";
+import type {
+  Lyric,
+  LyricPart,
+  LyricSourceResult,
+  ProviderParameters,
+  SourceMapType,
+} from "@/modules/lyrics/providers/shared";
 
 /**
  * Mock factory for creating test ProviderParameters
  */
 export function createMockProviderParameters(overrides?: Partial<ProviderParameters>): ProviderParameters {
   return {
-    song: 'Test Song',
-    artist: 'Test Artist',
+    song: "Test Song",
+    artist: "Test Artist",
     duration: 180,
-    videoId: 'test-video-id',
+    videoId: "test-video-id",
     audioTrackData: {
-      captionTracks: []
+      captionTracks: [],
     } as any,
-    album: 'Test Album',
+    album: "Test Album",
     sourceMap: {} as SourceMapType,
     alwaysFetchMetadata: false,
     signal: new AbortController().signal,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -27,9 +33,9 @@ export function createMockProviderParameters(overrides?: Partial<ProviderParamet
 export function createMockLyric(overrides?: Partial<Lyric>): Lyric {
   return {
     startTimeMs: 0,
-    words: 'Test lyric line',
+    words: "Test lyric line",
     durationMs: 5000,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -39,10 +45,10 @@ export function createMockLyric(overrides?: Partial<Lyric>): Lyric {
 export function createMockLyricPart(overrides?: Partial<LyricPart>): LyricPart {
   return {
     startTimeMs: 0,
-    words: 'Test',
+    words: "Test",
     durationMs: 1000,
     isBackground: false,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -52,11 +58,11 @@ export function createMockLyricPart(overrides?: Partial<LyricPart>): LyricPart {
 export function createMockLyricSourceResult(overrides?: Partial<LyricSourceResult>): LyricSourceResult {
   return {
     lyrics: [createMockLyric()],
-    language: 'en',
-    source: 'Test Source',
-    sourceHref: 'https://example.com',
+    language: "en",
+    source: "Test Source",
+    sourceHref: "https://example.com",
     cacheAllowed: true,
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -71,13 +77,13 @@ export function mockChromeStorage(data: Record<string, any> = {}) {
 
     if (keys === null || keys === undefined) {
       Object.assign(result, storageData);
-    } else if (typeof keys === 'string') {
+    } else if (typeof keys === "string") {
       result[keys] = storageData[keys];
     } else if (Array.isArray(keys)) {
       keys.forEach(key => {
         result[key] = storageData[key];
       });
-    } else if (typeof keys === 'object') {
+    } else if (typeof keys === "object") {
       Object.keys(keys).forEach(key => {
         result[key] = storageData[key] !== undefined ? storageData[key] : keys[key];
       });
@@ -102,13 +108,13 @@ export function mockChromeStorage(data: Record<string, any> = {}) {
 
     if (keys === null || keys === undefined) {
       Object.assign(result, storageData);
-    } else if (typeof keys === 'string') {
+    } else if (typeof keys === "string") {
       result[keys] = storageData[keys];
     } else if (Array.isArray(keys)) {
       keys.forEach(key => {
         result[key] = storageData[key];
       });
-    } else if (typeof keys === 'object') {
+    } else if (typeof keys === "object") {
       Object.keys(keys).forEach(key => {
         result[key] = storageData[key] !== undefined ? storageData[key] : keys[key];
       });
@@ -167,10 +173,10 @@ export function createMockFetchResponse(data: any, options: Partial<Response> = 
   return {
     ok: true,
     status: 200,
-    statusText: 'OK',
+    statusText: "OK",
     json: async () => data,
     text: async () => JSON.stringify(data),
-    ...options
+    ...options,
   } as Response;
 }
 
@@ -181,7 +187,7 @@ export function mockFetch(responses: Map<string, any> = new Map()) {
   const originalFetch = global.fetch;
 
   global.fetch = jest.fn((url: string | URL | Request) => {
-    const urlString = typeof url === 'string' ? url : url.toString();
+    const urlString = typeof url === "string" ? url : url.toString();
 
     for (const [pattern, response] of responses.entries()) {
       if (urlString.includes(pattern)) {
