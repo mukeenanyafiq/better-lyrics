@@ -11,7 +11,6 @@ export const stylelintConfig: Config = {
   rules: {
     "annotation-no-unknown": true,
     "at-rule-no-unknown": true,
-    "block-no-empty": true,
     "comment-no-empty": true,
     "custom-property-no-missing-var-function": true,
     "declaration-block-no-duplicate-custom-properties": true,
@@ -35,7 +34,6 @@ export const stylelintConfig: Config = {
     "no-descending-specificity": true,
     "no-duplicate-at-import-rules": true,
     "no-duplicate-selectors": true,
-    "no-empty-source": true,
     "no-invalid-double-slash-comments": true,
     "no-invalid-position-at-import-rule": true,
     "no-irregular-whitespace": true,
