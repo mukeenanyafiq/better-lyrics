@@ -41,11 +41,11 @@ const startLyricsTick = () => {
     const player = document.getElementById("movie_player");
     if (player) {
       try {
-        const now = Date.now() / 1000;
+        const now = Date.now();
         if (lastPlayerTimestamp === 0) 
           lastPlayerTimestamp = now;
 
-        const timeDiff = now - lastPlayerTimestamp;
+        const timeDiff = (now - lastPlayerTimestamp) / 1000;
         const currentTime = player.getCurrentTime();
         const time = currentTime === lastPlayerTime ? currentTime + timeDiff : currentTime;
         const { video_id, title, author } = player.getVideoData();
