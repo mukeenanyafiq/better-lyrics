@@ -47,20 +47,26 @@ const startLyricsTick = () => {
 
         const timeDiff = (now - lastPlayerTimestamp) / 1000;
         const currentTime = player.getCurrentTime();
+
+        // Interpolate time only if the player time hasn't changed
+        // or else the timeDiff will be added to the current timestamp until (timeDiff is always behind by one frame, this is not a bug).
         const time = currentTime === lastPlayerTime ? currentTime + timeDiff : currentTime;
+        
         const { video_id, title, author } = player.getVideoData();
         const audioTrackData = player.getAudioTrack();
         const duration = player.getDuration();
         const { isPlaying, isBuffering } = player.getPlayerStateObject();
-        if (!isPlaying) {
-          lastPlayerTimestamp = now;
-          lastPlayerTime = currentTime;
-        }
         const contentRect = player.getVideoContentRect();
+
+        if (currentTime !== lastPlayerTime || !isPlaying) {
+          lastPlayerTime = currentTime;
+          lastPlayerTimestamp = now;
+        }
+        
         document.dispatchEvent(
           new CustomEvent("blyrics-send-player-time", {
             detail: {
-              currentTime: isPlaying ? time : currentTime,
+              currentTime: time,
               videoId: video_id,
               song: title,
               artist: author,
@@ -72,11 +78,6 @@ const startLyricsTick = () => {
             },
           })
         );
-
-        if (currentTime !== lastPlayerTime) {
-          lastPlayerTime = currentTime;
-          lastPlayerTimestamp = now;
-        }
       } catch (e) {
         console.log(e);
         stopLyricsTick();
