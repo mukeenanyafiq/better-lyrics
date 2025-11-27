@@ -17,6 +17,7 @@ export class EditorStateManager {
   private saveCount = 0;
   private isUserTyping = false;
   private isProgrammaticChange = false;
+  private isSaving = false;
   private saveTimeout: number | null = null;
   private saveCustomThemeTimeout: number | null = null;
 
@@ -72,6 +73,15 @@ export class EditorStateManager {
     return this.isProgrammaticChange;
   }
 
+  getIsSaving(): boolean {
+    return this.isSaving;
+  }
+
+  setIsSaving(value: boolean): void {
+    this.isSaving = value;
+    console.log(`[EditorStateManager] isSaving set to: ${value}`);
+  }
+
   getSaveTimeout(): number | null {
     return this.saveTimeout;
   }
@@ -110,21 +120,22 @@ export class EditorStateManager {
     this.isProcessing = true;
     console.log(`[EditorStateManager] Processing queue (${this.operationQueue.length} operations)`);
 
-    while (this.operationQueue.length > 0) {
-      const operation = this.operationQueue.shift()!;
-      console.log(`[EditorStateManager] Executing operation: ${operation.type} (${operation.id})`);
+    try {
+      while (this.operationQueue.length > 0) {
+        const operation = this.operationQueue.shift()!;
+        console.log(`[EditorStateManager] Executing operation: ${operation.type} (${operation.id})`);
 
-      try {
-        await operation.execute();
-        console.log(`[EditorStateManager] Operation completed: ${operation.type} (${operation.id})`);
-      } catch (error) {
-        console.error(`[EditorStateManager] Operation failed: ${operation.type} (${operation.id})`, error);
-        throw error;
+        try {
+          await operation.execute();
+          console.log(`[EditorStateManager] Operation completed: ${operation.type} (${operation.id})`);
+        } catch (error) {
+          console.error(`[EditorStateManager] Operation failed: ${operation.type} (${operation.id})`, error);
+        }
       }
+    } finally {
+      this.isProcessing = false;
+      console.log("[EditorStateManager] Queue processing complete");
     }
-
-    this.isProcessing = false;
-    console.log("[EditorStateManager] Queue processing complete");
   }
 
   async queueOperation(type: OperationType, execute: () => Promise<void>): Promise<void> {
