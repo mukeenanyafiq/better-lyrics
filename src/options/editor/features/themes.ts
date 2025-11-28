@@ -67,7 +67,7 @@ export class ThemeManager {
       throw new Error(`Built-in theme at index ${index} not found`);
     }
 
-    const response = await fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`));
+    const response = await fetch(chrome.runtime.getURL(`/css/themes/${selectedTheme.path}`));
     const css = await response.text();
 
     const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;

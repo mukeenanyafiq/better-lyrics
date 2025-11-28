@@ -3,24 +3,6 @@
  * Handles real-time player state monitoring and event dispatching.
  */
 
-/**
- * Interval ID for the lyrics tick timer.
- * @type {number|null|undefined}
- */
-let tickLyricsInterval;
-
-/**
- * Last recorded player time to detect changes.
- * @type {number}
- */
-let lastPlayerTime = 0;
-
-/**
- * Last recorded player timestamp to interpolate time.
- * @type {number}
- */
-let lastPlayerTimestamp = 0;
-
 // Get all player methods (paste in broswer console)
 // for(i in document.getElementById("movie_player")) {
 //     if (typeof document.getElementById("movie_player")[i] === 'function' && i.includes("get")) {
@@ -34,8 +16,24 @@ let lastPlayerTimestamp = 0;
  * Dispatches custom events with player information every 20ms for real-time sync.
  * Automatically stops the previous interval if one exists.
  */
-const startLyricsTick = () => {
-  stopLyricsTick();
+export default function startLyricsTick() {
+  /**
+   * Interval ID for the lyrics tick timer.
+   * @type {number|null|undefined}
+   */
+  let tickLyricsInterval;
+
+  /**
+   * Last recorded player time to detect changes.
+   * @type {number}
+   */
+  let lastPlayerTime = 0;
+
+  /**
+   * Last recorded player timestamp to interpolate time.
+   * @type {number}
+   */
+  let lastPlayerTimestamp = 0;
 
   tickLyricsInterval = setInterval(function () {
     const player = document.getElementById("movie_player");
@@ -82,19 +80,6 @@ const startLyricsTick = () => {
       }
     }
   }, 20);
+
+  return () => clearInterval(tickLyricsInterval);
 };
-
-/**
- * Stops the lyrics tick interval and clears the timer.
- * Called when the page is unloaded or when an error occurs.
- */
-const stopLyricsTick = () => {
-  if (tickLyricsInterval) {
-    clearInterval(tickLyricsInterval);
-    tickLyricsInterval = null;
-  }
-};
-
-window.addEventListener("unload", stopLyricsTick);
-
-startLyricsTick();

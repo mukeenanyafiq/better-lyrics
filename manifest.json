@@ -26,22 +26,16 @@
   "web_accessible_resources": [
     {
       "matches": [
-        "*://music.youtube.com/*"
+        "<all_urls>"
       ],
       "resources": [
-        "css/ytmusic.css",
-        "css/blyrics.css",
-        "css/disablestylizedanimations.css",
-        "css/themesong.css",
-        "css/themes/*.css",
-        "*.js.map",
-        "src/options/standalone-editor.html"
+        "/css/*",
+        "*.js.map"
       ]
     }
   ],
   "chromium:background": {
-    "service_worker": "src/options/background.ts",
-    "type": "module"
+    "service_worker": "src/options/background.ts"
   },
   "gecko:background": {
     "scripts": [
@@ -72,7 +66,7 @@
         "*://music.youtube.com/*"
       ],
       "js": [
-        "public/earlyInject.js"
+        "scripts/earlyInject.js"
       ],
       "run_at": "document_start",
       "world": "MAIN"
@@ -82,7 +76,7 @@
         "*://music.youtube.com/*"
       ],
       "js": [
-        "public/script.js"
+        "scripts/script.js"
       ],
       "run_at": "document_end",
       "world": "MAIN"

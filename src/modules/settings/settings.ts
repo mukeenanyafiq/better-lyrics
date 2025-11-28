@@ -3,8 +3,8 @@ import * as Constants from "@constants";
 import * as Utils from "@core/utils";
 import * as Translation from "@modules/lyrics/translation";
 import * as Storage from "@core/storage";
-import { AppState } from "@/index";
-import * as BetterLyrics from "@/index";
+import { AppState } from "@/app";
+import * as BetterLyrics from "@/app";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 
 type EnableDisableCallback = () => void;

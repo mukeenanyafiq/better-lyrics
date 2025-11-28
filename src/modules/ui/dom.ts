@@ -1,7 +1,7 @@
 import * as Utils from "@utils";
 import * as Constants from "@constants";
 import * as Observer from "./observer";
-import { AppState } from "@/index";
+import { AppState } from "@/app";
 import { animEngineState, getResumeScrollElement, reflow, toMs } from "@modules/ui/animationEngine";
 
 let backgroundChangeObserver: MutationObserver | null = null;
@@ -377,7 +377,7 @@ export async function injectHeadTags(): Promise<void> {
   fontLink.rel = "stylesheet";
   document.head.appendChild(fontLink);
 
-  const cssFiles = ["css/ytmusic.css", "css/blyrics.css", "css/themesong.css"];
+  const cssFiles = ["/css/ytmusic.css", "/css/blyrics.css", "/css/themesong.css"];
 
   let css = "";
   const responses = await Promise.all(

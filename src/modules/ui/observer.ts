@@ -1,9 +1,9 @@
 import * as Settings from "@modules/settings/settings";
 import * as Dom from "./dom";
 import * as Constants from "@constants";
-import type { PlayerDetails } from "@/index";
-import * as BetterLyrics from "@/index";
-import { AppState } from "@/index";
+import type { PlayerDetails } from "@/app";
+import * as BetterLyrics from "@/app";
+import { AppState } from "@/app";
 import * as Utils from "@utils";
 import { animEngineState, getResumeScrollElement, animationEngine } from "@modules/ui/animationEngine";
 

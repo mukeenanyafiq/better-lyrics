@@ -1,4 +1,4 @@
-import { AppState } from "@/index";
+import { AppState } from "@/app";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
