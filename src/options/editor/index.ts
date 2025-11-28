@@ -106,7 +106,11 @@ export async function initializeEditor() {
   console.log("[BetterLyrics] DOM loaded, initializing editor");
 
   const editorElement = document.getElementById("editor")!;
-  const initialEditor = createEditorView(createEditorState("Loading..."), editorElement);
+  const isStandalone = document.querySelector(".theme-name-display.standalone") !== null;
+  const initialEditor = createEditorView(
+    createEditorState("Loading...", { enableSearch: isStandalone }),
+    editorElement
+  );
 
   editorStateManager.setEditor(initialEditor);
 
