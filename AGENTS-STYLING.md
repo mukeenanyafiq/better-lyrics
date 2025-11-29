@@ -110,9 +110,9 @@ Override these variables in custom CSS to create themes:
 | `.blyrics-container` | Main lyrics wrapper |
 | `.blyrics--line` | Each lyric line |
 | `.blyrics--word` | Each word in a line |
-| `.blyrics--animating` | Currently active/animating element |
+| `.blyrics--animating` | Currently active/animating element (USE THIS for styling) |
 | `.blyrics--pre-animating` | Element about to animate |
-| `.blyrics--active` | Currently highlighted lyric |
+| `.blyrics--active` | Currently highlighted lyric (AVOID for styling - use `.blyrics--animating`) |
 | `.blyrics-rtl` | RTL language support |
 | `.blyrics--translated` | Translated text |
 | `.blyrics--romanized` | Romanized text |
@@ -173,21 +173,40 @@ Key animation custom properties set by JS:
 }
 ```
 
-### Pattern 3: Blur Effect for Inactive Lines (Spotlight.css)
+### Pattern 3: Blur Effect for Inactive Lines
 
-Use `:has()` selector to blur lines before the active one:
+Use `.blyrics--animating` for styling active lines, but `.blyrics--active` in `:has()` checks:
 
 ```css
-.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--line:has(~ .blyrics--active):not(.blyrics--active) {
-  opacity: 0.5;
-  filter: blur(2.5px);
-  transition: filter 0.5s 0.35s, opacity 0.5s 0.35s;
+.blyrics-container > div {
+  opacity: 0.2;
+  filter: blur(6px);
+  transition: opacity 0.7s ease-out,
+    filter 0.7s ease-out,
+    transform 1.66s ease-out;
 }
-.blyrics-container > div.blyrics--active {
+
+.blyrics-container > div.blyrics--animating:not(:empty):not(.blyrics--translated):not(.blyrics--romanized) {
   opacity: 1;
   filter: blur(0px);
+  transition: opacity 0.7s ease calc(var(--blyrics-anim-delay) - 0.3s),
+    filter 0.7s ease calc(var(--blyrics-anim-delay) - 0.3s),
+    transform 1.666s ease calc(var(--blyrics-anim-delay) - 0.3s);
+}
+
+.blyrics-user-scrolling > div:not(.blyrics--animating) {
+  opacity: 1 !important;
+  filter: blur(0px) !important;
+  transition: opacity 0.4s ease, filter 0.4s ease, transform 0.5s ease calc(var(--blyrics-anim-delay, 0s) - 0.1s);
+}
+
+.blyrics-container:not(:has(.blyrics--active)) > div {
+  opacity: 1;
+  filter: none;
 }
 ```
+
+Note: Use `.blyrics--active` in `:has()` to detect if any lyric is highlighted (e.g., show all during instrumentals).
 
 ### Pattern 4: Use Duration Variable for Timing
 
@@ -319,12 +338,14 @@ ytmusic-player-page::before {
 
 | Selector | When to Use |
 |----------|-------------|
-| `.blyrics--active` | Currently highlighted line |
-| `.blyrics--animating` | Line/word currently animating |
+| `.blyrics--animating` | Styling the active line (PREFERRED) |
 | `.blyrics-user-scrolling` | User is manually scrolling (disable effects) |
-| `:has(~ .blyrics--active)` | Lines BEFORE active line |
-| `.blyrics--active ~ div` | Lines AFTER active line |
-| `:not(:has(.blyrics--active))` | No active line (e.g., instrumental) |
+| `:not(:has(.blyrics--active))` | No highlighted lyric (e.g., instrumental sections) |
+
+**Class usage:**
+- Use `.blyrics--animating` for **styling** active lines
+- Use `.blyrics--active` only in `:has()` checks to **detect** if any lyric is highlighted
+- Avoid using `.blyrics--active` directly for styling - it causes issues when multiple lyrics are selected
 
 ## Do NOT Modify
 
