@@ -488,11 +488,10 @@ async function loadMarketplace(): Promise<void> {
       grid.appendChild(card);
     });
 
-    applyFiltersToGrid();
+    await applyFiltersToGrid();
 
-    requestAnimationFrame(() => {
-      gridAnimationController = autoAnimate(grid, { duration: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" });
-    });
+    gridAnimationController = autoAnimate(grid, { duration: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" });
+    gridAnimationController.enable();
   } catch (err) {
     console.error("[Marketplace] Failed to load themes:", err);
     if (loading) loading.style.display = "none";
@@ -510,7 +509,12 @@ async function refreshMarketplace(): Promise<void> {
     gridAnimationController = null;
   }
   const grid = document.getElementById("store-modal-grid");
-  if (grid) grid.replaceChildren();
+  if (grid) {
+    const freshGrid = document.createElement("div");
+    freshGrid.id = grid.id;
+    freshGrid.className = grid.className;
+    grid.replaceWith(freshGrid);
+  }
   storeThemesCache = [];
   storeStatsCache = {};
   hiddenCards.clear();
@@ -1522,10 +1526,10 @@ function resetFilters(): void {
   const searchInput = document.getElementById("store-search-input") as HTMLInputElement;
   if (searchInput) searchInput.value = "";
 
-  const defaultSortRadio = document.querySelector(
-    'input[name="store-filter-sort"][value="default"]'
+  const ratingSortRadio = document.querySelector(
+    'input[name="store-filter-sort"][value="rating"]'
   ) as HTMLInputElement;
-  if (defaultSortRadio) defaultSortRadio.checked = true;
+  if (ratingSortRadio) ratingSortRadio.checked = true;
 
   const allRadio = document.querySelector('input[name="store-filter-show"][value="all"]') as HTMLInputElement;
   if (allRadio) allRadio.checked = true;
