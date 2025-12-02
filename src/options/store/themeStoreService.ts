@@ -162,9 +162,30 @@ export async function fetchThemeShaderConfig(
   }
 }
 
+export async function fetchThemeDescription(
+  repo: string,
+  branchOverride?: string
+): Promise<string | null> {
+  const branch = branchOverride ?? (await getDefaultBranch(repo));
+  const url = getRawGitHubUrl(repo, branch, "DESCRIPTION.md");
+
+  try {
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.text();
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchFullTheme(repo: string, branchOverride?: string): Promise<StoreTheme> {
   const branch = branchOverride ?? (await getDefaultBranch(repo));
-  const metadata = await fetchThemeMetadata(repo, branch);
+  const [metadata, descriptionMd] = await Promise.all([
+    fetchThemeMetadata(repo, branch),
+    fetchThemeDescription(repo, branch),
+  ]);
+
+  const description = descriptionMd ?? metadata.description ?? "";
 
   const baseUrl = getRawGitHubUrl(repo, branch, "", false);
   const cssUrl = `${baseUrl}style.css`;
@@ -190,6 +211,7 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
 
   return {
     ...metadata,
+    description,
     repo,
     coverUrl,
     imageUrls: allImageUrls,
@@ -240,11 +262,16 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
   }
 
   try {
-    const metadata = await fetchThemeMetadata(repo, branch);
+    const [metadata, descriptionMd] = await Promise.all([
+      fetchThemeMetadata(repo, branch),
+      fetchThemeDescription(repo, branch),
+    ]);
 
     if (!metadata.id) errors.push("metadata.json missing 'id' field");
     if (!metadata.title) errors.push("metadata.json missing 'title' field");
-    if (!metadata.description) errors.push("metadata.json missing 'description' field");
+    if (!metadata.description && !descriptionMd) {
+      errors.push("Theme must have either 'description' in metadata.json or a DESCRIPTION.md file");
+    }
     if (!metadata.creators || metadata.creators.length === 0) {
       errors.push("metadata.json missing 'creators' field");
     }

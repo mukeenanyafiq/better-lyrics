@@ -10,7 +10,7 @@ export interface ThemeRepoReference {
 export interface StoreThemeMetadata {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   creators: string[];
   minVersion: string;
   hasShaders: boolean;
@@ -19,7 +19,11 @@ export interface StoreThemeMetadata {
   images?: string[];
 }
 
-export interface StoreTheme extends StoreThemeMetadata {
+export interface ResolvedStoreThemeMetadata extends Omit<StoreThemeMetadata, "description"> {
+  description: string;
+}
+
+export interface StoreTheme extends ResolvedStoreThemeMetadata {
   repo: string;
   coverUrl: string;
   imageUrls: string[];
