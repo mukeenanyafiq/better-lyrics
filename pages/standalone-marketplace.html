@@ -36,10 +36,18 @@
 							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
 						</svg>
 						<input type="text" id="store-search-input" class="store-search-input" placeholder="Search themes..." />
+						<div class="search-shortcut-hint">
+							<kbd id="search-mod-key">⌘</kbd><kbd>K</kbd>
+						</div>
 					</div>
-					<button id="store-refresh-btn" class="store-refresh-btn" title="Refresh">
+					<button id="store-refresh-btn" class="store-refresh-btn" title="Refresh (R)">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 							<path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0v2.43l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					<button id="shortcuts-btn" class="store-refresh-btn" title="Keyboard shortcuts (?)">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.061-1.061 3 3 0 1 1 2.871 5.026v.345a.75.75 0 0 1-1.5 0v-.5c0-.72.57-1.172 1.081-1.287A1.5 1.5 0 1 0 8.94 6.94ZM10 15a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
 						</svg>
 					</button>
 				</div>
@@ -52,14 +60,17 @@
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-sort" value="rating" checked>
 							<span>Highest rated</span>
+							<kbd>1</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-sort" value="downloads">
 							<span>Most downloaded</span>
+							<kbd>2</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-sort" value="newest">
 							<span>Newest</span>
+							<kbd>3</kbd>
 						</label>
 					</div>
 				</div>
@@ -69,14 +80,17 @@
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-show" value="all" checked>
 							<span>All</span>
+							<kbd>A</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-show" value="installed">
 							<span>Installed</span>
+							<kbd>I</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-show" value="not-installed">
 							<span>Not installed</span>
+							<kbd>N</kbd>
 						</label>
 					</div>
 				</div>
@@ -86,19 +100,22 @@
 						<label class="marketplace-filter-chip">
 							<input type="checkbox" id="store-filter-shaders">
 							<span>Has shaders</span>
+							<kbd>S</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="checkbox" id="store-filter-compatible" checked>
 							<span>Compatible only</span>
+							<kbd>C</kbd>
 						</label>
 					</div>
 				</div>
-				<button id="url-install-btn" class="marketplace-url-btn">
+				<button id="url-install-btn" class="marketplace-url-btn" title="Install from URL (U)">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 						<path d="M12.232 4.232a2.5 2.5 0 0 1 3.536 3.536l-1.225 1.224a.75.75 0 0 0 1.061 1.06l1.224-1.224a4 4 0 0 0-5.656-5.656l-3 3a4 4 0 0 0 .225 5.865.75.75 0 0 0 .977-1.138 2.5 2.5 0 0 1-.142-3.667l3-3Z"/>
 						<path d="M11.603 7.963a.75.75 0 0 0-.977 1.138 2.5 2.5 0 0 1 .142 3.667l-3 3a2.5 2.5 0 0 1-3.536-3.536l1.225-1.224a.75.75 0 0 0-1.061-1.06l-1.224 1.224a4 4 0 1 0 5.656 5.656l3-3a4 4 0 0 0-.225-5.865Z"/>
 					</svg>
 					Install from URL
+					<kbd>U</kbd>
 				</button>
 				<a href="https://github.com/better-lyrics/themes/" target="_blank" rel="noopener noreferrer" class="marketplace-submit-link">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -218,6 +235,155 @@
 				<div class="modal-footer">
 					<button id="url-modal-cancel" class="modal-btn modal-btn-secondary">Cancel</button>
 					<button id="url-modal-install" class="modal-btn modal-btn-primary">Install</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Keyboard Shortcuts Modal -->
+		<div id="shortcuts-modal-overlay" class="modal-overlay">
+			<div class="modal shortcuts-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Keyboard Shortcuts</h3>
+					<button id="shortcuts-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="shortcuts-list">
+						<div class="shortcuts-group">
+							<div class="shortcuts-group-title">Navigation</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Search themes</span>
+								<div class="shortcut-keys">
+									<kbd>/</kbd><span>or</span><kbd id="shortcut-mod-key">⌘</kbd><kbd>K</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Refresh marketplace</span>
+								<div class="shortcut-keys">
+									<kbd>R</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Install from URL</span>
+								<div class="shortcut-keys">
+									<kbd>U</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Previous page</span>
+								<div class="shortcut-keys">
+									<kbd>[</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Next page</span>
+								<div class="shortcut-keys">
+									<kbd>]</kbd>
+								</div>
+							</div>
+						</div>
+						<div class="shortcuts-group">
+							<div class="shortcuts-group-title">Sort</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Highest rated</span>
+								<div class="shortcut-keys">
+									<kbd>1</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Most downloaded</span>
+								<div class="shortcut-keys">
+									<kbd>2</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Newest</span>
+								<div class="shortcut-keys">
+									<kbd>3</kbd>
+								</div>
+							</div>
+						</div>
+						<div class="shortcuts-group">
+							<div class="shortcuts-group-title">Filters</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Show all</span>
+								<div class="shortcut-keys">
+									<kbd>A</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Show installed</span>
+								<div class="shortcut-keys">
+									<kbd>I</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Show not installed</span>
+								<div class="shortcut-keys">
+									<kbd>N</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Toggle shaders</span>
+								<div class="shortcut-keys">
+									<kbd>S</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Toggle compatible</span>
+								<div class="shortcut-keys">
+									<kbd>C</kbd>
+								</div>
+							</div>
+						</div>
+						<div class="shortcuts-group">
+							<div class="shortcuts-group-title">Theme Details</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Install / Remove</span>
+								<div class="shortcut-keys">
+									<kbd>I</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Previous image</span>
+								<div class="shortcut-keys">
+									<kbd class="kbd-icon">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+											<path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+										</svg>
+									</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Next image</span>
+								<div class="shortcut-keys">
+									<kbd class="kbd-icon">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+											<path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+										</svg>
+									</kbd>
+								</div>
+							</div>
+						</div>
+						<div class="shortcuts-group">
+							<div class="shortcuts-group-title">General</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Close modal</span>
+								<div class="shortcut-keys">
+									<kbd>Esc</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">Show shortcuts</span>
+								<div class="shortcut-keys">
+									<kbd>?</kbd>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

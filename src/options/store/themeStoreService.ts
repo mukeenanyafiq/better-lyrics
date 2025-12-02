@@ -41,9 +41,9 @@ function getRawGitHubUrl(repo: string, branch: string, path: string, bustCache =
   return bustCache ? `${base}?t=${Date.now()}` : base;
 }
 
-async function testBranchExists(repo: string, branch: string): Promise<boolean> {
+async function testBranchExists(repo: string, branch: string, testFile = "metadata.json"): Promise<boolean> {
   try {
-    const url = `https://raw.githubusercontent.com/${repo}/${branch}/metadata.json`;
+    const url = `https://raw.githubusercontent.com/${repo}/${branch}/${testFile}`;
     const response = await fetchWithTimeout(url, { method: "HEAD" }, 5000);
     return response.ok;
   } catch {
@@ -51,7 +51,7 @@ async function testBranchExists(repo: string, branch: string): Promise<boolean> 
   }
 }
 
-async function getDefaultBranch(repo: string): Promise<string> {
+async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promise<string> {
   const cached = repoBranchCache.get(repo);
   if (cached && Date.now() - cached.timestamp < BRANCH_CACHE_TTL_MS) {
     return cached.branch;
@@ -74,12 +74,12 @@ async function getDefaultBranch(repo: string): Promise<string> {
     // API failed, fall through to branch testing
   }
 
-  if (await testBranchExists(repo, "master")) {
+  if (await testBranchExists(repo, "master", testFile)) {
     repoBranchCache.set(repo, { branch: "master", timestamp: Date.now() });
     return "master";
   }
 
-  if (await testBranchExists(repo, "main")) {
+  if (await testBranchExists(repo, "main", testFile)) {
     repoBranchCache.set(repo, { branch: "main", timestamp: Date.now() });
     return "main";
   }
@@ -98,7 +98,7 @@ export async function requestStorePermissions(): Promise<boolean> {
 }
 
 export async function fetchThemeStoreIndex(): Promise<string[]> {
-  const branch = await getDefaultBranch(INDEX_REPO);
+  const branch = await getDefaultBranch(INDEX_REPO, "index.json");
   const url = getRawGitHubUrl(INDEX_REPO, branch, "index.json");
   const response = await fetchWithTimeout(url, { cache: "no-store" });
 

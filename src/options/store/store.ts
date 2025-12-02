@@ -28,7 +28,9 @@ import { showAlert } from "../editor/ui/feedback";
 
 let detailModalOverlay: HTMLElement | null = null;
 let urlModalOverlay: HTMLElement | null = null;
+let shortcutsModalOverlay: HTMLElement | null = null;
 let currentDetailTheme: StoreTheme | null = null;
+const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 let currentSlideIndex = 0;
 let storeThemesCache: StoreTheme[] = [];
 let storeStatsCache: AllThemeStats = {};
@@ -53,6 +55,16 @@ async function loadUserInstalls(): Promise<void> {
 async function markUserInstall(themeId: string): Promise<void> {
   userInstallsCache[themeId] = true;
   await chrome.storage.local.set({ userThemeInstalls: userInstallsCache });
+}
+
+function setActionButtonContent(button: HTMLElement, text: string, shortcut?: string): void {
+  button.textContent = "";
+  button.appendChild(document.createTextNode(text));
+  if (shortcut) {
+    const kbd = document.createElement("kbd");
+    kbd.textContent = shortcut;
+    button.appendChild(kbd);
+  }
 }
 
 interface FilterState {
@@ -316,11 +328,14 @@ export function initStoreUI(): void {
 export async function initMarketplaceUI(): Promise<void> {
   detailModalOverlay = document.getElementById("detail-modal-overlay");
   urlModalOverlay = document.getElementById("url-modal-overlay");
+  shortcutsModalOverlay = document.getElementById("shortcuts-modal-overlay");
   isMarketplacePage = true;
 
+  updateModifierKeyDisplay();
   setupMarketplaceListeners();
   setupDetailModalListeners();
   setupUrlModalListeners();
+  setupShortcutsModalListeners();
   setupMarketplaceKeyboardListeners();
   setupPaginationListeners();
 
@@ -332,6 +347,9 @@ export async function initMarketplaceUI(): Promise<void> {
 function setupMarketplaceListeners(): void {
   const refreshBtn = document.getElementById("store-refresh-btn");
   refreshBtn?.addEventListener("click", () => refreshMarketplace());
+
+  const shortcutsBtn = document.getElementById("shortcuts-btn");
+  shortcutsBtn?.addEventListener("click", () => openShortcutsModal());
 
   const retryBtn = document.getElementById("store-retry-btn");
   retryBtn?.addEventListener("click", () => loadMarketplace());
@@ -408,16 +426,126 @@ function scrollToTop(): void {
   content?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function updateModifierKeyDisplay(): void {
+  const modKey = isMac ? "⌘" : "Ctrl";
+  const searchModKey = document.getElementById("search-mod-key");
+  const shortcutModKey = document.getElementById("shortcut-mod-key");
+  if (searchModKey) searchModKey.textContent = modKey;
+  if (shortcutModKey) shortcutModKey.textContent = modKey;
+}
+
+function setupShortcutsModalListeners(): void {
+  const closeBtn = document.getElementById("shortcuts-modal-close");
+  closeBtn?.addEventListener("click", closeShortcutsModal);
+
+  shortcutsModalOverlay?.addEventListener("click", e => {
+    if (e.target === shortcutsModalOverlay) closeShortcutsModal();
+  });
+}
+
+function openShortcutsModal(): void {
+  if (shortcutsModalOverlay) {
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    shortcutsModalOverlay.style.display = "flex";
+    requestAnimationFrame(() => {
+      shortcutsModalOverlay?.classList.add("active");
+    });
+  }
+}
+
+function closeShortcutsModal(): void {
+  if (shortcutsModalOverlay) {
+    const modal = shortcutsModalOverlay.querySelector(".modal");
+    modal?.classList.add("closing");
+    shortcutsModalOverlay.classList.remove("active");
+
+    setTimeout(() => {
+      if (shortcutsModalOverlay) {
+        shortcutsModalOverlay.style.display = "none";
+        modal?.classList.remove("closing");
+      }
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }, 200);
+  }
+}
+
+function isAnyModalOpen(): boolean {
+  return (
+    detailModalOverlay?.classList.contains("active") ||
+    urlModalOverlay?.classList.contains("active") ||
+    shortcutsModalOverlay?.classList.contains("active") ||
+    false
+  );
+}
+
+function isInputFocused(): boolean {
+  const activeElement = document.activeElement;
+  return (
+    activeElement instanceof HTMLInputElement ||
+    activeElement instanceof HTMLTextAreaElement ||
+    (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+  );
+}
+
+function setSortFilter(value: "rating" | "downloads" | "newest"): void {
+  const radio = document.querySelector(`input[name="store-filter-sort"][value="${value}"]`) as HTMLInputElement;
+  if (radio && !radio.checked) {
+    radio.checked = true;
+    currentFilters.sortBy = value;
+    currentPage = 1;
+    applyFiltersToGrid();
+  }
+}
+
+function setShowFilter(value: "all" | "installed" | "not-installed"): void {
+  const radio = document.querySelector(`input[name="store-filter-show"][value="${value}"]`) as HTMLInputElement;
+  if (radio && !radio.checked) {
+    radio.checked = true;
+    currentFilters.showFilter = value;
+    currentPage = 1;
+    applyFiltersToGrid();
+  }
+}
+
+function toggleCheckboxFilter(id: string, filterKey: "hasShaders" | "versionCompatible"): void {
+  const checkbox = document.getElementById(id) as HTMLInputElement;
+  if (checkbox) {
+    checkbox.checked = !checkbox.checked;
+    currentFilters[filterKey] = checkbox.checked;
+    currentPage = 1;
+    applyFiltersToGrid();
+  }
+}
+
 function setupMarketplaceKeyboardListeners(): void {
   document.addEventListener("keydown", e => {
+    const modifierKey = isMac ? e.metaKey : e.ctrlKey;
+
+    if ((modifierKey && e.key.toLowerCase() === "k") || e.key === "/") {
+      if (e.key === "/" && isInputFocused()) return;
+      e.preventDefault();
+      const searchInput = document.getElementById("store-search-input") as HTMLInputElement;
+      searchInput?.focus();
+      searchInput?.select();
+      return;
+    }
+
     if (e.key === "Escape") {
-      if (detailModalOverlay?.classList.contains("active")) {
+      if (shortcutsModalOverlay?.classList.contains("active")) {
+        e.preventDefault();
+        closeShortcutsModal();
+      } else if (detailModalOverlay?.classList.contains("active")) {
         e.preventDefault();
         closeDetailModal();
       } else if (urlModalOverlay?.classList.contains("active")) {
         e.preventDefault();
         closeUrlModal();
+      } else if (isInputFocused()) {
+        (document.activeElement as HTMLElement)?.blur();
       }
+      return;
     }
 
     if (detailModalOverlay?.classList.contains("active")) {
@@ -427,7 +555,85 @@ function setupMarketplaceKeyboardListeners(): void {
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         navigateSlide(1);
+      } else if (e.key.toLowerCase() === "i") {
+        e.preventDefault();
+        const actionBtn = document.getElementById("detail-action-btn") as HTMLButtonElement;
+        actionBtn?.click();
       }
+      return;
+    }
+
+    if (isInputFocused() || isAnyModalOpen()) return;
+
+    switch (e.key) {
+      case "r":
+        e.preventDefault();
+        refreshMarketplace();
+        break;
+      case "u":
+        e.preventDefault();
+        openUrlModal();
+        break;
+      case "?":
+        e.preventDefault();
+        openShortcutsModal();
+        break;
+      case "[":
+        e.preventDefault();
+        if (currentPage > 1) {
+          currentPage--;
+          applyFiltersToGrid();
+          scrollToTop();
+        }
+        break;
+      case "]":
+        e.preventDefault();
+        const totalVisible = storeThemesCache.filter(theme => {
+          const installedIds = new Set<string>();
+          return (
+            matchesSearchQuery(theme, currentFilters.searchQuery) &&
+            matchesInstallFilter(theme.id, installedIds, currentFilters.showFilter)
+          );
+        }).length;
+        const totalPages = Math.ceil(totalVisible / ITEMS_PER_PAGE);
+        if (currentPage < totalPages) {
+          currentPage++;
+          applyFiltersToGrid();
+          scrollToTop();
+        }
+        break;
+      case "a":
+        e.preventDefault();
+        setShowFilter("all");
+        break;
+      case "i":
+        e.preventDefault();
+        setShowFilter("installed");
+        break;
+      case "n":
+        e.preventDefault();
+        setShowFilter("not-installed");
+        break;
+      case "s":
+        e.preventDefault();
+        toggleCheckboxFilter("store-filter-shaders", "hasShaders");
+        break;
+      case "c":
+        e.preventDefault();
+        toggleCheckboxFilter("store-filter-compatible", "versionCompatible");
+        break;
+      case "1":
+        e.preventDefault();
+        setSortFilter("rating");
+        break;
+      case "2":
+        e.preventDefault();
+        setSortFilter("downloads");
+        break;
+      case "3":
+        e.preventDefault();
+        setSortFilter("newest");
+        break;
     }
   });
 }
@@ -1115,7 +1321,7 @@ async function openDetailModal(theme: StoreTheme): Promise<void> {
 
   if (actionBtn) {
     actionBtn.className = `store-card-btn ${initialInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
-    actionBtn.textContent = initialInstalled ? "Remove" : "Install";
+    setActionButtonContent(actionBtn, initialInstalled ? "Remove" : "Install", "I");
     actionBtn.onclick = async () => {
       actionBtn.disabled = true;
       const isRemoveButton = actionBtn.classList.contains("store-card-btn-remove");
@@ -1123,13 +1329,13 @@ async function openDetailModal(theme: StoreTheme): Promise<void> {
         if (isRemoveButton) {
           await removeTheme(theme.id);
           actionBtn.className = "store-card-btn store-card-btn-install";
-          actionBtn.textContent = "Install";
+          setActionButtonContent(actionBtn, "Install", "I");
           showAlert(`Removed ${theme.title}`, theme.title);
           updateRatingEnabled(false);
         } else {
           await installTheme(theme);
           actionBtn.className = "store-card-btn store-card-btn-remove";
-          actionBtn.textContent = "Remove";
+          setActionButtonContent(actionBtn, "Remove", "I");
           showAlert(`Installed ${theme.title}`, theme.title);
           updateRatingEnabled(true);
           if (!userInstallsCache[theme.id]) {
@@ -1151,7 +1357,7 @@ async function openDetailModal(theme: StoreTheme): Promise<void> {
         await refreshStoreCards();
       } catch (err) {
         actionBtn.className = `store-card-btn ${isRemoveButton ? "store-card-btn-remove" : "store-card-btn-install"}`;
-        actionBtn.textContent = isRemoveButton ? "Remove" : "Install";
+        setActionButtonContent(actionBtn, isRemoveButton ? "Remove" : "Install", "I");
         showAlert(`Failed: ${err}`);
       } finally {
         actionBtn.disabled = false;
