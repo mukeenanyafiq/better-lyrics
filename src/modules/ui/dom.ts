@@ -1,8 +1,8 @@
-import * as Utils from "@utils";
 import * as Constants from "@constants";
-import * as Observer from "./observer";
-import { AppState } from "@/index";
 import { animEngineState, getResumeScrollElement, reflow, toMs } from "@modules/ui/animationEngine";
+import * as Utils from "@utils";
+import { AppState } from "@/index";
+import * as Observer from "./observer";
 
 let backgroundChangeObserver: MutationObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;

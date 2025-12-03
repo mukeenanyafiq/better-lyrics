@@ -1,7 +1,7 @@
 import { editorStateManager } from "../core/state";
+import { showAlert } from "../ui/feedback";
 import { saveToStorageWithFallback, sendUpdateMessage, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
-import { showAlert } from "../ui/feedback";
 
 export const generateDefaultFilename = (): string => {
   const date = new Date();

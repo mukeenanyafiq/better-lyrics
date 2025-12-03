@@ -1,6 +1,51 @@
-import * as Utils from "@utils";
 import * as Constants from "@constants";
-import { cachedDurations, cachedProperties } from "@modules/ui/animationEngine";
+import * as Utils from "@utils";
+import { compileWithDetails } from "rics";
+
+const COMPILE_TIMEOUT = 3000;
+const MAX_ITERATIONS = 10000;
+const HARD_TIMEOUT = 5000;
+const LOG_SOURCE_MAX_LENGTH = 500;
+
+function truncateSource(source: string): string {
+  if (source.length <= LOG_SOURCE_MAX_LENGTH) return source;
+  return source.slice(0, LOG_SOURCE_MAX_LENGTH) + `... (${source.length} chars total)`;
+}
+
+function compileRicsToCSS(sourceCode: string): string {
+  try {
+    const startTime = performance.now();
+    const result = compileWithDetails(sourceCode, {
+      timeout: COMPILE_TIMEOUT,
+      maxIterations: MAX_ITERATIONS,
+    });
+    const elapsed = performance.now() - startTime;
+
+    if (elapsed > HARD_TIMEOUT) {
+      Utils.log(
+        Constants.GENERAL_ERROR_LOG,
+        `rics compilation timeout: took ${elapsed.toFixed(0)}ms\nSource:\n${truncateSource(sourceCode)}`
+      );
+      return sourceCode;
+    }
+
+    if (result.errors.length > 0) {
+      Utils.log(
+        Constants.GENERAL_ERROR_LOG,
+        `rics compilation errors: ${JSON.stringify(result.errors)}\nSource:\n${truncateSource(sourceCode)}`
+      );
+      return sourceCode;
+    }
+    return result.css;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    Utils.log(
+      Constants.GENERAL_ERROR_LOG,
+      `rics compilation failed: ${message}\nSource:\n${truncateSource(sourceCode)}`
+    );
+    return sourceCode;
+  }
+}
 
 async function decompressCSS(css: string): Promise<string> {
   if (!css.startsWith("__COMPRESSED__")) {
@@ -89,7 +134,7 @@ export async function getAndApplyCustomCSS(): Promise<void> {
       if (isCompressed || css.startsWith("__COMPRESSED__")) {
         css = await decompressCSS(css);
       }
-      Utils.applyCustomCSS(css);
+      Utils.applyCustomCSS(compileRicsToCSS(css));
     }
   } catch (error) {
     Utils.log(Constants.GENERAL_ERROR_LOG, error);
@@ -101,7 +146,7 @@ export async function getAndApplyCustomCSS(): Promise<void> {
         if (syncData.cssCompressed || css.startsWith("__COMPRESSED__")) {
           css = await decompressCSS(css);
         }
-        Utils.applyCustomCSS(css);
+        Utils.applyCustomCSS(compileRicsToCSS(css));
         return;
       }
 
@@ -111,7 +156,7 @@ export async function getAndApplyCustomCSS(): Promise<void> {
         if (localData.cssCompressed || css.startsWith("__COMPRESSED__")) {
           css = await decompressCSS(css);
         }
-        Utils.applyCustomCSS(css);
+        Utils.applyCustomCSS(compileRicsToCSS(css));
         return;
       }
 
@@ -121,7 +166,7 @@ export async function getAndApplyCustomCSS(): Promise<void> {
         if (syncData.cssCompressed || css.startsWith("__COMPRESSED__")) {
           css = await decompressCSS(css);
         }
-        Utils.applyCustomCSS(css);
+        Utils.applyCustomCSS(compileRicsToCSS(css));
       }
     } catch (fallbackError) {
       Utils.log(Constants.GENERAL_ERROR_LOG, fallbackError);
@@ -142,7 +187,7 @@ export function subscribeToCustomCSS(): void {
         if (css.startsWith("__COMPRESSED__")) {
           css = await decompressCSS(css);
         }
-        Utils.applyCustomCSS(css);
+        Utils.applyCustomCSS(compileRicsToCSS(css));
       }
     }
   });

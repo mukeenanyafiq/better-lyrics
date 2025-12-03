@@ -1,4 +1,4 @@
-import type { AllThemeStats, RatingResult, ApiResult } from "./types";
+import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 
 const API_BASE = "https://better-lyrics-themes-api.boidu.dev";
 const DEFAULT_TIMEOUT_MS = 10000;

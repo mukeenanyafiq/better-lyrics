@@ -1,6 +1,6 @@
 import * as Utils from "@core/utils";
-import type { LyricPart, LyricsArray } from "./shared";
 import { parseJsonNumber } from "ajv/dist/runtime/parseJson";
+import type { LyricPart, LyricsArray } from "./shared";
 
 const possibleIdTags = ["ti", "ar", "al", "au", "lr", "length", "by", "offset", "re", "tool", "ve", "#"];
 

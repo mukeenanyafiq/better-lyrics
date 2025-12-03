@@ -1,6 +1,6 @@
 import * as Constants from "@constants";
-import * as Utils from "@utils";
 import * as Storage from "@core/storage";
+import * as Utils from "@utils";
 
 export interface TranslationResult {
   originalLanguage: string;

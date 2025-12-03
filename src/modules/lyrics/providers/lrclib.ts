@@ -1,7 +1,7 @@
-import { type ProviderParameters } from "./shared";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { type ProviderParameters } from "./shared";
 
 export default async function lyricLib(providerParameters: ProviderParameters): Promise<void> {
   const url = new URL(Constants.LRCLIB_API_URL);

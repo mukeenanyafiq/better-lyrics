@@ -1,8 +1,8 @@
-import { getStorage } from "./storage";
-import { cachedDurations, cachedProperties } from "@modules/ui/animationEngine";
-import { AppState } from "@/index";
-import * as App from "@/index";
 import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS } from "@constants";
+import { cachedDurations, cachedProperties } from "@modules/ui/animationEngine";
+import * as App from "@/index";
+import { AppState } from "@/index";
+import { getStorage } from "./storage";
 
 /**
  * Conditionally logs messages based on the isLogsEnabled setting.

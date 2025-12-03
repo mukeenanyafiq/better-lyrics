@@ -1,15 +1,15 @@
-import * as Utils from "@utils";
+import * as Constants from "@constants";
+import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS } from "@constants";
+import * as Storage from "@core/storage";
+import type { LyricsData } from "@modules/lyrics/injectLyrics";
+import * as Lyrics from "@modules/lyrics/lyrics";
+import { initProviders } from "@modules/lyrics/providers/shared";
+import * as RequestSniffing from "@modules/lyrics/requestSniffer";
+import * as Settings from "@modules/settings/settings";
+import { animationEngine } from "@modules/ui/animationEngine";
 import * as DOM from "@modules/ui/dom";
 import * as Observer from "@modules/ui/observer";
-import * as Settings from "@modules/settings/settings";
-import * as Constants from "@constants";
-import * as RequestSniffing from "@modules/lyrics/requestSniffer";
-import * as Lyrics from "@modules/lyrics/lyrics";
-import * as Storage from "@core/storage";
-import { initProviders } from "@modules/lyrics/providers/shared";
-import type { LyricsData } from "@modules/lyrics/injectLyrics";
-import { animationEngine } from "@modules/ui/animationEngine";
-import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS } from "@constants";
+import * as Utils from "@utils";
 
 export interface PlayerDetails {
   currentTime: number;

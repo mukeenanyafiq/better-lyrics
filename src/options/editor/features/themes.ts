@@ -1,20 +1,20 @@
-import type { ThemeCardOptions } from "../types";
+import { getInstalledTheme } from "../../store/themeStoreManager";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
+import type { ThemeCardOptions } from "../types";
 import {
   deleteThemeBtn,
   editThemeBtn,
   syncIndicator,
   themeModalGrid,
   themeModalOverlay,
-  themeSelectorBtn,
   themeNameDisplay,
   themeNameText,
+  themeSelectorBtn,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import { saveToStorageWithFallback, sendUpdateMessage, showSyncError, showSyncSuccess } from "./storage";
-import { getInstalledTheme } from "../../store/themeStoreManager";
 
 const STORE_THEME_PREFIX = "store:";
 

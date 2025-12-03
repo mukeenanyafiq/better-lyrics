@@ -1,8 +1,9 @@
-import type { SaveResult } from "../types";
 import type { InstalledStoreTheme } from "../../store/types";
-import { SYNC_STORAGE_LIMIT, MAX_RETRY_ATTEMPTS, CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT } from "../core/editor";
-import { syncIndicator } from "../ui/dom";
+import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
+import type { SaveResult } from "../types";
+import { syncIndicator } from "../ui/dom";
+import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName } from "./themes";
 
 async function compressCSS(css: string): Promise<string> {
@@ -312,13 +313,16 @@ export function showSyncError(error: any): void {
   }, 7000);
 }
 
-export async function sendUpdateMessage(css: string, strategy: "local" | "sync" | "chunked"): Promise<void> {
-  console.log(`[BetterLyrics] sendUpdateMessage called, CSS length: ${css.length}, strategy: ${strategy}`);
+export async function sendUpdateMessage(sourceCode: string, strategy: "local" | "sync" | "chunked"): Promise<void> {
+  const compiledCSS = ricsCompiler.getCompiledCSS(sourceCode);
+  console.log(
+    `[BetterLyrics] sendUpdateMessage called, source length: ${sourceCode.length}, compiled CSS length: ${compiledCSS.length}, strategy: ${strategy}`
+  );
   try {
     chrome.runtime
       .sendMessage({
         action: "updateCSS",
-        css: css,
+        css: compiledCSS,
         storageType: strategy,
       })
       .then(() => {

@@ -1,30 +1,31 @@
-import { marked } from "marked";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
-import type { StoreTheme, InstalledStoreTheme, AllThemeStats, ThemeStats } from "./types";
+import { marked } from "marked";
+import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from "./types";
 
 let gridAnimationController: AnimationController | null = null;
+
+import { showAlert } from "../editor/ui/feedback";
+import { fetchAllStats, submitRating, trackInstall } from "./themeStoreApi";
+import {
+  applyStoreTheme,
+  clearActiveStoreTheme,
+  getActiveStoreTheme,
+  getInstalledStoreThemes,
+  installTheme,
+  isThemeInstalled,
+  isVersionCompatible,
+  performSilentUpdates,
+  removeTheme,
+} from "./themeStoreManager";
 import {
   checkStorePermissions,
-  requestStorePermissions,
   fetchAllStoreThemes,
   fetchFullTheme,
   fetchThemeShaderConfig,
-  validateThemeRepo,
   parseGitHubRepoUrl,
+  requestStorePermissions,
+  validateThemeRepo,
 } from "./themeStoreService";
-import {
-  getInstalledStoreThemes,
-  isThemeInstalled,
-  installTheme,
-  removeTheme,
-  isVersionCompatible,
-  applyStoreTheme,
-  getActiveStoreTheme,
-  clearActiveStoreTheme,
-  performSilentUpdates,
-} from "./themeStoreManager";
-import { fetchAllStats, trackInstall, submitRating } from "./themeStoreApi";
-import { showAlert } from "../editor/ui/feedback";
 
 let detailModalOverlay: HTMLElement | null = null;
 let urlModalOverlay: HTMLElement | null = null;
@@ -1322,6 +1323,18 @@ async function openDetailModal(theme: StoreTheme): Promise<void> {
         ratingStat.appendChild(document.createTextNode(`${themeStats.rating.toFixed(1)} (${themeStats.ratingCount})`));
         statsEl.appendChild(ratingStat);
       }
+    }
+  }
+
+  const repoLinkContainer = document.getElementById("detail-repo-link");
+  const repoAnchor = document.getElementById("detail-repo-anchor") as HTMLAnchorElement;
+  if (repoLinkContainer && repoAnchor) {
+    if (theme.repo) {
+      repoLinkContainer.style.display = "flex";
+      repoAnchor.href = `https://github.com/${theme.repo}`;
+      repoAnchor.textContent = theme.repo;
+    } else {
+      repoLinkContainer.style.display = "none";
     }
   }
 

@@ -1,4 +1,4 @@
-import type { ThemeStoreIndex, StoreTheme, StoreThemeMetadata, ThemeValidationResult, PermissionStatus } from "./types";
+import type { PermissionStatus, StoreTheme, StoreThemeMetadata, ThemeStoreIndex, ThemeValidationResult } from "./types";
 
 const INDEX_REPO = "better-lyrics/themes";
 const DEFAULT_TIMEOUT_MS = 10000;

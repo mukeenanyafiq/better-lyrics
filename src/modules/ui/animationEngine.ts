@@ -1,8 +1,8 @@
-import { AppState } from "@/index";
 import * as Constants from "@constants";
-import * as Utils from "@utils";
-import { isLoaderActive } from "@modules/ui/dom";
 import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
+import { isLoaderActive } from "@modules/ui/dom";
+import * as Utils from "@utils";
+import { AppState } from "@/index";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
 

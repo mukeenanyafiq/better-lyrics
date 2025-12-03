@@ -1,29 +1,29 @@
 import { openSearchPanel } from "@codemirror/search";
-import { showAlert } from "./ui/feedback";
-import {
-  deleteThemeBtn,
-  editThemeBtn,
-  themeModalClose,
-  themeModalOverlay,
-  themeSelectorBtn,
-  themeNameText,
-  openEditCSS,
-  openOptions,
-} from "./ui/dom";
 import { createEditorState, createEditorView } from "./core/editor";
-import { generateDefaultFilename, saveCSSToFile, importManager } from "./features/import";
 import { editorStateManager } from "./core/state";
+import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
 import { storageManager } from "./features/storage";
 import {
   closeThemeModal,
   handleDeleteTheme,
   handleRenameTheme,
   handleSaveTheme,
+  initStoreThemeListener,
   openThemeModal,
   saveToStorage,
   setThemeName,
-  initStoreThemeListener,
 } from "./features/themes";
+import {
+  deleteThemeBtn,
+  editThemeBtn,
+  openEditCSS,
+  openOptions,
+  themeModalClose,
+  themeModalOverlay,
+  themeNameText,
+  themeSelectorBtn,
+} from "./ui/dom";
+import { showAlert } from "./ui/feedback";
 
 export function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);

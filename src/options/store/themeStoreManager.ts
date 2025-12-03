@@ -1,5 +1,5 @@
-import type { InstalledStoreTheme, StoreTheme } from "./types";
 import { fetchThemeCSS, fetchThemeShaderConfig } from "./themeStoreService";
+import type { InstalledStoreTheme, StoreTheme } from "./types";
 
 const THEME_INDEX_KEY = "storeThemeIndex";
 const THEME_PREFIX = "storeTheme:";

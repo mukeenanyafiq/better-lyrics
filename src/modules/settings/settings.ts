@@ -1,11 +1,11 @@
-import * as DOM from "@modules/ui/dom";
 import * as Constants from "@constants";
-import * as Utils from "@core/utils";
-import * as Translation from "@modules/lyrics/translation";
 import * as Storage from "@core/storage";
-import { AppState } from "@/index";
-import * as BetterLyrics from "@/index";
+import * as Utils from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
+import * as Translation from "@modules/lyrics/translation";
+import * as DOM from "@modules/ui/dom";
+import * as BetterLyrics from "@/index";
+import { AppState } from "@/index";
 
 type EnableDisableCallback = () => void;
 
