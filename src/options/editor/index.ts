@@ -28,10 +28,20 @@ import { showAlert, showModal } from "./ui/feedback";
 export function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
   document.getElementById("back-btn")?.addEventListener("click", openOptions);
+}
+
+export function initializeEditorKeyboardShortcuts() {
+  const editorElement = document.getElementById("editor");
+  if (!editorElement) return;
 
   const isStandalone = document.querySelector(".theme-name-display.standalone") !== null;
 
   document.addEventListener("keydown", function (e) {
+    const cssSection = document.getElementById("css");
+    const editorIsVisible = isStandalone || (cssSection && cssSection.style.display === "block");
+
+    if (!editorIsVisible) return;
+
     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       saveToStorage();
@@ -166,6 +176,7 @@ export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
     await initializeEditor();
     initializeNavigation();
+    initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
     initializeFileOperations();
