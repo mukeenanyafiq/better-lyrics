@@ -218,9 +218,15 @@ export function onChange(_state: string) {
 
   const themeName = editorStateManager.getCurrentThemeName();
   const isCustom = editorStateManager.getIsCustomTheme();
+  const isStoreTheme = editorStateManager.getIsStoreTheme();
 
-  if (themeName !== null && !isCustom) {
+  if (themeName !== null && !isCustom && !isStoreTheme) {
     editorStateManager.setCurrentThemeName(null);
+    chrome.storage.sync.remove("themeName");
+    hideThemeName();
+    updateThemeSelectorButton();
+  } else if (isStoreTheme && themeName) {
+    editorStateManager.setIsStoreTheme(false);
     chrome.storage.sync.remove("themeName");
     hideThemeName();
     updateThemeSelectorButton();

@@ -455,6 +455,12 @@ export class StorageManager {
       return;
     }
 
+    if (editorStateManager.getIsUserTyping()) {
+      console.log("[StorageManager] Skipping theme reload (user is typing)");
+      await setThemeName();
+      return;
+    }
+
     console.log("[StorageManager] Theme name changed, reloading CSS");
     await setThemeName();
 
