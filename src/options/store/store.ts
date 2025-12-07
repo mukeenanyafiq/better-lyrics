@@ -120,15 +120,12 @@ const ITEMS_PER_PAGE = 12;
 let currentPage = 1;
 let isMarketplacePage = false;
 
-let TEST_THEMES_ENABLED = false;
-try {
-  TEST_THEMES_ENABLED = process.env.EXTENSION_PUBLIC_ENABLE_TEST_THEMES === "true";
-} catch {
-  // process.env not available, keep test themes disabled
-}
-
 function getTestThemes(): StoreTheme[] {
-  if (!TEST_THEMES_ENABLED) return [];
+  try {
+    if (process.env.EXTENSION_PUBLIC_ENABLE_TEST_THEMES !== "true") return [];
+  } catch {
+    return [];
+  }
 
   const placeholderImage = "https://placehold.co/400x240/333333/666666?text=Preview";
 
@@ -254,7 +251,11 @@ function getTestThemes(): StoreTheme[] {
 }
 
 function getTestStats(): AllThemeStats {
-  if (!TEST_THEMES_ENABLED) return {};
+  try {
+    if (process.env.EXTENSION_PUBLIC_ENABLE_TEST_THEMES !== "true") return {};
+  } catch {
+    return {};
+  }
 
   return {
     "test-basic": { installs: 150, rating: 4.0, ratingCount: 80 },
