@@ -41,37 +41,11 @@ jobs:
           biome lint --write .
           biome format --write .
 
-      - name: Check for changes and commit
+      - name: Commit and push changes
+        uses: planetscale/ghcommit-action@v0.2.19
+        with:
+          commit_message: "Auto-fix: Apply Biome lint and format fixes [skip ci]"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-
-            AUTO_FIX_MSG="Auto-fix: Apply Biome lint and format fixes"
-            LAST_COMMIT_MSG=$(git log -1 --pretty=%s || true)
-
-            if [ "$LAST_COMMIT_MSG" = "$AUTO_FIX_MSG" ]; then
-              echo "❌ ERROR: Potential auto-fix loop detected!"
-              echo "The previous commit was an auto-fix, but this run *still* found Biome issues."
-              echo "This means the auto-fix is not succeeding in one pass."
-              echo "Failing the job to prevent an infinite commit loop."
-              echo "Please review the Biome output and fix the remaining issues manually."
-              exit 1
-            fi
-
-            echo "✅ Found Biome issues. Proceeding with auto-fix commit."
-            git config --local user.name "better-lyrics-harmonizer[bot]"
-            # https://github.com/orgs/community/discussions/24664#discussioncomment-3880274
-            git config --local user.email "248079304+better-lyrics-harmonizer[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "$AUTO_FIX_MSG"
-
-            if git symbolic-ref HEAD >/dev/null 2>&1; then
-              git push
-              echo "✅ Auto-fixed Biome issues and pushed changes."
-            else
-              echo "✅ Auto-fixed Biome issues (detached HEAD - changes committed locally)"
-            fi
-          else
-            echo "✅ No Biome issues found - skipping commit"
-          fi
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
