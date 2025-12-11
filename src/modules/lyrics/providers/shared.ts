@@ -68,6 +68,7 @@ export interface Lyric {
   translation?: { text: string; lang: string };
   romanization?: string;
   timedRomanization?: LyricPart[];
+  isInstrumental?: boolean;
 }
 
 export interface LyricPart {

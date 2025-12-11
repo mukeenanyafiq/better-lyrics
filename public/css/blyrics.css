@@ -633,6 +633,68 @@
 	word-break: break-word;
 }
 
+/* Instrumental break styles */
+.blyrics--instrumental-icon {
+	height: var(--blyrics-font-size);
+	width: calc(var(--blyrics-font-size) + var(--blyrics-font-size) / 3);
+	overflow: visible;
+	margin-left: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics--instrumental[data-agent="v2"] .blyrics--instrumental-icon,
+.blyrics--instrumental[data-agent="v3"] .blyrics--instrumental-icon {
+	margin-left: 0px;
+	margin-right: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics--instrumental[data-agent="v1000"] .blyrics--instrumental-icon {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.blyrics--instrumental-bg {
+	fill: var(--blyrics-lyric-inactive-color);
+}
+
+.blyrics--instrumental-fill {
+	fill: var(--blyrics-lyric-active-color);
+}
+
+.blyrics--wave-clip {
+	transform: translateY(80%);
+}
+
+.blyrics--instrumental.blyrics--animating .blyrics--wave-clip {
+	animation: blyrics-rise var(--blyrics-duration, 5000ms) linear forwards;
+}
+
+.blyrics--wave-path {
+	animation: blyrics-wave 1.25s ease-in-out infinite;
+	animation-play-state: paused;
+}
+
+.blyrics--instrumental.blyrics--animating .blyrics--wave-path {
+	animation-play-state: running;
+}
+
+@keyframes blyrics-wave {
+	0%, 100% {
+		d: path("M -4 3 Q 1 2 5 3 Q 10 4 14 3 Q 18 2 22 3 Q 26 4 30 3 L 30 30 L -4 30 Z");
+	}
+  50% {
+		d: path("M -4 3 Q 1 4 5 3 Q 10 2 14 3 Q 18 4 22 3 Q 26 2 30 3 L 30 30 L -4 30 Z");
+	}
+}
+
+@keyframes blyrics-rise {
+	0% {
+		transform: translateY(80%);
+	}
+	100% {
+		transform: translateY(-10%);
+	}
+}
+
 /* Secondary and tertiary vocals */
 .blyrics--line[data-agent="v2"],
 .blyrics--line[data-agent="v3"] {
@@ -748,4 +810,23 @@
 		flex-wrap: wrap;
 		row-gap: 1.25rem;
 	}
+}
+
+/* Fullscreen autoscroll button fix */
+ytmusic-app-layout[player-fullscreened] .autoscroll-resume-wrapper {
+	position: fixed;
+	top: 1rem;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+}
+
+ytmusic-app-layout[player-fullscreened] .autoscroll-resume-button {
+	position: relative;
+	left: unset;
+	transform: none;
+}
+
+ytmusic-app-layout[player-fullscreened] .autoscroll-resume-button[autoscroll-hidden="true"] {
+	transform: translateY(-3rem);
 }

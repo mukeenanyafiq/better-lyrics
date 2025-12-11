@@ -191,6 +191,7 @@ interface TtmlElement {
   ":@": {
     "@_timing": string;
     "@_lang": string;
+    "@_dur": string;
   };
 }
 

@@ -2,9 +2,47 @@ import { AppState } from "@/index";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
-import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
+import { calculateLyricPositions, type LineData, type InstrumentalElements } from "@modules/lyrics/injectLyrics";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
+
+// Same configs as CSS.
+const WAVE_START_PERCENT = 80;
+const WAVE_END_PERCENT = -10;
+const WAVE_RANGE_PERCENT = WAVE_START_PERCENT - WAVE_END_PERCENT;
+
+// Using reflow here to restore css animation states.
+// Ik it looks hacky but it looks janky without it, trust.
+function resetWaveClipAnimation(waveClip: SVGElement): void {
+  waveClip.style.animation = "none";
+  reflow(waveClip as unknown as HTMLElement);
+  waveClip.style.animation = "";
+}
+
+function clearWaveClipStyles(waveClip: SVGElement): void {
+  waveClip.style.transition = "";
+  waveClip.style.transform = "";
+  waveClip.style.animation = "";
+}
+
+function setWaveClipProgress(waveClip: SVGElement, progress: number, smooth: boolean): void {
+  const translateY = WAVE_START_PERCENT - progress * WAVE_RANGE_PERCENT;
+  waveClip.style.animation = "none";
+  waveClip.style.transition = smooth ? "transform 0.15s ease" : "";
+  waveClip.style.transform = `translateY(${translateY}%)`;
+}
+
+// Gets the job done for exit anims
+function animateInstrumentalExit(elements: InstrumentalElements): void {
+  elements.fill.style.transition = "opacity var(--blyrics-lyric-highlight-fade-out-duration, 0.5s) ease";
+  elements.fill.style.opacity = "0";
+  setTimeout(() => {
+    elements.waveClip.style.animation = "none";
+    elements.waveClip.style.transform = `translateY(${WAVE_START_PERCENT}%)`;
+    elements.fill.style.transition = "";
+    elements.fill.style.opacity = "";
+  }, 500);
+}
 
 interface AnimEngineState {
   skipScrolls: number;
@@ -182,6 +220,10 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         if (!lineData.isScrolled) {
           lineData.lyricElement.classList.add(Constants.CURRENT_LYRICS_CLASS);
           lineData.isScrolled = true;
+
+          if (lineData.instrumentalElements) {
+            resetWaveClipAnimation(lineData.instrumentalElements.waveClip);
+          }
         }
       } else {
         if (lineData.isScrolled) {
@@ -198,6 +240,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       if (!isPlaying) {
         setUpAnimationEarlyTime = 0;
       }
+
       if (
         currentTime + setUpAnimationEarlyTime >= time &&
         (currentTime < nextTime || currentTime < time + lineData.duration + 0.05)
@@ -235,8 +278,24 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
             part.animationStartTimeMs = now - timeDelta * 1000;
           });
 
+          if (lineData.instrumentalElements) {
+            clearWaveClipStyles(lineData.instrumentalElements.waveClip);
+          }
+
           lineData.isAnimating = true;
           lineData.accumulatedOffsetMs = 0;
+        }
+
+        if (lineData.instrumentalElements) {
+          lineData.instrumentalElements.wavePath.style.animationPlayState = isPlaying ? "running" : "paused";
+
+          const needsManualPosition = !isPlaying || lineData.accumulatedOffsetMs !== 0;
+          if (needsManualPosition) {
+            const progress = Math.min(1, Math.max(0, (currentTime - time) / lineData.duration));
+            setWaveClipProgress(lineData.instrumentalElements.waveClip, progress, !isPlaying);
+          } else if (lineData.instrumentalElements.waveClip.style.animation === "none") {
+            clearWaveClipStyles(lineData.instrumentalElements.waveClip);
+          }
         }
 
         if (isPlaying !== lineData.isAnimationPlayStatePlaying) {
@@ -262,6 +321,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
             part.lyricElement.classList.remove(Constants.PRE_ANIMATING_CLASS);
             part.animationStartTimeMs = Infinity;
           });
+
+          if (lineData.instrumentalElements) {
+            animateInstrumentalExit(lineData.instrumentalElements);
+          }
+
           lineData.isSelected = false;
           lineData.isAnimating = false;
         }
