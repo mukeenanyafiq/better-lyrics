@@ -60,7 +60,9 @@ jobs:
           node-version: "20.x"
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install @biomejs/cli-linux-x64
 
       - name: Run Typescript
         run: npm run typecheck
