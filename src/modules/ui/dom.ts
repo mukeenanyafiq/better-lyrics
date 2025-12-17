@@ -15,6 +15,7 @@ import {
   LYRICS_WRAPPER_CREATED_LOG,
   LYRICS_WRAPPER_ID,
   NO_LYRICS_TEXT_SELECTOR,
+  NOTO_SANS_UNIVERSAL_LINK,
   SONG_IMAGE_SELECTOR,
   TAB_RENDERER_SELECTOR,
 } from "@constants";
@@ -395,6 +396,11 @@ export async function injectHeadTags(): Promise<void> {
   fontLink.href = FONT_LINK;
   fontLink.rel = "stylesheet";
   document.head.appendChild(fontLink);
+
+  const notoFontLink = document.createElement("link");
+  notoFontLink.href = NOTO_SANS_UNIVERSAL_LINK;
+  notoFontLink.rel = "stylesheet";
+  document.head.appendChild(notoFontLink);
 
   const cssFiles = ["css/ytmusic.css", "css/blyrics.css", "css/themesong.css"];
 
