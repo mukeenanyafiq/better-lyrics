@@ -6,6 +6,12 @@ import * as BetterLyrics from "@/index";
 import { AppState } from "@/index";
 import * as Utils from "@utils";
 import { animEngineState, getResumeScrollElement, animationEngine } from "@modules/ui/animationEngine";
+import {
+  isPlayerPageOpen,
+  isNavigating,
+  openPlayerPageForFullscreen,
+  closePlayerPageIfOpenedForFullscreen,
+} from "@modules/ui/navigation";
 
 /**
  * Enables the lyrics tab and prevents it from being disabled by YouTube Music.
@@ -208,5 +214,97 @@ export function scrollEventHandler(): void {
       Utils.log(Constants.PAUSING_LYRICS_SCROLL_LOG);
     }
     animEngineState.scrollResumeTime = Date.now() + 25000;
+  }
+}
+
+/**
+ * Sets up a keyboard handler to intercept 'f' key presses on non-player pages.
+ * When pressed, navigates to the player page first, then triggers fullscreen.
+ * This ensures Better Lyrics can display properly in fullscreen mode.
+ * Also sets up a listener to return to the previous view when exiting fullscreen.
+ */
+export function setupHomepageFullscreenHandler(): void {
+  document.addEventListener(
+    "keydown",
+    (event: KeyboardEvent) => {
+      if (event.key !== "f" && event.key !== "F") {
+        return;
+      }
+
+      const target = event.target as HTMLElement;
+      const isTypingInInput =
+        target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+
+      if (isTypingInInput) {
+        return;
+      }
+
+      if (isPlayerPageOpen()) {
+        return;
+      }
+
+      if (!AppState.lastVideoId) {
+        return;
+      }
+
+      if (isNavigating()) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      openPlayerPageForFullscreen().then(() => {
+        triggerFullscreen();
+      });
+    },
+    { capture: true }
+  );
+
+  setupFullscreenExitListener();
+}
+
+function setupFullscreenExitListener(): void {
+  const appLayout = document.querySelector("ytmusic-app-layout");
+  if (!appLayout) {
+    setTimeout(setupFullscreenExitListener, 1000);
+    return;
+  }
+
+  let wasFullscreen = false;
+
+  const observer = new MutationObserver(() => {
+    const currentState = appLayout.getAttribute("player-ui-state");
+    const isFullscreen = currentState === "FULLSCREEN";
+
+    if (wasFullscreen && !isFullscreen) {
+      closePlayerPageIfOpenedForFullscreen();
+    }
+
+    wasFullscreen = isFullscreen;
+  });
+
+  observer.observe(appLayout, { attributes: true, attributeFilter: ["player-ui-state"] });
+}
+
+function triggerFullscreen(): void {
+  const fullscreenButton = document.querySelector(Constants.FULLSCREEN_BUTTON_SELECTOR) as HTMLElement;
+
+  if (fullscreenButton) {
+    fullscreenButton.click();
+  } else {
+    const keyEvent = new KeyboardEvent("keydown", {
+      key: "f",
+      code: "KeyF",
+      keyCode: 70,
+      which: 70,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(keyEvent);
   }
 }
