@@ -44,6 +44,12 @@ interface BranchCacheEntry {
 const BRANCH_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const repoBranchCache = new Map<string, BranchCacheEntry>();
 
+const ALLOWED_IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp)$/i;
+
+function filterSafeImageFilenames(filenames: string[]): string[] {
+  return filenames.filter(f => ALLOWED_IMAGE_EXTENSIONS.test(f));
+}
+
 function getRawGitHubUrl(repo: string, branch: string, path: string, bustCache = true): string {
   const base = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
   return bustCache ? `${base}?t=${Date.now()}` : base;
@@ -201,10 +207,9 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
   const shaderUrl = metadata.hasShaders ? getRegistryFileUrl(themeId, "shader.json") : undefined;
 
   const imageUrls: string[] = [];
-  if (metadata.images && metadata.images.length > 0) {
-    for (const img of metadata.images) {
-      imageUrls.push(`${REGISTRY_BASE}/themes/${themeId}/images/${img}`);
-    }
+  const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
+  for (const img of safeImages) {
+    imageUrls.push(`${REGISTRY_BASE}/themes/${themeId}/images/${img}`);
   }
 
   let coverUrl: string;
@@ -323,10 +328,9 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
   const shaderUrl = metadata.hasShaders ? `${baseUrl}shader.json` : undefined;
 
   const imageUrls: string[] = [];
-  if (metadata.images && metadata.images.length > 0) {
-    for (const img of metadata.images) {
-      imageUrls.push(`${baseUrl}images/${img}`);
-    }
+  const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
+  for (const img of safeImages) {
+    imageUrls.push(`${baseUrl}images/${img}`);
   }
 
   let coverUrl: string;
@@ -426,7 +430,12 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
     const coverUrl = getRawGitHubUrl(repo, branch, "cover.png");
     const hasCover = await checkFileExists(coverUrl);
     if (!hasCover) {
-      errors.push("Theme must have either cover.png or images in metadata");
+      errors.push("Theme must have either cover.png or images in metadata (png, jpg, gif, webp)");
+    }
+  } else {
+    const invalidImages = metadata.images.filter(f => !ALLOWED_IMAGE_EXTENSIONS.test(f));
+    if (invalidImages.length > 0) {
+      errors.push(`Invalid image format: ${invalidImages.join(", ")} (allowed: png, jpg, gif, webp)`);
     }
   }
 
