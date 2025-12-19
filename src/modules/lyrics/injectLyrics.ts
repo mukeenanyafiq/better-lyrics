@@ -447,7 +447,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== Constants.NO_LYRICS_TEXT) {
-    DOM.addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration);
+    DOM.addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
   } else {
     DOM.addNoLyricsButton(data.song, data.artist, data.album, data.duration);
   }

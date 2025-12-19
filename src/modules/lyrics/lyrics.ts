@@ -26,6 +26,7 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   duration: number;
   videoId: string;
   segmentMap: SegmentMap | null;
+  providerKey?: string;
 };
 
 export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
@@ -196,6 +197,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     Utils.log(err);
   }
 
+  let selectedProvider: string | undefined;
+
   for (let provider of LyricProviders.providerPriority) {
     if (signal.aborted) {
       return;
@@ -222,6 +225,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           }
         }
         lyrics = sourceLyrics;
+        selectedProvider = provider;
         break;
       }
     } catch (err) {
@@ -264,6 +268,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     duration: providerParameters.duration,
     videoId: providerParameters.videoId,
     segmentMap,
+    providerKey: selectedProvider,
     ...lyrics,
   };
 
