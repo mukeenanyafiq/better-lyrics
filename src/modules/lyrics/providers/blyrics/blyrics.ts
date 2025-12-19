@@ -182,14 +182,11 @@ export async function fillTtml(responseString: string, providerParameters: Provi
         let line = translation[":@"]["@_for"];
         
         if (lang && text && line) {
-          lyrics.forEach((lyricLine, lyricIndex) => {
-            if (lyricLine.key == line) {
-              lyrics[lyricIndex].translation = {
-                text,
-                lang,
-              }
-            }
-          })
+          const lyricIndex = lyrics.findIndex(lyricLine => lyricLine.key == line)
+          lyrics[lyricIndex].translation = {
+            text,
+            lang,
+          }
         }
       });
     }
@@ -198,15 +195,12 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       transliterations.transliterations[0].transliteration.forEach(transliteration => {
         let line = transliteration[":@"]["@_for"];
         if (line) {
-          lyrics.forEach((lyricLine, lyricIndex) => {
-            if (lyricLine.key == line) {
-              let beginTime = lyrics[lyricIndex].startTimeMs;
-              let parseResult = parseLyricPart(transliteration.text, beginTime, false);
+          const lyricIndex = lyrics.findIndex(lyricLine => lyricLine.key == line)
+          let beginTime = lyrics[lyricIndex].startTimeMs;
+          let parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
-              lyrics[lyricIndex].romanization = parseResult.text;
-              lyrics[lyricIndex].timedRomanization = parseResult.parts;
-            }
-          })
+          lyrics[lyricIndex].romanization = parseResult.text;
+          lyrics[lyricIndex].timedRomanization = parseResult.parts;
         }
       });
     }
