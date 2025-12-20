@@ -176,12 +176,12 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       translations.translations[0].translation.forEach(translation => {
         let text = translation.text[0]["#text"];
         let line = translation[":@"]["@_for"];
-        
+
         if (lang && text && line) {
           lyrics.get(line)!.translation = {
             text,
             lang,
-          }
+          };
         }
       });
     }
@@ -190,7 +190,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       transliterations.transliterations[0].transliteration.forEach(transliteration => {
         let line = transliteration[":@"]["@_for"];
         if (line) {
-          const lyricLine = lyrics.get(line)!
+          const lyricLine = lyrics.get(line)!;
           let beginTime = lyricLine.startTimeMs;
           let parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
@@ -201,7 +201,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     }
   }
 
-  let lyricArray = lyrics.values().toArray()
+  let lyricArray = lyrics.values().toArray();
   const songDurationMs = parseTime(ttMeta["@_dur"]);
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
