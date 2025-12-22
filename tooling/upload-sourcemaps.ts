@@ -30,7 +30,7 @@ async function uploadFile(filePath: string) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": SOURCEMAPS_API_KEY!,
+        "x-auth-token": SOURCEMAPS_API_KEY!,
       },
       body: fileContent,
     });
