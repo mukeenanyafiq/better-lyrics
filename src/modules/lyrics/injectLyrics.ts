@@ -65,7 +65,6 @@ export type LineData = {
   isSelected: boolean;
   height: number;
   position: number;
-  instrumentalElements?: InstrumentalElements;
 } & PartData;
 
 export type SyncType = "richsync" | "synced" | "none";
@@ -358,10 +357,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
         });
       }
 
-      const waveClip = instrumentalElement.querySelector(".blyrics--wave-clip") as SVGElement;
-      const wavePath = instrumentalElement.querySelector(".blyrics--wave-path") as SVGElement;
-      const fill = instrumentalElement.querySelector(".blyrics--instrumental-fill") as SVGElement;
-
       const line: LineData = {
         lyricElement: instrumentalElement,
         time: lyricItem.startTimeMs / 1000,
@@ -375,7 +370,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
         isSelected: false,
         height: -1,
         position: -1,
-        instrumentalElements: { waveClip, wavePath, fill },
       };
 
       try {
