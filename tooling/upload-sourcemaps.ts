@@ -31,6 +31,7 @@ async function uploadFile(filePath: string) {
       headers: {
         "Content-Type": "application/json",
         "x-auth-token": SOURCEMAPS_API_KEY!,
+        "User-Agent": "better-lyrics-ci/1.0",
       },
       body: fileContent,
     });
@@ -66,6 +67,9 @@ function findFiles(dir: string, fileList: string[] = []) {
 }
 
 const sourcemapFiles = findFiles(`./sourcemaps_for_upload/${browser}`);
+if (sourcemapFiles.length === 0) {
+  console.warn(`Warning: No sourcemap files found for ${browser}`);
+}
 
 await Promise.all(sourcemapFiles.map(uploadFile)).catch(e => {
   console.error("Upload Failed", e);
