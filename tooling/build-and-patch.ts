@@ -16,7 +16,7 @@ try {
     });
 
     console.log(`Patching sourcemaps for ${browser}...`);
-    execSync(`tsx tooling/patch-sourcemaps.js ${browser}`, { stdio: "inherit" });
+    execSync(`tsx tooling/patch-sourcemaps.ts ${browser}`, { stdio: "inherit" });
 
     console.log(`Uploading sourcemaps for ${browser}...`);
     execSync(`tsx tooling/upload-sourcemaps.ts ${browser}`, { stdio: "inherit" });
