@@ -1,4 +1,3 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs";
 import path from "path";
 
@@ -8,42 +7,39 @@ if (!browser) {
   process.exit(1);
 }
 
-const BUCKET_NAME = "better-lyrics-sourcemaps";
-const R2_ENDPOINT = process.env.R2_ENDPOINT;
-const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const SOURCEMAPS_BASE_URL = process.env.SOURCEMAPS_BASE_URL || "https://better-lyrics-sourcemaps.dacubeking.com";
+const SOURCEMAPS_API_KEY = process.env.SOURCEMAPS_API_KEY;
 
-if (!R2_ENDPOINT || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
-  console.error("Missing required environment variables for R2 upload.");
+if (!SOURCEMAPS_API_KEY) {
+  console.error("Missing SOURCEMAPS_API_KEY environment variable.");
   process.exit(1);
 }
-
-const s3Client = new S3Client({
-  region: "auto",
-  endpoint: R2_ENDPOINT,
-  credentials: {
-    accessKeyId: AWS_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  },
-});
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
 const version = packageJson.version;
 
 async function uploadFile(filePath: string) {
   const fileName = path.basename(filePath);
-  const fileStream = fs.createReadStream(filePath);
-
-  const uploadParams = {
-    Bucket: BUCKET_NAME,
-    Key: `${browser}/v${version}/${fileName}`,
-    Body: fileStream,
-    ContentType: "application/json",
-  };
+  const fileContent = fs.readFileSync(filePath);
+  
+  // Construct the URL: /<browser>/v<version>/<filename>
+  const url = `${SOURCEMAPS_BASE_URL}/${browser}/v${version}/${fileName}`;
 
   try {
-    const _data = await s3Client.send(new PutObjectCommand(uploadParams));
-    console.log(`Successfully uploaded ${fileName} to R2.`);
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": SOURCEMAPS_API_KEY!,
+      },
+      body: fileContent,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload ${fileName}: ${response.status} ${response.statusText} - ${await response.text()}`);
+    }
+
+    console.log(`Successfully uploaded ${fileName} to API.`);
   } catch (err) {
     console.error(`Error uploading ${fileName}:`, err);
     process.exit(1);
@@ -69,4 +65,7 @@ function findFiles(dir: string, fileList: string[] = []) {
 
 const sourcemapFiles = findFiles(`./sourcemaps_for_upload/${browser}`);
 
-await Promise.all(sourcemapFiles.map(uploadFile)).catch(e => console.error("R2 Upload Failed", e));
+await Promise.all(sourcemapFiles.map(uploadFile)).catch(e => {
+  console.error("Upload Failed", e);
+  process.exit(1);
+});
