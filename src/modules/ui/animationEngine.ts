@@ -206,7 +206,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         setUpAnimationEarlyTime = 0;
       }
 
-      const effectiveEndTime = Math.min(nextTime, time + lineData.duration + 0.05);
+      const effectiveEndTime = Math.max(nextTime, time + lineData.duration + 0.05);
       if (currentTime + setUpAnimationEarlyTime >= time && currentTime < effectiveEndTime) {
         lineData.isSelected = true;
 
