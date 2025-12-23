@@ -1,7 +1,8 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { compressString, decompressString, isCompressed } from "@core/compression";
 import { loadChunkedStyles } from "@core/storage";
-import type { InstalledStoreTheme } from "../../store/types";
+import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
+import type { InstalledStoreTheme } from "@/options/store/types";
 import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { SaveResult } from "../types";
@@ -258,6 +259,12 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
     LOG_PREFIX_EDITOR,
     `Broadcasting RICS to tabs, source length: ${ricsSource.length}, strategy: ${strategy}`
   );
+
+  if (!ricsCompiler.isValidRics(ricsSource)) {
+    const state = ricsCompiler.getLastCompilationState();
+    console.warn(LOG_PREFIX_EDITOR, "RICS validation failed, broadcasting anyway:", state?.errors);
+  }
+
   try {
     chrome.runtime
       .sendMessage({
@@ -292,6 +299,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
     editorStateManager.incrementSaveCount();
 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
+    await setActiveStoreTheme(themeId);
 
     const saveResult = await saveToStorageWithFallback(themeContent, true);
     if (!saveResult.success) {

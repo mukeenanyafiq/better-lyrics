@@ -8,12 +8,12 @@
  * @param {Object} [request.settings] - Settings object for updateSettings action
  * @returns {boolean} Returns true to indicate asynchronous response
  */
+import { LOG_PREFIX_BACKGROUND } from "@constants";
 import { getInstalledStoreThemes, performSilentUpdates, performUrlThemeUpdates } from "./store/themeStoreManager";
 import { checkStorePermissions, fetchAllStoreThemes } from "./store/themeStoreService";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
-const LOG_PREFIX = "[BetterLyrics:Background]";
 
 async function checkAndApplyThemeUpdates(): Promise<void> {
   try {
@@ -23,17 +23,17 @@ async function checkAndApplyThemeUpdates(): Promise<void> {
     const installed = await getInstalledStoreThemes();
     if (installed.length === 0) return;
 
-    console.log(LOG_PREFIX, "Checking for theme updates...");
+    console.log(LOG_PREFIX_BACKGROUND, "Checking for theme updates...");
     const storeThemes = await fetchAllStoreThemes();
     const marketplaceUpdatedIds = await performSilentUpdates(storeThemes);
     const urlUpdatedIds = await performUrlThemeUpdates();
     const updatedIds = [...marketplaceUpdatedIds, ...urlUpdatedIds];
 
     if (updatedIds.length > 0) {
-      console.log(LOG_PREFIX, `Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
+      console.log(LOG_PREFIX_BACKGROUND, `Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
     }
   } catch (err) {
-    console.warn(LOG_PREFIX, "Theme update check failed:", err);
+    console.warn(LOG_PREFIX_BACKGROUND, "Theme update check failed:", err);
   }
 }
 
@@ -44,7 +44,7 @@ function setupThemeUpdateAlarm(): void {
         delayInMinutes: 1,
         periodInMinutes: UPDATE_INTERVAL_MINUTES,
       });
-      console.log(LOG_PREFIX, "Theme update alarm created");
+      console.log(LOG_PREFIX_BACKGROUND, "Theme update alarm created");
     }
   });
 }
@@ -70,7 +70,9 @@ chrome.runtime.onMessage.addListener(request => {
     chrome.tabs.query({ url: "*://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
         if (tab.id != null) {
-          chrome.tabs.sendMessage(tab.id, { action: "applyStyles", ricsSource: request.ricsSource }).catch(() => {});
+          chrome.tabs.sendMessage(tab.id, { action: "applyStyles", ricsSource: request.ricsSource }).catch(err => {
+            console.warn(LOG_PREFIX_BACKGROUND, `Failed to send message to tab ${tab.id}:`, err);
+          });
         }
       });
     });

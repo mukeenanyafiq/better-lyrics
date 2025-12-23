@@ -37,9 +37,3 @@ export function decompressString(data: string): string {
 export function isCompressed(data: string): boolean {
   return data.startsWith(COMPRESSED_PREFIX);
 }
-
-export function getCompressionRatio(original: string, compressed: string): number {
-  const originalSize = new Blob([original]).size;
-  const compressedSize = new Blob([compressed]).size;
-  return (1 - compressedSize / originalSize) * 100;
-}

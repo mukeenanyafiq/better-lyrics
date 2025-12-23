@@ -288,9 +288,10 @@ function parseMarkdown(text: string): DocumentFragment {
 
   const sanitized = DOMPurify.sanitize(html.trim());
 
-  const template = document.createElement("template");
-  template.innerHTML = sanitized;
-  return template.content;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<template>${sanitized}</template>`, "text/html");
+  const template = doc.querySelector("template");
+  return template ? template.content : document.createDocumentFragment();
 }
 
 function createShaderIcon(): SVGSVGElement {
