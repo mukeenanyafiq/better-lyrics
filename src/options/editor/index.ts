@@ -1,5 +1,6 @@
 import { openSearchPanel } from "@codemirror/search";
-import { showAlert } from "./ui/feedback";
+import { LOG_PREFIX_EDITOR } from "@constants";
+import { showAlert, showModal } from "./ui/feedback";
 import {
   deleteThemeBtn,
   editThemeBtn,
@@ -27,18 +28,46 @@ import {
 export function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
   document.getElementById("back-btn")?.addEventListener("click", openOptions);
+}
+
+export function initializeEditorKeyboardShortcuts() {
+  const editorElement = document.getElementById("editor");
+  if (!editorElement) return;
+
+  const isStandalone = document.querySelector(".theme-name-display.standalone") !== null;
 
   document.addEventListener("keydown", function (e) {
+    const cssSection = document.getElementById("css");
+    const editorIsVisible = isStandalone || (cssSection && cssSection.style.display === "block");
+
+    if (!editorIsVisible) return;
+
     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       saveToStorage();
     }
     if ((e.ctrlKey || e.metaKey) && e.key === "f") {
-      let view = editorStateManager.getEditor();
-      if (view) {
-        openSearchPanel(view);
-      }
       e.preventDefault();
+      if (isStandalone) {
+        const view = editorStateManager.getEditor();
+        if (view) {
+          openSearchPanel(view);
+        }
+      } else {
+        showModal({
+          title: "Find & Replace",
+          message:
+            "Find & Replace is only available in the fullscreen editor.<br><br>Click <strong>Open Fullscreen Editor</strong> to access all editor features.",
+          confirmText: "Open Fullscreen Editor",
+          cancelText: "Close",
+        }).then(result => {
+          if (result) {
+            chrome.tabs.create({
+              url: chrome.runtime.getURL("pages/standalone-editor.html"),
+            });
+          }
+        });
+      }
     }
   });
 }
@@ -82,7 +111,7 @@ export function initializeFileOperations() {
       try {
         await importManager.importCSSFile(file);
       } catch (err) {
-        console.error("[BetterLyrics] File import error:", err);
+        console.error(LOG_PREFIX_EDITOR, "File import error:", err);
       }
     };
     input.click();
@@ -111,7 +140,7 @@ export function initializeStorageListeners() {
 }
 
 export async function initializeEditor() {
-  console.log("[BetterLyrics] DOM loaded, initializing editor");
+  console.log(LOG_PREFIX_EDITOR, "DOM loaded, initializing editor");
 
   const editorElement = document.getElementById("editor")!;
   const isStandalone = document.querySelector(".theme-name-display.standalone") !== null;
@@ -134,20 +163,21 @@ export async function initializeEditor() {
     openStandaloneEditor();
   });
 
-  console.log("[BetterLyrics] Loading theme name and initial CSS");
+  console.log(LOG_PREFIX_EDITOR, "Loading theme name and initial CSS");
 
   const setSelectedThemePromise = setThemeName();
   const loadCustomCssPromise = storageManager.loadInitialCSS();
 
   await Promise.allSettled([setSelectedThemePromise, loadCustomCssPromise]);
 
-  console.log("[BetterLyrics] Editor initialization complete");
+  console.log(LOG_PREFIX_EDITOR, "Editor initialization complete");
 }
 
 export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
     await initializeEditor();
     initializeNavigation();
+    initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
     initializeFileOperations();
