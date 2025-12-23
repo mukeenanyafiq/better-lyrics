@@ -185,11 +185,8 @@ export function createFooter(song: string, artist: string, album: string, durati
     const geniusContainer = document.createElement("div");
     geniusContainer.className = `${Constants.FOOTER_CLASS}__container`;
 
-    const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-    const geniusSearchUrl = `https://genius.com/search?q=${searchQuery}`;
-
     const geniusLink = document.createElement("a");
-    geniusLink.href = geniusSearchUrl;
+    geniusLink.href = getGeniusLink(song, artist);
     geniusLink.target = "_blank";
     geniusLink.textContent = "Search on Genius";
     geniusLink.style.height = "100%";
@@ -508,15 +505,12 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
     window.open(url.toString(), "_blank");
   });
 
-  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-  const geniusSearchUrl = `https://genius.com/search?q=${searchQuery}`;
-
   const geniusSearch = document.createElement("button");
   geniusSearch.className = "blyrics-no-lyrics-button";
   geniusSearch.textContent = "Search on Genius";
 
   geniusSearch.addEventListener("click", () => {
-    window.open(geniusSearchUrl, "_blank");
+    window.open(getGeniusLink(song, artist), "_blank");
   });
 
   buttonContainer.appendChild(addLyricsButton);
@@ -628,4 +622,9 @@ export function injectSongAttributes(title: string, artist: string): void {
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
   mainPanel.appendChild(songInfoWrapper);
+}
+
+function getGeniusLink(song: string, artist: string) : string {
+    const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
+    return `https://genius.com/search?q=${searchQuery}`;
 }
