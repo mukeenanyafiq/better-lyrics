@@ -508,7 +508,19 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
     window.open(url.toString(), "_blank");
   });
 
+  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song}`);
+  const geniusSearchUrl = `https://genius.com/search?q=${searchQuery}`;
+
+  const geniusSearch = document.createElement("button");
+  geniusSearch.className = "blyrics-add-lyrics-button";
+  geniusSearch.textContent = "Try search on Genius";
+
+  geniusSearch.addEventListener("click", () => {
+    window.open(geniusSearchUrl, "_blank");
+  });
+
   buttonContainer.appendChild(addLyricsButton);
+  buttonContainer.appendChild(geniusSearch);
   lyricsWrapper.appendChild(buttonContainer);
 }
 

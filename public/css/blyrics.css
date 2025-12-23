@@ -471,6 +471,7 @@
 	z-index: 1;
 	position:relative;
 	transition: opacity 0.3s ease;
+	gap: 1rem;
 }
 
 .blyrics-add-lyrics-button {
