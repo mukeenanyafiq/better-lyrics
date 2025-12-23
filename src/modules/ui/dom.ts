@@ -625,12 +625,12 @@ export function injectSongAttributes(title: string, artist: string): void {
 }
 
 /**
-* Generates link to search on Genius
-* 
-* @param song - Song name
-* @param artist - Artist name
-*/
-function getGeniusLink(song: string, artist: string) : string {
-    const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-    return `https://genius.com/search?q=${searchQuery}`;
+ * Generates link to search on Genius
+ *
+ * @param song - Song name
+ * @param artist - Artist name
+ */
+function getGeniusLink(song: string, artist: string): string {
+  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
+  return `https://genius.com/search?q=${searchQuery}`;
 }
