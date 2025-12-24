@@ -1,0 +1,655 @@
+body {
+    margin: 0;
+    padding: 0 .5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+button {
+    transition: .1s;
+    margin: 0;
+    width: auto;
+}
+
+/* TOPBAR */
+.topbar {
+    padding: 0 .5rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 3rem;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+
+/** TOP LEFT BAR **/
+.top-left {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: 2rem;
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    translate: 0 -50%;
+}
+
+#actions-expand-btn {
+    display: none;
+}
+
+.action-buttons {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.icon {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+.metadata {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: left;
+    font-size: .75rem;
+    font-weight: 400;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/** TOPBAR TAB BUTTONS **/
+.tab-buttons {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    height: 2rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: hidden;
+}
+
+.label {
+    color: #ffffff;
+    text-align: center;
+    font-size: .875rem;
+    line-height: 20px;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-first-btn {
+    border-radius: .5rem .25rem .25rem .5rem;
+}
+
+.tab-secondary-btn {
+    border-radius: .25rem;
+}
+
+.tab-last-btn {
+    border-radius: .25rem .5rem .5rem .25rem;
+}
+
+.tab-btns {
+    background: rgba(255, 255, 255, .1);
+    padding: .625rem 1.25rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.active-btn {
+    background: rgba(255, 255, 255, .15);
+    box-shadow: inset 0px 0.75px 0px 0px rgba(255, 255, 255, 0.1);
+}
+
+/** TOPBAR LAST SAVED **/
+.last-saved {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: right;
+    font-size: .75rem;
+    font-weight: 400;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* TOOLS */
+.tools {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: .5rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: .0625rem;
+    padding: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: auto;
+}
+
+.new-lyric-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.add-line {
+    background: rgba(255, 255, 255, 0.075);
+    border-radius: .5rem;
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.add-line-agents {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 4rem;
+    position: relative;
+}
+
+.add-line-agents-btn {
+    border-radius: .5rem;
+    padding: 0 .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#add-line-duet {
+    background: rgba(0, 127, 255, 0.25);
+}
+
+#add-line-together {
+    background: rgba(255, 0, 0, 0.25);
+}
+
+.plus-middle {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: visible;
+}
+
+.plus-side {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    position: relative;
+    overflow: visible;
+}
+
+.add-line-label-bottom {
+    color: #ffffff;
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    position: absolute;
+    left: 50%;
+    translate: -50%;
+    bottom: .25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-line-label-side {
+    color: #ffffff;
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-section-span {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator {
+    background: rgba(255, 255, 255, 0.25);
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 1px;
+    position: relative;
+}
+
+.line-timing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.actions2 {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 225px;
+    height: 4rem;
+    position: relative;
+}
+
+.actions3 {
+    /* padding: .5rem 0; */
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 4rem;
+    position: relative;
+}
+
+.start-time {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-property {
+    color: #ffffff;
+    text-align: left;
+    font-size: .75rem;
+    font-weight: 600;
+    position: relative;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.input {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 0 .375rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: 0.5px;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 150px;
+    position: relative;
+    overflow: hidden;
+}
+
+.input:focus {
+    outline: none;
+    transition: .1s;
+    border-color: rgba(255, 255, 255, 0.75);
+}
+
+.input[type=number]::-webkit-inner-spin-button,
+.input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.duration {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.line-properties {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 150px;
+    position: relative;
+}
+
+.instrumental {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkbox {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: .25rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: 0.5px;
+    align-self: stretch;
+    flex-shrink: 0;
+    padding: .875rem;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+
+.background {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* LYRIC LIENS */
+.lines {
+    padding: .3125rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: auto;
+}
+
+.line {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: .5rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: .0625rem;
+    padding: .5rem .75rem .5rem .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.line > .frame-3 > .words > #new-word:not(:focus) {
+    transition: .1s;
+    opacity: 0;
+}
+
+.line:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.line:hover > .frame-3 > .words > #new-word {
+    opacity: 1;
+}
+
+.left-aligned {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    position: relative;
+    overflow: visible;
+    aspect-ratio: 1;
+}
+
+.frame-3 {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+}
+
+.time-duration {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: .75rem;
+    font-weight: 400;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-duration-span {
+    font-family: "Jetbrains Mono", sans-serif;
+}
+
+.words {
+    display: flex;
+    flex-direction: row;
+    gap: .3125rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.word {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: .375rem;
+    padding: .375rem 0.5rem 0.375rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.word-text {
+    color: #ffffff;
+    text-align: center;
+    font-size: .875rem;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-space {
+    color: rgba(255, 255, 255, .375);
+}
+
+.text2 {
+    color: rgba(255, 255, 255, 0.25);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-new-line {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    position: relative;
+    box-shadow: inset 0rem .0675rem 0rem 0rem rgba(255, 255, 255, 0.1);
+    aspect-ratio: 1;
+}
+
+.plus {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: visible;
+}
+
+/* TOOLBAR */
+.toolbar {
+    padding: .5rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.edit-modes {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* TOOLTIP BUTTON */
+.left-tooltip-icon-btn:hover::after {
+    transform: translateX(-5%) translateY(0);
+}
+
+.left-tooltip-icon-btn::after {
+    bottom: auto;
+    left: 0;
+    translate: -100%;
+    transform: translateY(0);
+}
+
+/* MEDIA */
+@media screen and (width <= 1300px) {
+    .metadata {
+        display: none;
+    }
+}
+
+@media screen and (width <= 800px) {
+    .action-buttons {
+        display: none;
+    }
+    #actions-expand-btn {
+        display: flex;
+    }
+}

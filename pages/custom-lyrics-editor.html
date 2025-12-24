@@ -1,0 +1,416 @@
+<html lang="en-US" style="width: unset; max-width: unset">
+	<head>
+		<meta name="color-scheme" content="dark" />
+		<title>Better Lyrics Custom Lyrics Editor</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://api.fontshare.com/v2/css?f[]=satoshi@1&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../src/options/options.css" />
+		<link rel="stylesheet" href="./clyrics/clyrics.css" />
+		<script src="/stylelint/stylelint-bundle.min.js"></script>
+	</head>
+	<body>
+		<!-- TOPBAR -->
+		<div id="topbar" class="topbar">			
+			<div class="top-left">
+				<img class="icon" src="https://better-lyrics.boidu.dev/icon-512.png" draggable="false" />
+				
+				<button id="actions-expand-btn" class="icon-btn tab-btns active-btn" style="padding: .625rem;">
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z"/>
+					</svg>
+				</button>
+				<div class="action-buttons">
+					<button id="action-file-btn" class="tab-first-btn tab-btns active-btn">
+						<span class="label">File</span>
+					</button>
+					<button id="action-edit-btn" class="tab-secondary-btn tab-btns active-btn">
+						<span class="label">Edit</span>
+					</button>
+					<button id="action-tools-btn" class="tab-last-btn tab-btns active-btn">
+						<span class="label">Tools</span>
+					</button>
+				</div>
+
+				<div class="metadata">
+					<span>
+						<strong id="metadata-name">Snowman</strong>
+						<strong id="metadata-duration"> • 04:30<br /></strong>
+						<span id="metadata-artist">Sia</span>
+						<span id="metadata-album"> • Everyday is Christmas (Deluxe Edition)</span>
+					</span>
+				</div>
+			</div>
+
+			<div class="tab-buttons">
+				<button id="tab-editor-btn" class="tab-first-btn tab-btn tab-btns active-btn">
+					<span class="label">Editor</span>
+				</button>
+				<button id="tab-timing-btn" class="tab-secondary-btn tab-btn tab-btns">
+					<span class="label">Timing</span>
+				</button>
+				<button id="tab-preview-btn" class="tab-last-btn tab-btn tab-btns">
+					<span class="label">Preview</span>
+				</button>
+			</div>
+
+			<div class="last-saved">
+				<span>
+					<strong>Last saved:<br /></strong>
+					<span id="last-saved-time">1m 7s ago</span>
+				</span>
+			</div>
+		</div>
+
+		<!-- TOOLS -->
+		<div class="tools">
+			<div class="new-lyric-line">
+				<div class="actions">
+					<button id="add-line" class="add-line active-btn">
+						<svg class="plus-middle" width="16" height="16" viewBox="0 0 16 16">
+							<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						<span class="add-line-label-bottom">Line</span>
+					</button>
+					<div class="add-line-agents">
+						<button id="add-line-duet" class="add-line-agents-btn active-btn">
+							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							<span class="add-line-label-side">Duet</span>
+						</button>
+
+						<button id="add-line-together" class="add-line-agents-btn active-btn">
+							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							<span class="add-line-label-side">Together</span>
+						</button>
+					</div>
+				</div>
+				<span class="tool-section-span">New Lyric Line</span>
+			</div>
+
+			<div class="separator"></div>
+
+			<div class="line-timing">
+				<div class="actions2">
+					<div class="start-time">
+						<span class="tool-property">Start Time</span>
+						<input id="start-time-input" type="number" class="input" />
+					</div>
+					<div class="duration">
+						<span class="tool-property">Duration</span>
+						<input id="duration-input" type="number" class="input" />
+					</div>
+				</div>
+				<span class="tool-section-span">Line Timing</span>
+			</div>
+
+			<div class="separator"></div>
+
+			<div class="line-properties">
+				<div class="actions3">
+					<div class="instrumental">
+						<span class="tool-property">Instrumental</span>
+						<button class="checkbox"></button>
+					</div>
+					<div class="background">
+						<span class="tool-property">Background</span>
+						<button class="checkbox"></button>
+					</div>
+				</div>
+				<span class="tool-section-span">Line Properties</span>
+			</div>
+		</div>
+
+		<!-- LYRIC LINES -->
+		<div class="lines">
+			<div class="line">
+				<svg class="left-aligned" width="28" height="28" viewBox="0 0 28 28" >
+					<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<div class="frame-3">
+					<div class="time-duration">
+						<span>
+							<strong class="time-duration-span">[♪] 00:06.216</strong>
+							<span class="time-duration-span">• 4.145s</span>
+						</span>
+					</div>
+					<div class="words">
+						<button class="word">
+							<div class="word-text">Don't</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">cry,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">Snowman,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">not</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">in</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">front</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">of</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">me</div>
+						</button>
+						<input id="new-word" type="text" class="input" placeholder="Type a word or line"/>
+					</div>
+				</div>
+				<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
+					<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="white" stroke-width="1.2"	stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+			<div class="line">
+				<svg class="left-aligned" width="28" height="28" viewBox="0 0 28 28" >
+					<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<div class="frame-3">
+					<div class="time-duration">
+						<span>
+							<strong class="time-duration-span">[♪] 00:06.216</strong>
+							<span class="time-duration-span">• 4.145s</span>
+						</span>
+					</div>
+					<div class="words">
+						<button class="word">
+							<div class="word-text">Don't</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">cry,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">Snowman,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">not</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">in</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">front</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">of</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">me</div>
+						</button>
+						<input id="new-word" type="text" class="input" placeholder="Type a word or line"/>
+					</div>
+				</div>
+				<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
+					<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="white" stroke-width="1.2"	stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+			<div class="line">
+				<svg class="left-aligned" width="28" height="28" viewBox="0 0 28 28" >
+					<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<div class="frame-3">
+					<div class="time-duration">
+						<span>
+							<strong class="time-duration-span">[♪] 00:06.216</strong>
+							<span class="time-duration-span">• 4.145s</span>
+						</span>
+					</div>
+					<div class="words">
+						<button class="word">
+							<div class="word-text">Don't</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">cry,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">Snowman,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">not</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">in</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">front</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">of</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">me</div>
+						</button>
+						<input id="new-word" type="text" class="input" placeholder="Type a word or line"/>
+					</div>
+				</div>
+				<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
+					<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="white" stroke-width="1.2"	stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+			<div class="line">
+				<svg class="left-aligned" width="28" height="28" viewBox="0 0 28 28" >
+					<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<div class="frame-3">
+					<div class="time-duration">
+						<span>
+							<strong class="time-duration-span">[♪] 00:06.216</strong>
+							<span class="time-duration-span">• 4.145s</span>
+						</span>
+					</div>
+					<div class="words">
+						<button class="word">
+							<div class="word-text">Don't</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">cry,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">Snowman,</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">not</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">in</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">front</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">of</div>
+						</button>
+						<button class="word">
+							<div class="word-space word-text">1x</div>
+						</button>
+						<button class="word">
+							<div class="word-text">me</div>
+						</button>
+						<input id="new-word" type="text" class="input" placeholder="Type a word or line"/>
+					</div>
+				</div>
+				<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
+					<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="white" stroke-width="1.2"	stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+		</div>
+
+		<!-- TOOLBAR -->
+		<div class="toolbar">
+			<div class="edit-modes">
+				<button id="edit-mode-simple-btn" class="tab-first-btn edit-mode-btn tab-btns active-btn">
+					<div class="label">Simple</div>
+				</button>
+				<button id="edit-mode-lrc-btn" class="tab-secondary-btn edit-mode-btn tab-btns">
+					<div class="label">LRC</div>
+				</button>
+				<button id="edit-mode-json-btn" class="tab-last-btn edit-mode-btn tab-btns">
+					<div class="label">JSON</div>
+				</button>
+			</div>
+		</div>
+	</body>
+	<script type="module" defer src="./clyrics/clyrics.js"></script>
+</html>
