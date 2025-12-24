@@ -67,7 +67,7 @@ jobs:
           node-version: "20.x"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run Typescript
         run: npm run typecheck
@@ -137,7 +137,7 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Download Chrome build
         uses: actions/download-artifact@v4
@@ -158,7 +158,7 @@ jobs:
           CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
           REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
-        run: tsx tooling/publish-chrome.ts dist/chrome-v${{ needs.release.outputs.version }}.zip
+        run: npx tsx tooling/publish-chrome.ts dist/chrome-v${{ needs.release.outputs.version }}.zip
 
       - name: Upload Chrome Zip for release
         uses: actions/upload-artifact@v4
@@ -179,7 +179,7 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Download Firefox build
         uses: actions/download-artifact@v4
@@ -238,7 +238,7 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Download Edge build
         uses: actions/download-artifact@v4
@@ -258,7 +258,7 @@ jobs:
           CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           API_KEY: ${{ secrets.EDGE_API_KEY }}
           PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
-        run: tsx tooling/publish-edge.ts dist/edge-v${{ needs.release.outputs.version }}.zip
+        run: npx tsx tooling/publish-edge.ts dist/edge-v${{ needs.release.outputs.version }}.zip
 
       - name: Upload Edge Zip for release
         uses: actions/upload-artifact@v4
