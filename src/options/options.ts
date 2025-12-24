@@ -381,6 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
   new Sortable(document.getElementById("providers-list")!, {
     animation: 150,
     ghostClass: "dragging",
+    forceFallback: true,
     onUpdate: saveOptions,
   });
 });
