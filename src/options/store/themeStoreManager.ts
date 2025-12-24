@@ -1,4 +1,5 @@
 import { LOG_PREFIX_STORE } from "@constants";
+import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
@@ -33,7 +34,7 @@ interface ThemeIndex {
 }
 
 async function getThemeIndex(): Promise<ThemeIndex> {
-  const result = (await chrome.storage.local.get(THEME_INDEX_KEY)) as { [THEME_INDEX_KEY]?: ThemeIndex };
+  const result = await getLocalStorage<{ [THEME_INDEX_KEY]?: ThemeIndex }>([THEME_INDEX_KEY]);
   return result[THEME_INDEX_KEY] || { themeIds: [] };
 }
 
@@ -46,9 +47,7 @@ function getThemeStorageKey(themeId: string): string {
 }
 
 async function migrateFromLegacyStorage(): Promise<void> {
-  const result = (await chrome.storage.local.get(LEGACY_STORAGE_KEY)) as {
-    [LEGACY_STORAGE_KEY]?: InstalledStoreTheme[];
-  };
+  const result = await getLocalStorage<{ [LEGACY_STORAGE_KEY]?: InstalledStoreTheme[] }>([LEGACY_STORAGE_KEY]);
   const legacyThemes = result[LEGACY_STORAGE_KEY];
 
   if (!legacyThemes || legacyThemes.length === 0) return;
@@ -88,7 +87,7 @@ export async function getInstalledStoreThemes(): Promise<InstalledStoreTheme[]> 
   if (index.themeIds.length === 0) return [];
 
   const keys = index.themeIds.map(getThemeStorageKey);
-  const result = (await chrome.storage.local.get(keys)) as Record<string, InstalledStoreTheme | undefined>;
+  const result = await getLocalStorage<Record<string, InstalledStoreTheme | undefined>>(keys);
 
   const themes: InstalledStoreTheme[] = [];
   const validIds: string[] = [];
@@ -117,7 +116,7 @@ export async function isThemeInstalled(themeId: string): Promise<boolean> {
 export async function getInstalledTheme(themeId: string): Promise<InstalledStoreTheme | null> {
   await ensureMigrated();
   const key = getThemeStorageKey(themeId);
-  const result = (await chrome.storage.local.get(key)) as Record<string, InstalledStoreTheme | undefined>;
+  const result = await getLocalStorage<Record<string, InstalledStoreTheme | undefined>>([key]);
   return result[key] || null;
 }
 
@@ -198,9 +197,7 @@ export async function removeTheme(themeId: string): Promise<void> {
 }
 
 export async function getActiveStoreTheme(): Promise<string | null> {
-  const result = (await chrome.storage.sync.get(ACTIVE_STORE_THEME_KEY)) as {
-    [ACTIVE_STORE_THEME_KEY]?: string;
-  };
+  const result = await getSyncStorage<{ [ACTIVE_STORE_THEME_KEY]?: string }>([ACTIVE_STORE_THEME_KEY]);
   return result[ACTIVE_STORE_THEME_KEY] || null;
 }
 

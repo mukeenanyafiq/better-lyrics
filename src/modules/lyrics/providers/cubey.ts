@@ -1,4 +1,5 @@
 import { LOG_PREFIX } from "@constants";
+import { getLocalStorage } from "@core/storage";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters } from "./shared";
 
 /**
@@ -108,7 +109,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
       log(LOG_PREFIX, "Forcing new token, removing any existing one.");
       await chrome.storage.local.remove("jwtToken");
     } else {
-      const storedData = (await chrome.storage.local.get("jwtToken")) as { jwtToken?: string };
+      const storedData = await getLocalStorage<{ jwtToken?: string }>(["jwtToken"]);
       if (storedData.jwtToken) {
         if (isJwtExpired(storedData.jwtToken)) {
           log(LOG_PREFIX, "Local JWT has expired. Removing and requesting a new one.");

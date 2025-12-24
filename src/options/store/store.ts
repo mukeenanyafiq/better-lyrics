@@ -2,6 +2,7 @@ import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { LOG_PREFIX_STORE } from "@constants";
+import { getLocalStorage, getSyncStorage } from "@core/storage";
 import { applyStoreThemeComplete } from "../editor/features/storage";
 import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from "./types";
 
@@ -70,9 +71,9 @@ function installedThemeToStoreTheme(installed: InstalledStoreTheme): StoreTheme 
 }
 
 async function loadUserRatings(): Promise<void> {
-  const { userThemeRatings } = (await chrome.storage.local.get("userThemeRatings")) as {
-    userThemeRatings?: Record<string, number>;
-  };
+  const { userThemeRatings } = await getLocalStorage<{ userThemeRatings?: Record<string, number> }>([
+    "userThemeRatings",
+  ]);
   userRatingsCache = userThemeRatings || {};
 }
 
@@ -82,9 +83,9 @@ async function saveUserRating(themeId: string, rating: number): Promise<void> {
 }
 
 async function loadUserInstalls(): Promise<void> {
-  const { userThemeInstalls } = (await chrome.storage.local.get("userThemeInstalls")) as {
-    userThemeInstalls?: Record<string, boolean>;
-  };
+  const { userThemeInstalls } = await getLocalStorage<{ userThemeInstalls?: Record<string, boolean> }>([
+    "userThemeInstalls",
+  ]);
   userInstallsCache = userThemeInstalls || {};
 }
 
@@ -1984,8 +1985,8 @@ export async function updateYourThemesDropdown(): Promise<void> {
   const installed = await getInstalledStoreThemes();
   const storedActiveThemeId = await getActiveStoreTheme();
 
-  const syncData = await chrome.storage.sync.get("themeName");
-  const currentThemeName = syncData.themeName as string | undefined;
+  const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+  const currentThemeName = syncData.themeName;
   const isStoreThemeActive = currentThemeName?.startsWith("store:");
   const activeThemeId = isStoreThemeActive ? currentThemeName?.slice(6) : null;
 

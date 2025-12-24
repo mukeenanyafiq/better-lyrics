@@ -1,4 +1,5 @@
 import { LOG_PREFIX_STORE, THEME_STORE_API_URL } from "@constants";
+import { getLocalStorage } from "@core/storage";
 import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 import { fetchWithTimeout } from "./themeStoreService";
 const THEME_ID_MAX_LENGTH = 128;
@@ -18,7 +19,7 @@ function isValidRating(rating: number): boolean {
 }
 
 async function getOdid(): Promise<string> {
-  const { odid } = (await chrome.storage.local.get("odid")) as { odid?: string };
+  const { odid } = await getLocalStorage<{ odid?: string }>(["odid"]);
   if (odid) return odid;
 
   const newOdid = crypto.randomUUID();

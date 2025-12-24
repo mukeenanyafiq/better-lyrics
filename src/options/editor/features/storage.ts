@@ -441,8 +441,8 @@ export class StorageManager {
       return;
     }
 
-    const syncData = await chrome.storage.sync.get("themeName");
-    const currentThemeName = syncData.themeName as string | undefined;
+    const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+    const currentThemeName = syncData.themeName;
 
     if (!currentThemeName?.startsWith("store:")) return;
 

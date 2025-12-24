@@ -1,4 +1,5 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { getSyncStorage } from "@core/storage";
 
 import type { ThemeSource } from "../../store/types";
 import type { ThemeCardOptions } from "../types";
@@ -390,8 +391,8 @@ export async function updateThemeSelectorButton(): Promise<void> {
   if (themeName) {
     themeSelectorBtn.appendChild(document.createTextNode(themeName));
 
-    const syncData = await chrome.storage.sync.get("themeName");
-    const storedThemeName = syncData.themeName as string | undefined;
+    const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+    const storedThemeName = syncData.themeName;
 
     if (storedThemeName?.startsWith(STORE_THEME_PREFIX)) {
       const storeThemeId = storedThemeName.slice(STORE_THEME_PREFIX.length);
@@ -542,54 +543,52 @@ export function closeThemeModal() {
 }
 
 export async function setThemeName() {
-  await chrome.storage.sync.get("themeName").then(async data => {
-    const syncData = data as { themeName?: string };
-    if (syncData.themeName) {
-      if (syncData.themeName.startsWith(STORE_THEME_PREFIX)) {
-        const storeThemeId = syncData.themeName.slice(STORE_THEME_PREFIX.length);
-        const storeTheme = await getInstalledTheme(storeThemeId);
-        if (storeTheme) {
-          editorStateManager.setCurrentThemeName(storeTheme.title);
-          editorStateManager.setIsCustomTheme(false);
-          editorStateManager.setIsStoreTheme(true);
-          const editorSource = themeSourceToEditorSource(storeTheme.source);
-          showThemeName(storeTheme.title, editorSource);
+  const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+  if (syncData.themeName) {
+    if (syncData.themeName.startsWith(STORE_THEME_PREFIX)) {
+      const storeThemeId = syncData.themeName.slice(STORE_THEME_PREFIX.length);
+      const storeTheme = await getInstalledTheme(storeThemeId);
+      if (storeTheme) {
+        editorStateManager.setCurrentThemeName(storeTheme.title);
+        editorStateManager.setIsCustomTheme(false);
+        editorStateManager.setIsStoreTheme(true);
+        const editorSource = themeSourceToEditorSource(storeTheme.source);
+        showThemeName(storeTheme.title, editorSource);
+      } else {
+        editorStateManager.setCurrentThemeName(null);
+        editorStateManager.setIsCustomTheme(false);
+        editorStateManager.setIsStoreTheme(false);
+        hideThemeName();
+      }
+    } else {
+      editorStateManager.setIsStoreTheme(false);
+      const builtInIndex = THEMES.findIndex(theme => theme.name === syncData.themeName);
+      if (builtInIndex !== -1) {
+        editorStateManager.setCurrentThemeName(syncData.themeName);
+        editorStateManager.setIsCustomTheme(false);
+        showThemeName(syncData.themeName, "builtin");
+      } else {
+        const customThemes = await getCustomThemes();
+        const customIndex = customThemes.findIndex(theme => theme.name === syncData.themeName);
+        if (customIndex !== -1) {
+          editorStateManager.setCurrentThemeName(syncData.themeName);
+          editorStateManager.setIsCustomTheme(true);
+          showThemeName(syncData.themeName, "custom");
         } else {
           editorStateManager.setCurrentThemeName(null);
           editorStateManager.setIsCustomTheme(false);
           editorStateManager.setIsStoreTheme(false);
           hideThemeName();
         }
-      } else {
-        editorStateManager.setIsStoreTheme(false);
-        const builtInIndex = THEMES.findIndex(theme => theme.name === syncData.themeName);
-        if (builtInIndex !== -1) {
-          editorStateManager.setCurrentThemeName(syncData.themeName);
-          editorStateManager.setIsCustomTheme(false);
-          showThemeName(syncData.themeName, "builtin");
-        } else {
-          const customThemes = await getCustomThemes();
-          const customIndex = customThemes.findIndex(theme => theme.name === syncData.themeName);
-          if (customIndex !== -1) {
-            editorStateManager.setCurrentThemeName(syncData.themeName);
-            editorStateManager.setIsCustomTheme(true);
-            showThemeName(syncData.themeName, "custom");
-          } else {
-            editorStateManager.setCurrentThemeName(null);
-            editorStateManager.setIsCustomTheme(false);
-            editorStateManager.setIsStoreTheme(false);
-            hideThemeName();
-          }
-        }
       }
-    } else {
-      editorStateManager.setCurrentThemeName(null);
-      editorStateManager.setIsCustomTheme(false);
-      editorStateManager.setIsStoreTheme(false);
-      hideThemeName();
     }
-    updateThemeSelectorButton();
-  });
+  } else {
+    editorStateManager.setCurrentThemeName(null);
+    editorStateManager.setIsCustomTheme(false);
+    editorStateManager.setIsStoreTheme(false);
+    hideThemeName();
+  }
+  updateThemeSelectorButton();
 }
 
 export async function handleSaveTheme() {
