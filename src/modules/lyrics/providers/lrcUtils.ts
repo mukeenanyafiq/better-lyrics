@@ -41,6 +41,29 @@ export function parseTime(timeStr: string | number | undefined): number {
 }
 
 /**
+ * Formats a time number in milliseconds to mm:ss or mm:ss.xx
+ */
+export function formatTime(timeNum: number | undefined, isSec?: boolean, useMs?: boolean): string {
+  if (!timeNum) return "0";
+  if (isSec) timeNum *= 1000
+
+  const totalSec = Math.floor(timeNum / 1000);
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  const millisec = timeNum % 1000;
+
+  const padZero = (num: number, length: number = 2): string => {
+    return num.toString().padStart(length, "0");
+  };
+  
+  if (useMs) {
+    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(Math.floor(millisec /10))}`
+  } else {
+    return `${padZero(minutes)}:${padZero(seconds)}`
+  }
+}
+
+/**
  *
  * @param lrcText
  * @param songDuration

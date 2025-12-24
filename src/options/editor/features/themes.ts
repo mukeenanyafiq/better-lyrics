@@ -257,8 +257,12 @@ export async function populateThemeModal(): Promise<void> {
   const customThemes = await getCustomThemes();
 
   const builtInSection = document.createElement("div");
-  builtInSection.className = "theme-modal-section";
-  builtInSection.innerHTML = '<h3 class="theme-modal-section-title">Built-in Themes</h3>';
+  builtInSection.className = "modal-section";
+
+  const builtInHeader = document.createElement("div");
+  builtInHeader.className = "modal-section-header"
+  builtInHeader.innerHTML = '<h3 class="modal-section-title">Built-in Themes</h3>';
+  builtInSection.appendChild(builtInHeader);
 
   const builtInGrid = document.createElement("div");
   builtInGrid.className = "theme-modal-items";
@@ -278,8 +282,12 @@ export async function populateThemeModal(): Promise<void> {
 
   if (customThemes.length > 0) {
     const customSection = document.createElement("div");
-    customSection.className = "theme-modal-section";
-    customSection.innerHTML = '<h3 class="theme-modal-section-title">Custom Themes</h3>';
+    customSection.className = "modal-section";
+    
+    const customHeader = document.createElement("div");
+    customHeader.className = "modal-section-header"
+    customHeader.innerHTML = '<h3 class="modal-section-title">Custom Themes</h3>';
+    customSection.appendChild(customHeader);
 
     const customGrid = document.createElement("div");
     customGrid.className = "theme-modal-items";

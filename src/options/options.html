@@ -318,40 +318,46 @@
 						Lyric Source Preference
 					</h2>
 					<p>
-						Drag to reorder priority. Higher sources are tried first.
+						Drag to reorder priority. Higher sources are fetched first.
 						Uncheck to disable.
 					</p>
 					<div class="container" style="margin-bottom: 0.2rem">
 						<ul id="providers-list" class="sortable-list"></ul>
 					</div>
+					<div class="container">
+						<span>Custom Lyrics</span>
+						<button class="small-btn" id="clyrics-modify-btn">
+							Modify
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="tab-content" id="themes-content">
-			<div class="settings-group">
-				<h2>
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-						<path fill-rule="evenodd" d="M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z" clip-rule="evenodd"></path>
-					</svg>
-
-					Theme Settings
-				</h2>
-				<p>Customize the appearance of Better Lyrics.</p>
-				<div class="container">
-					<span>Theme</span>
-					<button class="small-btn" id="theme-selector-btn">
-						Choose a theme
-					</button>
-				</div>
-				<div class="container">
-					<span>Custom CSS</span>
-					<button class="small-btn" id="edit-css-btn">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-							<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
-							<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+			<div class="tab-content" id="themes-content">
+				<div class="settings-group">
+					<h2>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path fill-rule="evenodd" d="M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z" clip-rule="evenodd"></path>
 						</svg>
-						Create
-					</button>
+
+						Theme Settings
+					</h2>
+					<p>Customize the appearance of Better Lyrics.</p>
+					<div class="container">
+						<span>Theme</span>
+						<button class="small-btn" id="theme-selector-btn">
+							Choose a theme
+						</button>
+					</div>
+					<div class="container">
+						<span>Custom CSS</span>
+						<button class="small-btn" id="edit-css-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+								<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
+								<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+							</svg>
+							Create
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -392,8 +398,83 @@
 						</svg>
 					</button>
 				</div>
-				<div class="theme-modal-body">
+				
+				<div class="modal-body-wrapped modal-body">
 					<div id="theme-modal-grid"></div>
+				</div>
+			</div>
+		</div>
+
+		<div id="clyrics-modal-overlay" class="modal-overlay">
+			<div class="modal clyrics-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Custom Lyrics</h3>
+					<button id="clyrics-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="modal-body-wrapped modal-body">
+					<div id="clyrics-modal-list"></div>
+					<div id="clyrics-new-lyric" style="display: none;">
+						<div class="modal-section">
+							<div class="modal-section-header">
+								<h3 class="modal-section-title">Create a New Lyric</h3>
+								<button class="small-svg-btn">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+										<path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/>
+									</svg>
+								</button>
+							</div>
+							<div class="clyrics-top-buttons">
+								<button id="return-clyrics-btn" class="icon-btn" data-tooltip="Return">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
+									</svg>
+								</button>
+								<button id="import-currently-btn" class="small-btn">
+									Import from currently playing
+								</button>
+							</div>
+							<span class="clyrics-span">
+								Your lyric will be saved and synchronized across all devices.
+								<br/>
+								<strong>However, your lyric will NOT be uploaded to Better Lyrics provider.</strong>
+							</span>
+								<div id="clyrics-track-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Track Name *</strong></span>
+									<input type="text" placeholder="Enter the name of the track" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-artist-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Artist Name *</strong></span>
+									<input type="text" placeholder="Enter the name of the track's artist" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-album-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Album Name</strong></span>
+									<input type="text" placeholder="Enter the name of the track's album" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-duration" class="clyrics-short-input">
+									<span class="clyrics-input-title"><strong>Duration</strong></span>
+									<input type="number" placeholder="Enter the duration of the track (in seconds)" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-lyric-file" class="clyrics-short-input">
+									<div class="clyrics-input-info">
+										<span class="clyrics-input-title"><strong>Lyric File</strong></span>
+										<span class="clyrics-input-description"><strong>(.lrc, .elrc, .ttml, .xml are supported)</strong></span>
+									</div>
+									<label for="clyrics-lyric-file-input" class="small-btn">Import</label>
+									<input type="file" id="clyrics-lyric-file-input" accept=".lrc,.elrc,.ttml,.xml" style="display: none;" />
+								</div>
+							<strong id="clyrics-required-section" class="clyrics-span" style="color: #ff8080">
+								Required section: Track Name and Artist Name
+							</strong>
+							<button id="create-clyric-btn" class="label-btn btn-confirm icon-btn" data-tooltip="Creates a new lyric">
+								<strong>Create</strong>
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

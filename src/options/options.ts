@@ -14,6 +14,8 @@ interface Options {
   preferredProviderList: string[];
 }
 
+new Date()
+
 const saveOptions = (): void => {
   const options = getOptionsFromForm();
 
@@ -195,6 +197,7 @@ const restoreOptions = (): void => {
       "musixmatch-synced",
       "yt-lyrics",
       "lrclib-plain",
+      "custom-lyrics",
     ],
   };
 
@@ -230,6 +233,7 @@ const setOptionsInForm = (items: Options): void => {
     "musixmatch-synced",
     "yt-lyrics",
     "lrclib-plain",
+    "custom-lyrics",
   ];
 
   for (let i = 0; i < items.preferredProviderList.length; i++) {
@@ -250,6 +254,7 @@ const setOptionsInForm = (items: Options): void => {
     providersListElem.appendChild(providerElem);
   });
 };
+
 type SyncType = "syllable" | "word" | "line" | "unsynced";
 
 interface ProviderInfo {
@@ -260,19 +265,20 @@ interface ProviderInfo {
 const providerIdToInfoMap: { [key: string]: ProviderInfo } = {
   "musixmatch-richsync": { name: "Musixmatch", syncType: "word" },
   "musixmatch-synced": { name: "Musixmatch", syncType: "line" },
-  "yt-captions": { name: "Youtube Captions", syncType: "line" },
-  "lrclib-synced": { name: "LRClib", syncType: "line" },
+  "yt-captions": { name: "YouTube Captions", syncType: "line" },
+  "lrclib-synced": { name: "LRCLIB", syncType: "line" },
   "bLyrics-richsynced": { name: "Better Lyrics", syncType: "syllable" },
   "bLyrics-synced": { name: "Better Lyrics", syncType: "line" },
   "legato-synced": { name: "Better Lyrics Legato", syncType: "line" },
-  "yt-lyrics": { name: "Youtube", syncType: "unsynced" },
-  "lrclib-plain": { name: "LRClib", syncType: "unsynced" },
+  "yt-lyrics": { name: "YouTube", syncType: "unsynced" },
+  "lrclib-plain": { name: "LRCLIB", syncType: "unsynced" },
+  "custom-lyrics": { name: "Custom-made lyrics", syncType: "syllable" },
 };
 
 const syncTypeConfig: { [key in SyncType]: { label: string; icon: string; tooltip: string } } = {
   syllable: {
     label: "Syllable",
-    tooltip: "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    tooltip: "Supports highlighting individual syllables as they're sung. Syllable syncing provides the best experience.",
     icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
   },
   word: {

@@ -14,6 +14,10 @@ export const themeSelectorBtn = document.getElementById("theme-selector-btn") as
 export const themeModalOverlay = document.getElementById("theme-modal-overlay") as HTMLElement | null;
 export const themeModalClose = document.getElementById("theme-modal-close") as HTMLButtonElement | null;
 export const themeModalGrid = document.getElementById("theme-modal-grid") as HTMLElement | null;
+export const clyricsModifyBtn = document.getElementById("clyrics-modify-btn") as HTMLButtonElement | null;
+export const clyricsModalOverlay = document.getElementById("clyrics-modal-overlay") as HTMLElement | null;
+export const clyricsModalClose = document.getElementById("clyrics-modal-close") as HTMLButtonElement | null;
+export const clyricsModalList = document.getElementById("clyrics-modal-list") as HTMLElement | null;
 
 export const openEditCSS = (): void => {
   const editCSS = document.getElementById("css");

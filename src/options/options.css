@@ -80,8 +80,13 @@ button {
     font-size: 1.125rem;
 }
 
+svg {
+	width: 1rem;
+	height: 1rem;
+}
+
 * {
-    font-family: Avenir, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: Avenir, -apple-system, BlinkMacSystemFont, Inter, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     font-weight: 400;
 }
@@ -91,6 +96,10 @@ body {
     color: #fff;
     padding: 1.25rem 2rem 1rem;
     overflow: hidden;
+}
+
+strong {
+	font-weight: 600;
 }
 
 .container {
@@ -125,7 +134,8 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+button:hover,
+label:hover {
     background-color: hsla(0, 0%, 100%, 0.2);
 }
 
@@ -218,7 +228,6 @@ select option {
     background-color: hsla(0, 0%, 100%, 0.1);
     color: #fff;
     padding: 8px 12px;
-    padding-right: 16px;
     border: none;
     border-radius: 0.5rem;
     text-align: center;
@@ -229,8 +238,18 @@ select option {
 }
 
 .small-btn svg {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: 1rem;
+    height: 1rem;
+}
+
+.small-svg-btn {
+	background: transparent;
+	width: auto;
+	padding: 0;
+	margin: 0;
+	border-radius: .2rem;
+	width: 1.125rem;
+	height: 1.125rem;
 }
 
 #css {
@@ -512,7 +531,7 @@ select option {
 }
 
 .tab-container button {
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     padding: 0.375rem 0.75rem;
     border: none;
     background: none;
@@ -627,6 +646,15 @@ hr {
 .dots {
     flex-grow: 1;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.btn-confirm {
+	background-color: rgba(0, 255, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+	background-color: rgba(0, 255, 0, 0.4);
 }
 
 .btn-danger {
@@ -1025,6 +1053,11 @@ input.cm-textfield:focus-visible {
 	padding: 0 !important;
 }
 
+.label-btn {
+	margin: 0;
+	padding: 0.5rem 1.5rem;
+}
+
 /* Theme Modal */
 .theme-modal {
 	max-width: 700px;
@@ -1034,36 +1067,10 @@ input.cm-textfield:focus-visible {
 	flex-direction: column;
 }
 
-.theme-modal-body {
-	padding: 1.5rem;
-	overflow-y: auto;
-	flex: 1;
-	max-height: calc(85vh - 80px);
-}
-
 @media (max-width: 600px) {
 	.theme-modal {
 		max-width: 95%;
 	}
-}
-
-.theme-modal-section {
-	margin-bottom: 2rem;
-}
-
-.theme-modal-section:last-child {
-	margin-bottom: 0;
-}
-
-.theme-modal-section-title {
-	font-size: 0.8125rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: rgba(255, 255, 255, 0.5);
-	margin: 0 0 1rem 0;
-	padding-bottom: 0.5rem;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .theme-modal-items {
@@ -1076,7 +1083,7 @@ input.cm-textfield:focus-visible {
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 0.5rem;
-	padding: 0.625rem 0.75rem 0.5rem;
+	padding: 0.625rem 0.75rem;
 	cursor: pointer;
 	transition: all 0.2s;
 	position: relative;
@@ -1249,6 +1256,93 @@ input.cm-textfield:focus-visible {
 	height: 0.875rem;
 }
 
+/* Custom Lyrics Modal */
+.clyrics-modal-items {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.5rem;
+}
+
+.clyrics-card {
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.5rem;
+	padding: 0.625rem 0.75rem;
+	transition: all 0.2s;
+	position: relative;
+	width: auto;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	/* flex: 0 0 auto; */
+}
+
+.clyrics-card-info {
+	display: flex;
+	gap: 0.125rem;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.clyrics-card-buttons {
+	display: flex;
+	gap: 0.5rem;
+	flex-direction: row;
+}
+
+.clyrics-top-buttons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.clyrics-input-title {
+	font-size: 1.125rem;
+}
+
+.clyrics-input-description {
+	opacity: 0.5;
+	font-size: .75rem;
+}
+
+.clyrics-input-span {
+	opacity: 0.5;
+	font-size: .625rem;
+}
+
+.clyrics-input-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.clyrics-long-input {
+	display: flex;
+	gap: 4px;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+
+.clyrics-short-input {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.clyrics-span {
+	font-size: 0.8rem;
+}
+
+.clyrics-input {
+	border-radius: 0.25rem;
+	padding: 0.5rem 0.5rem;
+	width: auto;
+	align-self: stretch;
+}
+
 .modal-overlay {
 	position: fixed;
 	top: 0;
@@ -1352,8 +1446,42 @@ input.cm-textfield:focus-visible {
 	padding: 1.5rem;
 }
 
+.modal-body-wrapped {
+	overflow-y: auto;
+	flex: 1;
+	max-height: calc(85vh - 80px);
+}
+
+.modal-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 2rem;
+}
+
+.modal-section:last-child {
+	margin-bottom: 0;
+}
+
+.modal-section-header {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 0 0.25rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-section-title {
+	font-size: 0.8125rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0 0 0.25rem;
+}
+
 .modal-message {
-	margin: 0 0 1rem 0;
+	margin: 0 0 1rem;
 	font-size: 0.95rem;
 	color: rgba(255, 255, 255, 0.85);
 	line-height: 1.5;

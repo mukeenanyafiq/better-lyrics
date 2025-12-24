@@ -4,6 +4,7 @@ import bLyrics from "./blyrics/blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
+import customLyrics from "./customLrc";
 import { ytCaptions } from "./ytCaptions";
 import legato from "./legato";
 import * as Storage from "@core/storage";
@@ -80,13 +81,16 @@ export interface LyricPart {
   isBackground?: boolean;
 }
 
-export interface ProviderParameters {
+export interface TrackInfoProvider {
   song: string;
   artist: string;
   duration: number;
+  album: string | null;
+}
+
+export interface ProviderParameters extends TrackInfoProvider {
   videoId: string;
   audioTrackData: AudioTrackData;
-  album: string | null;
   sourceMap: SourceMapType;
   alwaysFetchMetadata: boolean;
   signal: AbortSignal;
@@ -106,6 +110,7 @@ let defaultPreferredProviderList: LyricSourceKey[] = [
   "musixmatch-synced",
   "yt-lyrics",
   "lrclib-plain",
+  "custom-lyrics",
 ] as const;
 
 function isLyricSourceKey(provider: string): provider is LyricSourceKey {
@@ -155,6 +160,7 @@ const sourceKeyToFillFn = {
   "yt-captions": ytCaptions,
   "yt-lyrics": ytLyrics,
   "legato-synced": legato,
+  "custom-lyrics": customLyrics,
 } as const;
 
 export type LyricSourceKey = Readonly<keyof typeof sourceKeyToFillFn>;
