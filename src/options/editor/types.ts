@@ -35,9 +35,3 @@ export interface CLyricsCardOptions {
   duration: number;
   modified: number;
 }
-
-declare global {
-  interface Window {
-    stylelint: any;
-  }
-}

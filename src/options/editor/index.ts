@@ -1,28 +1,15 @@
 import { openSearchPanel } from "@codemirror/search";
 import { LOG_PREFIX_EDITOR } from "@constants";
-import { showAlert, showModal } from "./ui/feedback";
-import {
-  deleteThemeBtn,
-  editThemeBtn,
-  themeModalClose,
-  themeModalOverlay,
-  themeSelectorBtn,
-  themeNameText,
-  openEditCSS,
-  openOptions,
-  clyricsModifyBtn,
-  clyricsModalClose,
-  clyricsModalOverlay,
-} from "./ui/dom";
 import { createEditorState, createEditorView } from "./core/editor";
-import { generateDefaultFilename, saveCSSToFile, importManager } from "./features/import";
 import { editorStateManager } from "./core/state";
+import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
 import { storageManager } from "./features/storage";
 import {
   closeThemeModal,
   handleDeleteTheme,
   handleRenameTheme,
   handleSaveTheme,
+  initStoreThemeListener,
   openThemeModal,
   saveToStorage,
   setThemeName,
@@ -31,6 +18,19 @@ import {
   closeCLyricsModal,
   openCLyricsModal
 } from "./features/clyrics";
+  deleteThemeBtn,
+  editThemeBtn,
+  openEditCSS,
+  openOptions,
+  themeModalClose,
+  themeModalOverlay,
+  themeNameText,
+  themeSelectorBtn,
+  clyricsModifyBtn,
+  clyricsModalClose,
+  clyricsModalOverlay,
+} from "./ui/dom";
+import { showAlert, showModal } from "./ui/feedback";
 
 export function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
@@ -110,7 +110,7 @@ export function initializeFileOperations() {
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = ".css";
+    input.accept = ".css,.rics";
     input.onchange = async (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) return;
@@ -208,5 +208,6 @@ export function initialize() {
     initializeFileOperations();
     initializeStorageListeners();
     initializeCLyricsModal();
+    initStoreThemeListener();
   });
 }
