@@ -1,5 +1,6 @@
 import { log } from "@utils";
-import type {NextResponse} from "@modules/lyrics/requestSniffer/NextResponse";
+import type {Continuation, LongBylineText, NextResponse} from "@modules/lyrics/requestSniffer/NextResponse";
+import {parseTime} from "@modules/lyrics/providers/lrcUtils";
 
 interface Segment {
   primaryVideoStartTimeMilliseconds: number;
@@ -19,18 +20,32 @@ export interface LyricsInfo {
 }
 
 interface VideoMetadata {
-
-  counterPartInfo: CounterpartInfo
-}
-interface CounterpartInfo {
+  /**
+   * This is the ID of the next song in the playlist.
+   * This probably won't account for reordering that the user does, but should be correct otherwiser
+   */
+  nextVideoId: string | undefined;
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  isVideo: boolean;
+  durationMs: number;
   counterpartVideoId: string | null;
   segmentMap: SegmentMap | null;
 }
 
+
+
 const browseIdToVideoIdMap = new Map<string, string>();
 const videoIdToLyricsMap = new Map<string, LyricsInfo>();
-const videoMetaDataMap = new Map<string, CounterpartInfo>();
+const videoMetaDataMap = new Map<string, VideoMetadata>();
 const videoIdToAlbumMap = new Map<string, string | null>();
+
+/**
+ * ContinuationId -> Last song in the playlist (before the continuation)
+ */
+const continuationMap = new Map<string, VideoMetadata>();
 
 let firstRequestMissedVideoId: string | null = null;
 
@@ -44,12 +59,12 @@ function delay(ms: number): Promise<void> {
  * @param maxRetries
  * @return
  */
-export async function getLyrics(videoId: string, maxRetries = 250): Promise<LyricsInfo> {
+export function getLyrics(videoId: string, maxRetries = 250): Promise<LyricsInfo> {
   if (videoIdToLyricsMap.has(videoId)) {
-    return videoIdToLyricsMap.get(videoId)!;
+    return Promise.resolve(videoIdToLyricsMap.get(videoId)!);
   } else {
     let checkCount = 0;
-    return await new Promise(resolve => {
+    return new Promise(resolve => {
       const checkInterval = setInterval(() => {
         if (videoIdToLyricsMap.has(videoId)) {
           clearInterval(checkInterval);
@@ -79,15 +94,15 @@ export async function getLyrics(videoId: string, maxRetries = 250): Promise<Lyri
  * @param maxCheckCount
  * @return
  */
-export async function getMatchingSong(videoId: string, maxCheckCount = 250): Promise<CounterpartInfo | null> {
+export function getSongMetadata(videoId: string, maxCheckCount = 250): Promise<VideoMetadata | null> {
   if (videoMetaDataMap.has(videoId)) {
-    return videoMetaDataMap.get(videoId)!;
+    return Promise.resolve(videoMetaDataMap.get(videoId)!);
   } else {
     let checkCount = 0;
-    return await new Promise(resolve => {
+    return new Promise(resolve => {
       const checkInterval = setInterval(() => {
-        if (videoMetaDataMap.has(videoId)) {
-          let counterpart = videoMetaDataMap.get(videoId);
+        let counterpart = videoMetaDataMap.get(videoId);
+        if (counterpart) {
           clearInterval(checkInterval);
           resolve(counterpart!);
         }
@@ -149,27 +164,109 @@ export function setupRequestSniffer(): void {
       }
 
       if (playlistPanelRendererContents) {
-        for (let playlistPanelRendererContent of playlistPanelRendererContents) {
-          let counterPartRenderer = playlistPanelRendererContent
+        // let's first map this into a sensible type
+        let videoPairs = playlistPanelRendererContents.map(content => {
+          let counterPartRenderer = content
               .playlistPanelVideoWrapperRenderer?.counterpart[0].counterpartRenderer;
-          let counterpartId =
-              counterPartRenderer?.playlistPanelVideoRenderer.videoId;
-          let primaryRenderer = playlistPanelRendererContent.playlistPanelVideoRenderer;
+
+          let primaryRenderer = content.playlistPanelVideoRenderer;
           if (!primaryRenderer) {
-            primaryRenderer = playlistPanelRendererContent.playlistPanelVideoWrapperRenderer?.primaryRenderer.playlistPanelVideoRenderer;
+            primaryRenderer = content.playlistPanelVideoWrapperRenderer?.primaryRenderer.playlistPanelVideoRenderer;
           }
-          let primaryId =
-            playlistPanelRendererContent.playlistPanelVideoWrapperRenderer?.primaryRenderer.playlistPanelVideoRenderer.videoId;
 
-          let segmentMap = playlistPanelRendererContent.playlistPanelVideoWrapperRenderer?.counterpart[0].segmentMap;
+          if (!primaryRenderer) {
+            console.warn("Failed to find a primary renderer in next response!")
+            return null;
+          }
 
-          if (counterpartId && primaryId) {
+          let primaryId = primaryRenderer?.videoId;
+          let primaryTitle = primaryRenderer?.title.runs[0].text;
+
+          function extractByLineInfo(longByLineText: LongBylineText){
+            let byLineIsVideo = false;
+            let longByLine = longByLineText.runs.filter(r => {
+                  let trimmed = r.text.trim();
+                  let hasVideoWord = trimmed.includes("views") || trimmed.includes("likes");
+                  if (hasVideoWord) {
+                    byLineIsVideo = true;
+                  }
+                  return trimmed.length > 0 && trimmed !== "•" && !hasVideoWord;
+                }
+            ).map(r => r.text);
+
+            let artist: string;
+            let album = "";
+            if (byLineIsVideo) {
+              artist = longByLine?.join(", ")
+            } else {
+              // Last elm is year, second to last is album, rest is artists
+              album = longByLine[longByLine?.length - 2]
+              artist = longByLine?.slice(0, -2).join(", ");
+            }
+            return [artist, album];
+          }
+
+          let [primaryArtist, primaryAlbum] = extractByLineInfo(primaryRenderer?.longBylineText);
+
+
+          let primaryThumbnail = primaryRenderer?.thumbnail.thumbnails[0];
+          let primaryIsVideo = primaryThumbnail?.height !== primaryThumbnail?.width;
+
+          let primary = {
+            id: primaryId,
+            title: primaryTitle,
+            artist: primaryArtist,
+            album: primaryAlbum,
+            isVideo: primaryIsVideo,
+            durationMs: parseTime(primaryRenderer.lengthText.runs[0].text)
+          }
+
+          if (counterPartRenderer) {
+            let counterpartId = counterPartRenderer?.playlistPanelVideoRenderer.videoId;
+            let counterpartTitle = counterPartRenderer.playlistPanelVideoRenderer.title.runs[0].text;
+            let counterpartThumbnail = counterPartRenderer.playlistPanelVideoRenderer.thumbnail.thumbnails[0];
+            let counterpartIsVideo = counterpartThumbnail.height !== counterpartThumbnail.width;
+            let [counterpartArtist, counterpartAlbum] = extractByLineInfo(counterPartRenderer?.playlistPanelVideoRenderer.longBylineText);
+
+
+            return {
+              primary,
+              counterpart: {
+                id: counterpartId,
+                title: counterpartTitle,
+                artist: counterpartArtist,
+                album: counterpartAlbum,
+                isVideo: counterpartIsVideo,
+                durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text),
+                segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap
+              }
+            }
+          } else {
+            return {primary: primary};
+          }
+
+
+        });
+        for (let [index, videoPair] of videoPairs.entries()) {
+          if (!videoPair) {
+            continue;
+          }
+
+          let nextPair = videoPairs.length > index + 1 ? videoPairs[index + 1] : undefined;
+          let nextPrimaryVideo = nextPair?.primary.id;
+          let nextCounterPartVideo = nextPair?.counterpart?.id || nextPrimaryVideo;
+
+          console.log("Setting next primary video: ", nextPrimaryVideo, videoPair.primary.id);
+          console.log("Setting next counterpart video: ", nextCounterPartVideo, videoPair.counterpart?.id);
+
+          let counterpart = videoPair.counterpart;
+          if (counterpart) {
             let numSegmentMap: SegmentMap | null = null; // our segment map with `Number` as the type
             let reversedSegmentMap: SegmentMap | null = null;
 
-            if (segmentMap && segmentMap.segment) {
-              numSegmentMap = { segment: [], reversed: false}
-              for (const segment of segmentMap.segment) {
+            numSegmentMap = { segment: [], reversed: false}
+            if (counterpart.segmentMap.segment) {
+              for (const segment of counterpart.segmentMap.segment) {
                 numSegmentMap.segment.push({
                   counterpartVideoStartTimeMilliseconds: Number(segment.counterpartVideoStartTimeMilliseconds),
                   primaryVideoStartTimeMilliseconds: Number(segment.primaryVideoStartTimeMilliseconds),
@@ -186,18 +283,45 @@ export function setupRequestSniffer(): void {
               }
             }
 
-            videoMetaDataMap.set(primaryId, { counterpartVideoId: counterpartId, segmentMap: numSegmentMap });
-            videoMetaDataMap.set(counterpartId, {
-              counterpartVideoId: primaryId,
-              segmentMap: reversedSegmentMap,
+            videoMetaDataMap.set(videoPair.primary.id, {
+              artist: videoPair.primary.artist,
+              nextVideoId: nextPrimaryVideo,
+              title: videoPair.primary.title,
+              album: videoPair.primary.album,
+              isVideo: videoPair.primary.isVideo,
+              counterpartVideoId: counterpart.id,
+              segmentMap: numSegmentMap,
+              durationMs: videoPair.primary.durationMs,
+              id: videoPair.primary.id
             });
 
+            videoMetaDataMap.set(counterpart.id, {
+              artist: counterpart.artist,
+              isVideo: counterpart.isVideo,
+              nextVideoId: nextCounterPartVideo,
+              album: counterpart.album,
+              title: counterpart.title,
+              counterpartVideoId: videoPair.primary.id,
+              segmentMap: reversedSegmentMap,
+              durationMs: counterpart.durationMs,
+              id: counterpart.id
+            });
+
+            videoIdToAlbumMap.set(counterpart.id, counterpart.album);
           } else {
-            let primaryId = playlistPanelRendererContent?.playlistPanelVideoRenderer?.videoId;
-            if (primaryId) {
-              videoMetaDataMap.set(primaryId, { counterpartVideoId: null, segmentMap: null });
-            }
+            videoMetaDataMap.set(videoPair.primary.id, {
+              artist: videoPair.primary.artist,
+              nextVideoId: nextPrimaryVideo,
+              title: videoPair.primary.title,
+              album: videoPair.primary.album,
+              isVideo: videoPair.primary.isVideo,
+              counterpartVideoId: null,
+              segmentMap: null,
+              durationMs: videoPair.primary.durationMs,
+              id: videoPair.primary.id
+            });
           }
+          videoIdToAlbumMap.set(videoPair.primary.id, videoPair.primary.album);
         }
       }
 

@@ -92,7 +92,7 @@ export interface WatchPlaylistEndpoint {
     readonly params:     string;
 }
 
-export type PlaylistID = "RDAMVMwXTJosqjxtA" | "RDAMVMbatpz8tBk0A" | "RDAMVMNsY-9MCOIAQ" | "RDAMVM27sJqXZM8iI" | "RDAMVML9JhkhA5rVM" | "RDAMVMJ6B13QxOEkc";
+export type PlaylistID = string;
 
 export interface ContentPlaylistPanelVideoRenderer {
     readonly title:                   TitleClass;
@@ -270,7 +270,7 @@ export interface DeletePlaylistEndpointCommand {
 export interface Command {
 }
 
-export type BackingQueuePlaylistIDEnum = "QPouIihOZraM01NZeAGdMaSsZxhk7G3Dtxg" | "QPJNlFK9UPlT0sI9EmxbJXPFRygQF5spTl2" | "QPYoTnDkNDGA3HBqiTOTyQbzdzIclmYr2h4" | "QPO0-QUTGHqTQ5sCf4WJnbfKctmSlLh5dLY" | "QPERuv_YoEcjCt1owz7tv_HzpMkr1PpbPRA" | "QPVqkcFuJHZtbT3FzPA9dHrnKTuseOKEefz";
+export type BackingQueuePlaylistIDEnum = string
 
 export interface GetReportFormEndpoint {
     readonly params: string;
@@ -420,7 +420,7 @@ export interface FluffyWatchEndpointMusicConfig {
     readonly musicVideoType:             MusicVideoType;
 }
 
-export type PlaylistEditParams = "SiNRUG91SWloT1pyYU0wMU5aZUFHZE1hU3NaeGhrN0czRHR4Zw%3D%3D" | "SiNRUEpObEZLOVVQbFQwc0k5RW14YkpYUEZSeWdRRjVzcFRsMg%3D%3D" | "SiNRUFlvVG5Ea05ER0EzSEJxaVRPVHlRYnpkekljbG1ZcjJoNA%3D%3D" | "SiNRUE8wLVFVVEdIcVRRNXNDZjRXSm5iZktjdG1TbExoNWRMWQ%3D%3D" | "SiNRUEVSdXZfWW9FY2pDdDFvd3o3dHZfSHpwTWtyMVBwYlBSQQ%3D%3D" | "SiNRUFZxa2NGdUpIWnRiVDNGelBBOWRIcm5LVHVzZU9LRWVmeg%3D%3D";
+export type PlaylistEditParams = string;
 
 export interface PurpleQueueNavigationEndpoint {
     readonly clickTrackingParams: string;
