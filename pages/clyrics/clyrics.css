@@ -294,11 +294,20 @@ button {
     justify-content: center;
 }
 
-.separator {
+.separator-row {
     background: rgba(255, 255, 255, 0.25);
     align-self: stretch;
     flex-shrink: 0;
     width: 1px;
+    position: relative;
+}
+
+.separator-column {
+    background: rgba(255, 255, 255, 0.25);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: .25rem 0;
+    height: 1px;
     position: relative;
 }
 
@@ -401,7 +410,7 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* justify-content: space-between; */
+    justify-content: space-between;
     gap: .375rem;
     align-self: stretch;
     flex-shrink: 0;
@@ -446,7 +455,7 @@ button {
 }
 
 /* LYRIC LIENS */
-.lines {
+.lyric-lines {
     padding: .3125rem 0;
     display: flex;
     flex-direction: column;
@@ -459,13 +468,13 @@ button {
     overflow: auto;
 }
 
-.line {
+.lyric-line {
     background: rgba(0, 0, 0, 0.25);
     border-radius: .5rem;
     border-style: solid;
     border-color: rgba(255, 255, 255, 0.25);
     border-width: .0625rem;
-    padding: .5rem .75rem .5rem .5rem;
+    padding: .625rem .75rem .625rem .375rem;
     display: flex;
     flex-direction: row;
     gap: .25rem;
@@ -477,17 +486,22 @@ button {
     overflow: hidden;
 }
 
-.line > .frame-3 > .words > #new-word:not(:focus) {
+.lyric-line > .frame-3 > .words > #new-word-line:not(:focus) {
     transition: .1s;
     opacity: 0;
 }
 
-.line:hover {
+.lyric-line:hover {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
-.line:hover > .frame-3 > .words > #new-word {
+.lyric-line:hover > .frame-3 > .words > #new-word-line {
     opacity: 1;
+}
+
+.line {
+    display: flex;
+    align-items: center;
 }
 
 .left-aligned {
@@ -636,6 +650,30 @@ button {
     left: 0;
     translate: -100%;
     transform: translateY(0);
+}
+
+/* CONTEXT MENU */
+.list-buttons {
+    display: flex;
+    background-color: hsl(0, 0%, 12.5%);
+    padding: .5rem;
+    border-radius: .5rem;
+    border-color: hsl(0, 0%, 100%, .25);
+    border-width: .1rem;
+    border-style: solid;
+    flex-direction: column;
+    box-shadow: 0 0 .25rem .25rem rgba(0, 0, 0, 0.1);
+    gap: .2rem;
+}
+
+.list-btn {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .5rem;
+    border-radius: .25rem;
+    background-color: transparent;
+    text-align: left;
 }
 
 /* MEDIA */

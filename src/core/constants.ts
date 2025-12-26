@@ -201,13 +201,14 @@ export interface ProviderConfig {
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 1 },
-  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 2 },
+  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 2 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 3 },
   { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 4 },
   { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 5 },
   { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 6 },
-  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 7 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 7 },
   { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 8 },
+  { key: "custom-lyrics", displayName: "Custom Lyrics", syncType: "syllable", priority: 9 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);
