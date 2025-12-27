@@ -4,7 +4,7 @@ import bLyrics from "./blyrics/blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
-import customLyrics from "./customLrc";
+import customLyrics from "./clyrics";
 import { ytCaptions } from "./ytCaptions";
 import legato from "./legato";
 import { getTransientStorage, setTransientStorage } from "@core/storage";

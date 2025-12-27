@@ -6,11 +6,12 @@ export interface TrackInfoCustom extends TrackInfoProvider {
 
 export default async function customLyrics(providerParameters: ProviderParameters): Promise<void> {
     const result = await chrome.storage.sync.get(["customLyrics"]);
-    const custom: TrackInfoCustom[] = result.customLyrics || [];
+    const raw = result.customLyrics;
+    const custom: TrackInfoCustom[] = Array.isArray(raw) ? raw as TrackInfoCustom[] : [];
     const track = custom.find(track => {
-        track.song == providerParameters.song,
-        track.album == providerParameters.album,
-        track.artist == providerParameters.artist,
+        return track.song == providerParameters.song &&
+        track.album == providerParameters.album &&
+        track.artist == providerParameters.artist &&
         Math.abs(track.duration - providerParameters.duration) <= 2
     })
 
