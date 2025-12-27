@@ -1,11 +1,58 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import type { CLyricsCardOptions } from "../types";
-import { clyricsModalList, clyricsModalOverlay } from "../ui/dom";
+import { clyricsNewLyrics, clyricsModalList, clyricsModalOverlay } from "../ui/dom";
+
+let initializedForm = false;
+
+export async function formNewLyrics(): Promise<void> {
+  if (!clyricsNewLyrics || initializedForm) return;
+  initializedForm = true;
+
+  clyricsNewLyrics.innerHTML = "";
+  clyricsNewLyrics.className = "modal-section";
+
+  // Header
+  const modalHeader = document.createElement("div");
+  modalHeader.className = "modal-section-header"
+
+  /// Title
+  const modalTitle = document.createElement("h3");
+  modalTitle.className = "modal-section-title";
+  modalTitle.textContent = "Create a New Lyrics";
+
+  modalHeader.appendChild(modalTitle);
+
+  clyricsNewLyrics.appendChild(modalHeader);
+
+  // Top Buttons
+  const modalTopButtons = document.createElement("div");
+  modalTopButtons.className = "clyrics-top-buttons";
+
+  /// Return button
+  const returnButton = document.createElement("button");
+  returnButton.className = "icon-btn";
+  returnButton.setAttribute("data-tooltip", "Return");
+
+  returnButton.addEventListener("click", () => {
+    if (clyricsModalList) clyricsModalList.style.display = "";
+    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
+  });
+
+  /// Import from currently playing button
+  const importCurrentButton = document.createElement("button");
+  importCurrentButton.className = "small-btn";
+  importCurrentButton.textContent = "Import from currently playing";
+
+  importCurrentButton.addEventListener("click", () => {
+
+  });
+}
 
 export async function populateCLyrics(): Promise<void> {
   if (!clyricsModalList) return;
 
   clyricsModalList.innerHTML = "";
+  clyricsModalList.className = "modal-section";
 
   // const customLyrics = [{
   //   name: "Snowman",
@@ -17,19 +64,21 @@ export async function populateCLyrics(): Promise<void> {
 
   const customLyrics: any[] = []
 
-  const yourLyricsSection = document.createElement("div");
-  yourLyricsSection.className = "modal-section";
-
   const yourLyricsHeader = document.createElement("div");
   yourLyricsHeader.className = "modal-section-header"
-  yourLyricsHeader.innerHTML = `<h3 class="modal-section-title">Your Lyrics (${customLyrics.length})</h3>`;
+
+  const yourLyricsTitle = document.createElement("h3");
+  yourLyricsTitle.className = "modal-section-title";
+  yourLyricsTitle.textContent = `Your Lyrics (${customLyrics.length})`;
+  
+  yourLyricsHeader.appendChild(yourLyricsTitle);
 
   const newLyric = document.createElement("button")
   newLyric.className = "small-svg-btn"
   newLyric.id = "create-new-clyric"
   newLyric.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/></svg>'
+
   yourLyricsHeader.appendChild(newLyric);
-  yourLyricsSection.appendChild(yourLyricsHeader);
 
   const yourLyricsItems = document.createElement("div");
   yourLyricsItems.className = "clyrics-modal-items";
@@ -43,12 +92,11 @@ export async function populateCLyrics(): Promise<void> {
     
     const nothing = document.createElement("div");
     nothing.className = "clyrics-input-title";
-    nothing.innerHTML = `<strong style="font-weight: bold">You don't have any applied custom lyrics</strong>`;
+    nothing.innerHTML = `<strong>You don't have any applied custom lyrics</strong>`;
     
     const note = document.createElement("div");
     note.className = "clyrics-span";
     note.textContent = `Create a new one or import one from your computer!`;
-    note.title = `Create a new one or import one from your computer!`;
     
     info.appendChild(nothing);
     info.appendChild(note);
@@ -68,8 +116,7 @@ export async function populateCLyrics(): Promise<void> {
     yourLyricsItems.appendChild(card);
   });
 
-  yourLyricsSection.appendChild(yourLyricsItems);
-  clyricsModalList.appendChild(yourLyricsSection);
+  clyricsModalList.appendChild(yourLyricsItems);
 }
 
 function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
@@ -82,7 +129,6 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   const metadata = document.createElement("div");
   metadata.className = "clyrics-input-span";
   metadata.textContent = `Duration: ${formatTime(options.duration, true)} • Modified: ${new Date(options.modified).toLocaleString()}`;
-  metadata.title = `${options.artist} • ${options.album}`;
   
   const name = document.createElement("div");
   name.className = "clyrics-input-title";
@@ -91,7 +137,6 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   const artistAlbum = document.createElement("div");
   artistAlbum.className = "clyrics-input-description";
   artistAlbum.textContent = `${options.artist} • ${options.album}`;
-  artistAlbum.title = `${options.artist} • ${options.album}`;
   
   info.appendChild(metadata);
   info.appendChild(name);
@@ -102,9 +147,9 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   return card;
 }
 
-export function openCLyricsModal() {
+export async function openCLyricsModal() {
   if (clyricsModalOverlay) {
-    populateCLyrics()
+    populateCLyrics();
     clyricsModalOverlay.style.display = "flex";
     requestAnimationFrame(() => {
       if (clyricsModalOverlay) {
@@ -112,6 +157,7 @@ export function openCLyricsModal() {
       }
     });
   }
+  
 }
 
 export function closeCLyricsModal() {

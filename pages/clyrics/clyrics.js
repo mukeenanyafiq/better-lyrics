@@ -1,6 +1,13 @@
 let didActions = [];
 let currentVer = 0;
 
+// Variables
+let variables = {
+    "timeline": true,
+    "roman": false,
+    "translate": false
+}
+
 // Actions
 const actionFile = document.getElementById("action-file-menu");
 
@@ -8,17 +15,19 @@ let actionMenuOpen = null;
 function closeActionMenu() {
     if (!actionMenuOpen) return;
     actionMenuOpen.style.display = "none";
+    actionMenuOpen.style.opacity = "0";
     actionMenuOpen = null;
 }
 
 const actionFunc = {
     "action-file-btn": {
         menu: actionFile,
-        func: function(e) {
+        func: function(btn) {
             actionMenuOpen = actionFile;
-            actionFile.style.top = `${e.clientY}px`;
-            actionFile.style.left = `${e.clientX}px`;
+            actionFile.style.top = btn.getBoundingClientRect().bottom + 4;
+            actionFile.style.left = btn.getBoundingClientRect().left;
             actionFile.style.display = "flex";
+            requestAnimationFrame(() => { actionFile.style.opacity = "1"; });
         }
     }
 };
@@ -29,8 +38,29 @@ actionButtons.forEach(button => {
         const act = actionFunc[button.id]
         if (act && actionMenuOpen == act.menu) { return closeActionMenu(); }
         closeActionMenu();
-        if (act && act.func) act.func(e);
+        if (act && act.func) act.func(button);
     });
+});
+
+// Checkbox
+const checkboxes = document.querySelectorAll(".checkbox");
+const checkboxFunc = {
+    "show-timeline-btn": function(x) {
+        const timelines = document.querySelectorAll(".line-timeline");
+        timelines.forEach(timeline => {
+            timeline.style.display = x ? "" : "none";
+        })
+    }
+};
+
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("click", () => {
+        const checked = checkbox.classList.contains("checked")
+        if (checkboxFunc[checkbox.id]) checkboxFunc[checkbox.id](!checked);
+
+        if (checked) checkbox.classList.remove("checked");
+        else checkbox.classList.add("checked");
+    })
 });
 
 // Tab Buttons
@@ -61,14 +91,16 @@ newWords.forEach(input => {
         word.classList.add("word-text");
 
         interactableWord.appendChild(word);
+        
+        didActions.push({
+            type: "enter-word",
+            input: input.value
+        });
+        
+        currentVer += 1;
 
         input.value = "";
         input.before(interactableWord);
-
-        didActions.push({
-            
-        });
-        currentVer += 1;
     })
 })
 
@@ -78,8 +110,15 @@ let contextMenuOpen = false;
 
 function closeContextMenu() {
     contextMenuOpen = false;
-    contextMenu.style.display = "none";
+    contextMenu.style.opacity = "0";
+    contextMenu.classList.add("hidden");
 }
+
+document.addEventListener("click", e => {
+    if (contextMenuOpen && !contextMenu.matches(":hover")) {
+        closeContextMenu();
+    }
+});
 
 document.addEventListener("contextmenu", e => {
     if (contextMenuOpen) {
@@ -89,6 +128,27 @@ document.addEventListener("contextmenu", e => {
         e.preventDefault();
         contextMenu.style.top = `${e.clientY}px`;
         contextMenu.style.left = `${e.clientX}px`;
-        contextMenu.style.display = "flex";
+        contextMenu.classList.remove("hidden");
+        requestAnimationFrame(() => { contextMenu.style.opacity = "1"; });
     }
+});
+
+// Keybind
+const keybinds = {
+    "ctrl+z": function() {
+
+    }
+}
+
+document.addEventListener("keydown", e => {
+    // let built = ""
+    // if (e.ctrlKey) built += "+ctrl"
+    // if (e.altKey) built += "+alt"
+    // if (e.metaKey) built += "+meta"
+    // if (e.shiftKey) built += "+shift"
+    // built = built.substring(1)
+    // built += `${built.length > 0 ? "+" : ""}` + e.key
+
+    // Undo (Ctrl+Z)
+    console.log(e.key);
 })

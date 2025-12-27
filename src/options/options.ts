@@ -273,7 +273,7 @@ const providerIdToInfoMap: { [key: string]: ProviderInfo } = {
   "legato-synced": { name: "Better Lyrics Legato", syncType: "line" },
   "yt-lyrics": { name: "YouTube", syncType: "unsynced" },
   "lrclib-plain": { name: "LRCLIB", syncType: "unsynced" },
-  "custom-lyrics": { name: "Custom-made lyrics", syncType: "syllable" },
+  "custom-lyrics": { name: "Custom Lyrics", syncType: "syllable" },
 };
 
 const syncTypeConfig: { [key in SyncType]: { label: string; icon: string; tooltip: string } } = {

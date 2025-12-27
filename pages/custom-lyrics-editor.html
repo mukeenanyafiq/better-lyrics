@@ -70,11 +70,11 @@
 						<span class="add-line-label-bottom">Line</span>
 					</button>
 					<div class="add-line-agents">
-						<button id="add-line-duet" class="add-line-agents-btn active-btn">
+						<button id="add-line-background" class="add-line-agents-btn active-btn">
 							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
 								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
-							<span class="add-line-label-side">Duet</span>
+							<span class="add-line-label-side">Background</span>
 						</button>
 
 						<button id="add-line-together" class="add-line-agents-btn active-btn">
@@ -94,11 +94,19 @@
 				<div class="actions2">
 					<div id="start-time" class="tool-input">
 						<span class="tool-property">Start Time</span>
-						<input id="start-time-input" type="number" class="input" />
+						<div id="start-time-input" class="tool-input-multiple">
+							<input id="start-time-input-minutes" type="number" class="input" placeholder="min" />
+							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" />
+							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" max="999" />
+						</div>
 					</div>
 					<div id="duration" class="tool-input">
 						<span class="tool-property">Duration</span>
-						<input id="duration-input" type="number" class="input" />
+						<div id="duration-input" class="tool-input-multiple">
+							<input id="duration-input-minutes" type="number" class="input" placeholder="min" />
+							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" />
+							<input id="duration-input-ms" type="number" class="input" placeholder="ms" max="999" />
+						</div>
 					</div>
 				</div>
 				<span class="tool-section-span">Line Timing</span>
@@ -112,7 +120,7 @@
 						<span class="tool-property">Instrumental</span>
 						<button id="instrumental-btn" class="checkbox">
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="currentColor" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
@@ -120,7 +128,7 @@
 						<span class="tool-property">Background</span>
 						<button id="background-btn" class="checkbox">
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="currentColor" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
@@ -130,13 +138,13 @@
 			
 			<div class="separator-row"></div>
 
-			<div id="line-display" class="tool" style="width: 200px;">
+			<div id="line-display" class="tool" style="width: 150px;">
 				<div class="actions3">
-					<div id="show-time-line" class="tool-input">
-						<span class="tool-property">Time Line</span>
-						<button id="show-time-line-btn" class="checkbox">
+					<div id="show-timeline" class="tool-input">
+						<span class="tool-property">Timeline</span>
+						<button id="show-timeline-btn" class="checkbox checked">
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="currentColor" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
@@ -144,7 +152,7 @@
 						<span class="tool-property">Romanization</span>
 						<button id="show-roman-btn" class="checkbox">
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="currentColor" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
@@ -152,7 +160,7 @@
 						<span class="tool-property">Translation</span>
 						<button id="show-translate-btn" class="checkbox">
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="currentColor" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
@@ -163,8 +171,8 @@
 
 		<!-- LYRIC LINES -->
 		<div class="lyric-lines">
-			<div style="
-				display: flex;
+			<div id="no-lyric" style="
+				display: none;
 				flex-direction: column;
 				align-items: center;
 				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -176,13 +184,13 @@
 				<span>Add a new lyric line from the top left or import the lyrics from a file or provider!</span>
 			</div>
 
-			<!-- <div class="lyric-line">
+			<div class="lyric-line">
 				<div id="normal-line" class="line">
 					<svg class="line-svg" width="28" height="28" viewBox="0 0 28 28" >
 						<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
 					</svg>
 					<div class="frame-3">
-						<div class="time-duration">
+						<div class="line-timeline">
 							<span>
 								<strong class="code">[♪] 00:06.216</strong>
 								<span class="code">• 4.145s</span>
@@ -221,7 +229,7 @@
 						<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6h4m4 0h-4m0 0v12M4 11h3m3 0H7m0 0v7"/>
 					</svg>
 					<div class="frame-3">
-						<div class="time-duration">
+						<div class="line-timeline">
 							<span>
 								<strong class="code">[BACKGROUND] 00:06.216</strong>
 								<span class="code">• 4.145s</span>
@@ -237,7 +245,7 @@
 						</div>
 					</div>
 				</div>
-			</div> -->
+			</div>
 		</div>
 
 		<!-- TOOLBAR -->
@@ -253,10 +261,87 @@
 					<div class="label">JSON</div>
 				</button>
 			</div>
+			<button class="icon-btn" data-tooltip="1 warning found. Hover over the line to check" style="padding: .5rem">
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+					<path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/>
+				</svg>
+			</button>
 		</div>
 
-		<!-- FREEFORM ELEMENTS (CONTEXT MENU) --> 
-		<div id="action-file-menu" class="list-buttons" style="position: absolute; display: none;">
+		<!-- FREEFORM ELEMENTS (CONTEXT MENU, MODAL) -->
+		<div id="clyrics-modal-overlay" class="modal-overlay">
+			<div class="modal clyrics-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Custom Lyrics</h3>
+					<button id="clyrics-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="modal-body-wrapped modal-body">
+					<div id="clyrics-modal-list"></div>
+					<div id="clyrics-new-lyric">
+						<div class="modal-section">
+							<div class="modal-section-header">
+								<h3 class="modal-section-title">Create a New Lyric</h3>
+								<button class="small-svg-btn">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+										<path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/>
+									</svg>
+								</button>
+							</div>
+							<div class="clyrics-top-buttons">
+								<button id="return-clyrics-btn" class="icon-btn" data-tooltip="Return">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
+									</svg>
+								</button>
+								<button id="import-currently-btn" class="small-btn">Import from currently playing</button>
+							</div>
+							<span class="clyrics-span">
+								Your lyric will be saved and synchronized across all devices.
+								<br/>
+								<strong>However, your lyric will NOT be uploaded to Better Lyrics provider.</strong>
+							</span>
+								<div id="clyrics-track-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Track Name *</strong></span>
+									<input type="text" placeholder="Enter the name of the track" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-artist-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Artist Name *</strong></span>
+									<input type="text" placeholder="Enter the name of the track's artist" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-album-name" class="clyrics-long-input">
+									<span class="clyrics-input-title"><strong>Album Name</strong></span>
+									<input type="text" placeholder="Enter the name of the track's album" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-duration" class="clyrics-short-input">
+									<span class="clyrics-input-title"><strong>Duration</strong></span>
+									<input type="number" placeholder="Enter the duration of the track (in seconds)" class="clyrics-input clyrics-card" />
+								</div>
+								<div id="clyrics-lyric-file" class="clyrics-short-input">
+									<div class="clyrics-input-info">
+										<span class="clyrics-input-title"><strong>Lyric File</strong></span>
+										<span class="clyrics-input-description"><strong>(.lrc, .elrc, .ttml, .xml are supported)</strong></span>
+									</div>
+									<label for="clyrics-lyric-file-input" class="small-btn">Import</label>
+									<input type="file" id="clyrics-lyric-file-input" accept=".lrc,.elrc,.ttml,.xml" style="display: none;" />
+								</div>
+							<strong id="clyrics-required-section" class="clyrics-span" style="color: #ff8080">
+								Required section: Track Name and Artist Name
+							</strong>
+							<button id="create-clyric-btn" class="label-btn btn-confirm icon-btn" data-tooltip="Creates a new lyric">
+								<strong>Create</strong>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="action-file-menu" class="list-buttons hidden" style="opacity: 0;">
 			<button id="new-lyrics-btn" class="list-btn">New Lyrics<strong>(Ctrl+N)</strong></button>
 			<button id="open-lyrics-btn" class="list-btn" disabled>Open Lyrics<strong>(Ctrl+O)</strong></button>
 			<div class="separator-column"></div>
@@ -264,7 +349,7 @@
 			<button id="export-lyrics-btn" class="list-btn" disabled>Export Lyrics<strong>></strong></button>
 		</div>
 
-		<div id="context-menu" class="list-buttons" style="position: absolute; display: none;">
+		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;">
 			<button id="split-word-btn" class="list-btn">Split Word Line<strong>(Ctrl+Q)</strong></button>
 			<button id="delete-word-btn" class="list-btn" disabled>Delete Word Line<strong>(Ctrl+Del)</strong></button>
 			<div class="separator-column"></div>
@@ -277,4 +362,5 @@
 		</div>
 	</body>
 	<script type="module" defer src="./clyrics/clyrics.js"></script>
+	<script type="module" defer src="../src/options/editor/features/clyrics.ts"></script>
 </html>

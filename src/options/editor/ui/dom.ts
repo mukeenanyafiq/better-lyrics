@@ -19,6 +19,7 @@ export const clyricsModifyBtn = document.getElementById("clyrics-modify-btn") as
 export const clyricsModalOverlay = document.getElementById("clyrics-modal-overlay") as HTMLElement | null;
 export const clyricsModalClose = document.getElementById("clyrics-modal-close") as HTMLButtonElement | null;
 export const clyricsModalList = document.getElementById("clyrics-modal-list") as HTMLElement | null;
+export const clyricsNewLyrics = document.getElementById("clyrics-new-lyrics") as HTMLElement | null;
 
 export const openEditCSS = (): void => {
   const editCSS = document.getElementById("css");
@@ -27,7 +28,6 @@ export const openEditCSS = (): void => {
   if (editCSS && themeContent && options) {
     editCSS.style.display = "block";
     options.style.display = "none";
-    themeContent.style.display = "none";
   }
 };
 
@@ -39,6 +39,5 @@ export const openOptions = (): void => {
   if (editCSS && themeContent && options) {
     editCSS.style.display = "";
     options.style.display = "";
-    themeContent.style.display = "";
   }
 };

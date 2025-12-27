@@ -234,12 +234,12 @@ button {
     overflow: hidden;
 }
 
-#add-line-duet {
-    background: rgba(0, 127, 255, 0.25);
+#add-line-background {
+    background-color: rgba(0, 127, 255, 0.25);
 }
 
 #add-line-together {
-    background: rgba(255, 0, 0, 0.25);
+    background-color: rgba(255, 0, 0, 0.25);
 }
 
 .plus-middle {
@@ -333,7 +333,6 @@ button {
     align-items: flex-start;
     justify-content: center;
     flex-shrink: 0;
-    width: 225px;
     height: 4rem;
     position: relative;
 }
@@ -353,12 +352,26 @@ button {
 .tool-input {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
     align-self: stretch;
     flex: 1;
     position: relative;
     overflow: hidden;
+    gap: 1rem;
+}
+
+.tool-input-multiple {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: .25rem;
+}
+
+.tool-input-multiple > .input {
+    width: 4rem;
+    flex: 1;
 }
 
 .tool-property {
@@ -412,8 +425,9 @@ button {
 }
 
 .checkbox {
+    transition: .1s;
     display: flex;
-    background: rgba(0, 0, 0, 0.25);
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: .25rem;
     border-style: solid;
     border-color: rgba(255, 255, 255, 0.25);
@@ -421,14 +435,22 @@ button {
     align-self: stretch;
     flex-shrink: 0;
     align-items: center;
-    padding: .25rem;
+    padding: .125rem;
     position: relative;
     overflow: hidden;
     aspect-ratio: 1;
 }
 
-.checkbox:not(.check-ed) > svg {
+.checkbox:not(.checked) > svg {
     opacity: 0;
+}
+
+.checkbox.checked {
+    background-color: hsl(0, 0%, 100%, .875);
+}
+
+.checkbox.checked > svg {
+    opacity: .7;
 }
 
 /* LYRIC LIENS */
@@ -507,7 +529,7 @@ button {
     position: relative;
 }
 
-.time-duration {
+.line-timeline {
     color: rgba(255, 255, 255, 0.5);
     text-align: center;
     font-size: .75rem;
@@ -601,13 +623,13 @@ button {
     padding: .5rem 0;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-end;
+    justify-content: flex-start;
     align-self: stretch;
     flex-shrink: 0;
+    gap: .5rem;
     height: 2rem;
     position: relative;
-    overflow: hidden;
 }
 
 .edit-modes {
@@ -637,7 +659,10 @@ button {
 
 /* CONTEXT MENU */
 .list-buttons {
+    position: absolute;
+    transition: opacity .1s ease;
     display: flex;
+    opacity: 1;
     background-color: hsl(0, 0%, 12.5%);
     padding: .5rem;
     border-radius: .5rem;
@@ -645,8 +670,13 @@ button {
     border-width: .0625rem;
     border-style: solid;
     flex-direction: column;
-    box-shadow: 0 0 .25rem .25rem rgba(0, 0, 0, 0.1);
+    box-shadow: 0 .25rem 2rem .25rem rgba(0, 0, 0, 0.15);
     gap: .2rem;
+}
+
+.list-buttons.hidden {
+    display: none;
+    opacity: 0;
 }
 
 .list-buttons:hover {
@@ -658,7 +688,7 @@ button {
     justify-content: space-between;
     gap: 1rem;
     font-size: 1rem;
-    padding: .375rem .5rem;
+    padding: .375rem;
     border-radius: .25rem;
     background-color: transparent;
     text-align: left;
