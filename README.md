@@ -243,15 +243,17 @@ Yes! Better Lyrics supports switching between different providers. You can reord
 
 Available providers (default priority order):
 
-1. Better Lyrics (syllable-level sync)
-2. Musixmatch (word-level sync)
-3. YouTube Captions (line-level sync)
-4. Better Lyrics (line-level sync)
-5. LRCLib (line-level sync)
-6. Better Lyrics Legato (line-level sync)
-7. Musixmatch (line-level sync)
-8. YouTube Lyrics (unsynced)
-9. LRCLib (unsynced)
+| #   | Provider             | Sync Level |
+| --- | -------------------- | ---------- |
+| 1   | Better Lyrics        | Syllable   |
+| 2   | Musixmatch           | Word       |
+| 3   | YouTube Captions     | Line       |
+| 4   | Better Lyrics        | Line       |
+| 5   | LRCLib               | Line       |
+| 6   | Better Lyrics Legato | Line       |
+| 7   | Musixmatch           | Line       |
+| 8   | YouTube Lyrics       | Unsynced   |
+| 9   | LRCLib               | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
