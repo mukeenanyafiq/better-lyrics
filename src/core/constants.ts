@@ -190,7 +190,7 @@ export const PLAYER_BAR_SELECTOR: string = "ytmusic-player-bar";
 export const AD_PLAYING_ATTR: string = "is-advertisement";
 export const LYRICS_AD_OVERLAY_ID: string = "blyrics-ad-overlay";
 
-export type SyncType = "syllable" | "word" | "line" | "unsynced";
+export type SyncType = "vary" | "syllable" | "word" | "line" | "unsynced";
 
 export interface ProviderConfig {
   key: LyricSourceKey;
@@ -201,15 +201,16 @@ export interface ProviderConfig {
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 1 },
-  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 2 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 3 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 4 },
-  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 5 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 6 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 7 },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 8 },
-  { key: "custom-lyrics", displayName: "Custom Lyrics", syncType: "syllable", priority: 9 },
+  { key: "unison-richsynced", displayName: "Unison", syncType: "vary", priority: 1 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 2 },
+  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 3 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 4 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 5 },
+  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 6 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 7 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 8 },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 9 },
+  { key: "custom-lyrics", displayName: "Custom Lyrics (Local)", syncType: "vary", priority: 10 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

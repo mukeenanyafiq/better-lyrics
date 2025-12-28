@@ -20,7 +20,7 @@ import {
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
 import { log } from "@utils";
-import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, renderLoader } from "./dom";
+import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, renderLoader, setAlbumArtSize } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
 
@@ -206,6 +206,7 @@ export function lyricReloader(): void {
 /**
  * Initializes the main player time event listener.
  * Handles video changes, lyric injection, and player state updates.
+ * > Runs indefinitely
  */
 export function initializeLyrics(): void {
   // @ts-ignore
@@ -227,6 +228,7 @@ export function initializeLyrics(): void {
 
       AppState.queueLyricInjection = true;
       AppState.queueAlbumArtInjection = true;
+      AppState.queueAlbumArtSizeChange = true;
       AppState.queueSongDetailsInjection = true;
       AppState.suppressZeroTime = Date.now() + 5000;
     }
@@ -239,6 +241,13 @@ export function initializeLyrics(): void {
     if (AppState.queueAlbumArtInjection && AppState.shouldInjectAlbumArt === true) {
       AppState.queueAlbumArtInjection = false;
       addAlbumArtToLayout(currentVideoId);
+    }
+
+    if (AppState.queueAlbumArtSizeChange) {
+      AppState.queueAlbumArtSizeChange = false;
+      const root = getComputedStyle(document.documentElement);
+      const albumArtQuality = root.getPropertyValue("--ytmusic-album-art-img-size") || "600";
+      setAlbumArtSize(albumArtQuality);
     }
 
     if (AppState.lyricInjectionFailed) {

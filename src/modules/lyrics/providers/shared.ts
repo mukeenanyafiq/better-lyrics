@@ -8,6 +8,7 @@ import customLyrics from "./clyrics";
 import { ytCaptions } from "./ytCaptions";
 import legato from "./legato";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
+import unison from "./unison";
 
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
@@ -142,6 +143,7 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
+  "unison-richsynced": unison,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
   "musixmatch-richsync": cubey,

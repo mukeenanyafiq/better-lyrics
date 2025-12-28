@@ -256,7 +256,7 @@ const setOptionsInForm = (items: Options): void => {
   });
 };
 
-type SyncType = "syllable" | "word" | "line" | "unsynced";
+type SyncType = "vary" | "syllable" | "word" | "line" | "unsynced";
 
 interface ProviderInfo {
   name: string;
@@ -268,15 +268,21 @@ const providerIdToInfoMap: { [key: string]: ProviderInfo } = {
   "musixmatch-synced": { name: "Musixmatch", syncType: "line" },
   "yt-captions": { name: "YouTube Captions", syncType: "line" },
   "lrclib-synced": { name: "LRCLIB", syncType: "line" },
+  "unison-richsynced": { name: "Better Lyrics Unison", syncType: "vary" },
   "bLyrics-richsynced": { name: "Better Lyrics", syncType: "syllable" },
   "bLyrics-synced": { name: "Better Lyrics", syncType: "line" },
   "legato-synced": { name: "Better Lyrics Legato", syncType: "line" },
   "yt-lyrics": { name: "YouTube", syncType: "unsynced" },
   "lrclib-plain": { name: "LRCLIB", syncType: "unsynced" },
-  "custom-lyrics": { name: "Custom Lyrics", syncType: "syllable" },
+  "custom-lyrics": { name: "Custom Lyrics", syncType: "vary" },
 };
 
 const syncTypeConfig: { [key in SyncType]: { label: string; icon: string; tooltip: string } } = {
+  vary: {
+    label: "Vary",
+    tooltip: "Combination of syllable, word, and line synced. Vary synced can be a syllable synced on one track, but can be word synced in another track, or even line synced",
+    icon: `<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335c0-45.255 0-67.882 14.059-81.941S50.745 239 96 239h117c30.17 0 45.255 0 54.627 9.373S277 272.83 277 303v105c0 30.17 0 45.255-9.373 54.627S243.17 472 213 472H96c-45.255 0-67.882 0-81.941-14.059S0 421.255 0 376zm337-31c0-30.17 0-45.255 9.373-54.627S370.83 240 401 240h59c45.255 0 67.882 0 81.941 14.059S556 290.745 556 336v41c0 45.255 0 67.882-14.059 81.941S505.255 473 460 473h-59c-30.17 0-45.255 0-54.627-9.373S337 439.17 337 409z"/><rect y="552.271" width="1024" height="233" rx="48"/></svg>`
+  },
   syllable: {
     label: "Syllable",
     tooltip: "Supports highlighting individual syllables as they're sung. Syllable syncing provides the best experience.",

@@ -8,12 +8,17 @@ export default async function customLyrics(providerParameters: ProviderParameter
     const result = await chrome.storage.sync.get(["customLyrics"]);
     const raw = result.customLyrics;
     const custom: TrackInfoCustom[] = Array.isArray(raw) ? raw as TrackInfoCustom[] : [];
-    const track = custom.find(track => {
-        return track.song == providerParameters.song &&
-        track.album == providerParameters.album &&
-        track.artist == providerParameters.artist &&
-        Math.abs(track.duration - providerParameters.duration) <= 2
-    })
+
+    let tracks = custom;
+    if (providerParameters.album) {
+        tracks = tracks.filter(t => { return t.album == providerParameters.album; });
+    }
+
+    const track = tracks.find(t => {
+        return t.song == providerParameters.song &&
+            t.artist == providerParameters.artist &&
+            Math.abs(t.duration - providerParameters.duration) <= 2;
+    });
 
     if (track) {
         providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = {
@@ -22,7 +27,7 @@ export default async function customLyrics(providerParameters: ProviderParameter
             sourceHref: "",
             musicVideoSynced: false,
             cacheAllowed: false
-        }
+        };
     } else {
         providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = null;
     }

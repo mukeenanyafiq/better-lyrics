@@ -877,6 +877,11 @@ hr {
 	flex-shrink: 0;
 }
 
+.sync-tag--vary {
+	color: #f07cff;
+	background: rgba(240, 144, 255, 0.15);
+}
+
 .sync-tag--syllable {
 	color: #fcd34d;
 	background: rgba(252, 211, 77, 0.15);

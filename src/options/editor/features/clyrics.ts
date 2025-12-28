@@ -46,6 +46,159 @@ export async function formNewLyrics(): Promise<void> {
   importCurrentButton.addEventListener("click", () => {
 
   });
+
+  clyricsNewLyrics.appendChild(modalTopButtons);
+
+  // Span info
+  const clyricsSpan = document.createElement("span");
+  clyricsSpan.className = "clyrics-span"
+  clyricsSpan.innerHTML = "Your lyrics will be saved and synchronized across all of your devices.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress"
+
+  clyricsNewLyrics.appendChild(clyricsSpan);
+
+  // Inputs
+  const clyricsNewInputs = {
+    "video-id": {
+      required: false,
+      type: "text",
+      length: "long",
+      title: "(Music) YouTube Video ID",
+      description: "Helps narrow down available lyrics for swift importing",
+      placeholder: "https://music.youtube.com/watch?v=videoid"
+    },
+
+    "track-name": {
+      required: true,
+      type: "text",
+      length: "long",
+      title: "Track Name",
+      description: "",
+      placeholder: "Name of the track"
+    },
+
+    "artist-name": {
+      required: true,
+      type: "text",
+      length: "long",
+      title: "Artist Name",
+      description: "",
+      placeholder: "Artist who performed the track (use & for multiple artists)"
+    },
+
+    "album-name": {
+      required: false,
+      type: "text",
+      length: "long",
+      title: "Album Name",
+      description: "",
+      placeholder: "Album that the track are located at"
+    },
+
+    "duration": {
+      required: false,
+      type: "number",
+      length: "short",
+      title: "Duration",
+      description: "",
+      placeholder: "Duration of the track (seconds)"
+    },
+
+    "lyric-file": {
+      required: false,
+      type: "file",
+      length: "short",
+      title: "Lyric File",
+      description: "(.lrc, .elrc, .ttml, .xml are supported)",
+      placeholder: "Import"
+    }
+  };
+
+  for (const key in clyricsNewInputs) {
+    const input = clyricsNewInputs[key as keyof typeof clyricsNewInputs];
+    
+    /// Every Input
+    const element = document.createElement("div");
+    element.id = `clyrics-${key}`;
+    element.className = `clyrics-${input.length}-input`;
+
+    if (input.description.length > 0) {
+      const info = document.createElement("div");
+      info.className = "clyrics-input-info";
+
+      //// Input Title
+      const title = document.createElement("span");
+      title.className = "clyrics-input-title";
+      title.innerHTML = `<strong>${input.title}${input.required ? " *" : ""}</strong>`;
+      info.appendChild(title);
+      
+      //// Input Description
+      const description = document.createElement("span");
+      description.className = "clyrics-input-description";
+      description.textContent = input.description;
+      info.appendChild(description);
+
+      element.appendChild(info);
+    } else {
+      //// Input Title
+      const title = document.createElement("span");
+      title.className = "clyrics-input-title"
+      title.innerHTML = `<strong>${input.title}${input.required ? " *" : ""}</strong>`;
+      element.appendChild(title);
+    }
+
+    if (input.type == "file") {
+      //// Label Input File
+      const label = document.createElement("label");
+      label.htmlFor = "clyrics-lyric-file-input";
+      label.className = "small-btn";
+
+      const svg = "http://www.w3.org/2000/svg"
+      const importIcon = document.createElementNS(svg, "svg");
+      importIcon.setAttribute("width", "32")
+      importIcon.setAttribute("height", "32")
+      importIcon.setAttribute("viewBox", "0 0 24 24")
+
+      const pathImportIcon = document.createElementNS(svg, "path");
+      pathImportIcon.setAttribute("fill", "currentColor")
+      pathImportIcon.setAttribute("d", "M21 14a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 0-2 0v4a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-4a1 1 0 0 0-1-1m-9.71 1.71a1 1 0 0 0 .33.21a.94.94 0 0 0 .76 0a1 1 0 0 0 .33-.21l4-4a1 1 0 0 0-1.42-1.42L13 12.59V3a1 1 0 0 0-2 0v9.59l-2.29-2.3a1 1 0 1 0-1.42 1.42Z")
+      importIcon.appendChild(pathImportIcon);
+
+      label.appendChild(importIcon);
+      label.innerHTML += "Import";
+
+      element.appendChild(label);
+
+      //// Input File
+      const inputter = document.createElement("input");
+      inputter.type = "file";
+      inputter.id = "clyrics-lyric-file-input";
+      inputter.accept = ".lrc,.elrc,.ttml,.xml";
+      inputter.style.display = "none";
+    } else {
+      //// Input Any Type
+      const inputter = document.createElement("input");
+      inputter.type = input.type;
+      inputter.placeholder = input.placeholder;
+      inputter.classList.add("clyrics-input");
+      inputter.classList.add("clyrics-card");
+    }
+
+    clyricsNewLyrics.appendChild(element);
+  }
+
+  // Create Button
+  const createBtn = document.createElement("button");
+  createBtn.id = "create-clyric-btn";
+  createBtn.classList.add("label-btn");
+  createBtn.classList.add("btn-confirm");
+  createBtn.classList.add("icon-btn");
+  createBtn.innerHTML = "<strong>Create</strong>";
+
+  createBtn.addEventListener("click", () => {
+
+  });
+
+  clyricsNewLyrics.appendChild(createBtn);
 }
 
 export async function populateCLyrics(): Promise<void> {
@@ -149,6 +302,7 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
 
 export async function openCLyricsModal() {
   if (clyricsModalOverlay) {
+    formNewLyrics();
     populateCLyrics();
     clyricsModalOverlay.style.display = "flex";
     requestAnimationFrame(() => {
