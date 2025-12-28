@@ -163,87 +163,89 @@ export function setupRequestSniffer(): void {
 
       if (playlistPanelRendererContents) {
         // let's first map this into a sensible type
-        let videoPairs = playlistPanelRendererContents.map(content => {
-          let counterPartRenderer = content.playlistPanelVideoWrapperRenderer?.counterpart[0].counterpartRenderer;
+        let videoPairs = playlistPanelRendererContents
+          .map(content => {
+            let counterPartRenderer = content.playlistPanelVideoWrapperRenderer?.counterpart[0].counterpartRenderer;
 
-          let primaryRenderer = content.playlistPanelVideoRenderer;
-          if (!primaryRenderer) {
-            primaryRenderer = content.playlistPanelVideoWrapperRenderer?.primaryRenderer.playlistPanelVideoRenderer;
-          }
-
-          if (!primaryRenderer) {
-            console.warn("Failed to find a primary renderer in next response!");
-            return null;
-          }
-
-          let primaryId = primaryRenderer?.videoId;
-          let primaryTitle = primaryRenderer?.title.runs[0].text;
-
-          function extractByLineInfo(longByLineText: LongBylineText) {
-            let byLineIsVideo = false;
-            let longByLine = longByLineText.runs
-              .filter(r => {
-                let trimmed = r.text.trim();
-                let hasVideoWord = trimmed.includes("views") || trimmed.includes("likes");
-                if (hasVideoWord) {
-                  byLineIsVideo = true;
-                }
-                return trimmed.length > 0 && trimmed !== "•" && trimmed !== "&" && !hasVideoWord;
-              })
-              .map(r => r.text);
-
-            let artist: string;
-            let album = "";
-            console.log(longByLine, byLineIsVideo);
-            if (byLineIsVideo) {
-              artist = longByLine?.join(", ");
-            } else {
-              // Last elm is year, second to last is album, rest is artists
-              album = longByLine[longByLine?.length - 2];
-              artist = longByLine?.slice(0, -2).join(", ");
+            let primaryRenderer = content.playlistPanelVideoRenderer;
+            if (!primaryRenderer) {
+              primaryRenderer = content.playlistPanelVideoWrapperRenderer?.primaryRenderer.playlistPanelVideoRenderer;
             }
-            return [artist, album];
-          }
 
-          let [primaryArtist, primaryAlbum] = extractByLineInfo(primaryRenderer?.longBylineText);
+            if (!primaryRenderer) {
+              console.warn("Failed to find a primary renderer in next response!");
+              return null;
+            }
 
-          let primaryThumbnail = primaryRenderer?.thumbnail.thumbnails[0];
-          let primaryIsVideo = primaryThumbnail?.height !== primaryThumbnail?.width;
+            let primaryId = primaryRenderer?.videoId;
+            let primaryTitle = primaryRenderer?.title.runs[0].text;
 
-          let primary = {
-            id: primaryId,
-            title: primaryTitle,
-            artist: primaryArtist,
-            album: primaryAlbum,
-            isVideo: primaryIsVideo,
-            durationMs: parseTime(primaryRenderer.lengthText.runs[0].text),
-          };
+            function extractByLineInfo(longByLineText: LongBylineText) {
+              let byLineIsVideo = false;
+              let longByLine = longByLineText.runs
+                .filter(r => {
+                  let trimmed = r.text.trim();
+                  let hasVideoWord = trimmed.includes("views") || trimmed.includes("likes");
+                  if (hasVideoWord) {
+                    byLineIsVideo = true;
+                  }
+                  return trimmed.length > 0 && trimmed !== "•" && trimmed !== "&" && !hasVideoWord;
+                })
+                .map(r => r.text);
 
-          if (counterPartRenderer) {
-            let counterpartId = counterPartRenderer?.playlistPanelVideoRenderer.videoId;
-            let counterpartTitle = counterPartRenderer.playlistPanelVideoRenderer.title.runs[0].text;
-            let counterpartThumbnail = counterPartRenderer.playlistPanelVideoRenderer.thumbnail.thumbnails[0];
-            let counterpartIsVideo = counterpartThumbnail.height !== counterpartThumbnail.width;
-            let [counterpartArtist, counterpartAlbum] = extractByLineInfo(
-              counterPartRenderer?.playlistPanelVideoRenderer.longBylineText
-            );
+              let artist: string;
+              let album = "";
+              console.log(longByLine, byLineIsVideo);
+              if (byLineIsVideo) {
+                artist = longByLine?.join(", ");
+              } else {
+                // Last elm is year, second to last is album, rest is artists
+                album = longByLine[longByLine?.length - 2];
+                artist = longByLine?.slice(0, -2).join(", ");
+              }
+              return [artist, album];
+            }
 
-            return {
-              primary,
-              counterpart: {
-                id: counterpartId,
-                title: counterpartTitle,
-                artist: counterpartArtist,
-                album: counterpartAlbum,
-                isVideo: counterpartIsVideo,
-                durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text),
-                segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap,
-              },
+            let [primaryArtist, primaryAlbum] = extractByLineInfo(primaryRenderer?.longBylineText);
+
+            let primaryThumbnail = primaryRenderer?.thumbnail.thumbnails[0];
+            let primaryIsVideo = primaryThumbnail?.height !== primaryThumbnail?.width;
+
+            let primary = {
+              id: primaryId,
+              title: primaryTitle,
+              artist: primaryArtist,
+              album: primaryAlbum,
+              isVideo: primaryIsVideo,
+              durationMs: parseTime(primaryRenderer.lengthText.runs[0].text),
             };
-          } else {
-            return { primary: primary };
-          }
-        }).filter(pair => pair); //remove null values
+
+            if (counterPartRenderer) {
+              let counterpartId = counterPartRenderer?.playlistPanelVideoRenderer.videoId;
+              let counterpartTitle = counterPartRenderer.playlistPanelVideoRenderer.title.runs[0].text;
+              let counterpartThumbnail = counterPartRenderer.playlistPanelVideoRenderer.thumbnail.thumbnails[0];
+              let counterpartIsVideo = counterpartThumbnail.height !== counterpartThumbnail.width;
+              let [counterpartArtist, counterpartAlbum] = extractByLineInfo(
+                counterPartRenderer?.playlistPanelVideoRenderer.longBylineText
+              );
+
+              return {
+                primary,
+                counterpart: {
+                  id: counterpartId,
+                  title: counterpartTitle,
+                  artist: counterpartArtist,
+                  album: counterpartAlbum,
+                  isVideo: counterpartIsVideo,
+                  durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text),
+                  segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap,
+                },
+              };
+            } else {
+              return { primary: primary };
+            }
+          })
+          .filter(pair => pair); //remove null values
 
         for (let [index, videoPair] of videoPairs.entries()) {
           if (!videoPair) {
