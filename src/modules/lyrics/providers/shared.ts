@@ -143,7 +143,6 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
-  "unison-richsynced": unison,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
   "musixmatch-richsync": cubey,
@@ -153,6 +152,7 @@ const sourceKeyToFillFn = {
   "yt-captions": ytCaptions,
   "yt-lyrics": ytLyrics,
   "legato-synced": legato,
+  "unison-richsynced": unison,
   "custom-lyrics": customLyrics,
 } as const;
 

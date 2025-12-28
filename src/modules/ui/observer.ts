@@ -245,9 +245,12 @@ export function initializeLyrics(): void {
 
     if (AppState.queueAlbumArtSizeChange) {
       AppState.queueAlbumArtSizeChange = false;
-      const root = getComputedStyle(document.documentElement);
-      const albumArtQuality = root.getPropertyValue("--ytmusic-album-art-img-size") || "600";
-      setAlbumArtSize(albumArtQuality);
+      // we're making sure that the current track album cover does not get replaced by a previous track album cover
+      setTimeout(() => {
+        const root = getComputedStyle(document.documentElement);
+        const albumArtQuality = root.getPropertyValue("--ytmusic-album-art-img-size") || "600";
+        setAlbumArtSize(albumArtQuality);
+      }, 5000);
     }
 
     if (AppState.lyricInjectionFailed) {

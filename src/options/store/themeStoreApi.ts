@@ -18,7 +18,7 @@ function isValidRating(rating: number): boolean {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5;
 }
 
-async function getOdid(): Promise<string> {
+export async function getOdid(): Promise<string> {
   const { odid } = await getLocalStorage<{ odid?: string }>(["odid"]);
   if (odid) return odid;
 

@@ -653,6 +653,8 @@ export function injectSongAttributes(title: string, artist: string): void {
 
 /**
  * Sets the size of the album art image
+ * 
+ * @param size - Size quality
  */ 
 export function setAlbumArtSize(size: string): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;

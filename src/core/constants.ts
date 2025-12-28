@@ -205,11 +205,11 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 2 },
   { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 3 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 4 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 5 },
+  { key: "lrclib-synced", displayName: "LRCLIB", syncType: "line", priority: 5 },
   { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 6 },
   { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 7 },
   { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 8 },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 9 },
+  { key: "lrclib-plain", displayName: "LRCLIB", syncType: "unsynced", priority: 9 },
   { key: "custom-lyrics", displayName: "Custom Lyrics (Local)", syncType: "vary", priority: 10 },
 ] as const;
 
