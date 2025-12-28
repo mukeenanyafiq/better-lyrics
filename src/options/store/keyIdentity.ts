@@ -38,6 +38,12 @@ export interface SignedInstall {
   publicKey: JsonWebKey;
 }
 
+export interface SignedPayload<T = Record<string, unknown>> {
+  payload: T & { timestamp: number; nonce: string; keyId: string };
+  signature: string;
+  publicKey: JsonWebKey;
+}
+
 export interface IdentityExport {
   version: 1;
   keyId: string;
@@ -121,6 +127,30 @@ export async function signInstall(themeId: string): Promise<SignedInstall> {
 
   const payload: SignedInstallPayload = {
     themeId,
+    timestamp: Date.now(),
+    nonce: crypto.randomUUID(),
+    keyId: identity.keyId,
+  };
+
+  const payloadString = canonicalJson(payload);
+  const payloadBuffer = new TextEncoder().encode(payloadString);
+
+  const privateKey = await crypto.subtle.importKey("jwk", identity.privateKey, ECDSA_PARAMS, false, ["sign"]);
+
+  const signatureBuffer = await crypto.subtle.sign({ name: "ECDSA", hash: HASH_ALGORITHM }, privateKey, payloadBuffer);
+
+  return {
+    payload,
+    signature: bufferToBase64(signatureBuffer),
+    publicKey: identity.publicKey,
+  };
+}
+
+export async function signPayload<T extends Record<string, unknown>>(data: T): Promise<SignedPayload<T>> {
+  const identity = await getIdentity();
+
+  const payload = {
+    ...data,
     timestamp: Date.now(),
     nonce: crypto.randomUUID(),
     keyId: identity.keyId,
@@ -227,7 +257,15 @@ async function generateKeyIdentity(): Promise<KeyIdentity> {
 }
 
 async function hashPublicKey(jwk: JsonWebKey): Promise<string> {
-  const canonical = canonicalJson(jwk);
+  // Normalize: only include fields that define the EC key identity
+  // This ensures the same key produces the same hash regardless of optional fields
+  const normalized = {
+    crv: jwk.crv,
+    kty: jwk.kty,
+    x: jwk.x,
+    y: jwk.y,
+  };
+  const canonical = canonicalJson(normalized);
   const buffer = new TextEncoder().encode(canonical);
   const hashBuffer = await crypto.subtle.digest(HASH_ALGORITHM, buffer);
   return bufferToHex(hashBuffer);
@@ -294,13 +332,15 @@ function isValidJwk(obj: unknown): obj is JsonWebKey {
   return jwk.kty === "EC" && jwk.crv === "P-256" && typeof jwk.x === "string" && typeof jwk.y === "string";
 }
 
-function canonicalJson(obj: object): string {
-  const keys = Object.keys(obj).sort();
-  const sorted: Record<string, unknown> = {};
-  for (const key of keys) {
-    sorted[key] = (obj as Record<string, unknown>)[key];
+function canonicalJson(obj: unknown): string {
+  if (obj === null || typeof obj !== "object") {
+    return JSON.stringify(obj);
   }
-  return JSON.stringify(sorted);
+  if (Array.isArray(obj)) {
+    return `[${obj.map(canonicalJson).join(",")}]`;
+  }
+  const sorted = Object.keys(obj).sort();
+  return `{${sorted.map(k => `${JSON.stringify(k)}:${canonicalJson((obj as Record<string, unknown>)[k])}`).join(",")}}`;
 }
 
 function bufferToBase64(buffer: ArrayBuffer): string {
