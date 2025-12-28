@@ -10,6 +10,7 @@ let gridAnimationController: AnimationController | null = null;
 
 import { showAlert, type AlertAction } from "../editor/ui/feedback";
 import { fetchAllStats, submitRating, trackInstall } from "./themeStoreApi";
+import { getDisplayName } from "./keyIdentity";
 import {
   applyStoreTheme,
   clearActiveStoreTheme,
@@ -1553,6 +1554,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
   } else if (ratingSectionEl && ratingStarsEl && ratingStatusEl) {
     const starButtons = ratingStarsEl.querySelectorAll(".detail-star");
     const existingUserRating = userRatingsCache[theme.id];
+    const displayName = await getDisplayName();
 
     starButtons.forEach((btn, i) => {
       btn.classList.remove("active", "hover");
@@ -1578,7 +1580,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
     };
 
     if (existingUserRating) {
-      ratingStatusEl.textContent = `You rated ${existingUserRating} star${existingUserRating > 1 ? "s" : ""}`;
+      ratingStatusEl.textContent = `You rated ${existingUserRating} star${existingUserRating > 1 ? "s" : ""} as ${displayName}`;
       ratingStatusEl.className = "detail-rating-status";
     } else {
       ratingStatusEl.textContent = "";
@@ -1607,7 +1609,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         const { success, data: ratingData, error } = await submitRating(theme.id, rating);
         if (success && ratingData) {
           await saveUserRating(theme.id, rating);
-          ratingStatusEl.textContent = `You rated ${rating} star${rating > 1 ? "s" : ""}`;
+          ratingStatusEl.textContent = `You rated ${rating} star${rating > 1 ? "s" : ""} as ${displayName}`;
           ratingStatusEl.className = "detail-rating-status success";
 
           if (storeStatsCache[theme.id]) {

@@ -1,7 +1,8 @@
 import { LOG_PREFIX_STORE, THEME_STORE_API_URL } from "@constants";
-import { getLocalStorage } from "@core/storage";
 import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 import { fetchWithTimeout } from "./themeStoreService";
+import { signRating, signInstall, isKeyRegistered, markKeyRegistered } from "./keyIdentity";
+
 const THEME_ID_MAX_LENGTH = 128;
 const THEME_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
@@ -16,15 +17,6 @@ function isValidThemeId(themeId: string): boolean {
 
 function isValidRating(rating: number): boolean {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5;
-}
-
-async function getOdid(): Promise<string> {
-  const { odid } = await getLocalStorage<{ odid?: string }>(["odid"]);
-  if (odid) return odid;
-
-  const newOdid = crypto.randomUUID();
-  await chrome.storage.local.set({ odid: newOdid });
-  return newOdid;
 }
 
 export async function fetchAllStats(): Promise<ApiResult<AllThemeStats>> {
@@ -49,18 +41,45 @@ export async function trackInstall(themeId: string): Promise<ApiResult<number | 
   }
 
   try {
-    const response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/install/${encodeURIComponent(themeId)}`, {
+    const signed = await signInstall(themeId);
+    let needsRegistration = !(await isKeyRegistered());
+
+    const body: Record<string, unknown> = {
+      payload: signed.payload,
+      signature: signed.signature,
+    };
+
+    if (needsRegistration) {
+      body.publicKey = signed.publicKey;
+    }
+
+    let response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/install/${encodeURIComponent(themeId)}`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
 
-    if (response.status === 429) {
-      return { success: true, data: null, error: "Rate limited" };
+    if (response.status === 400 && !needsRegistration) {
+      const errorData = await response.json().catch(() => null);
+      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+        body.publicKey = signed.publicKey;
+        needsRegistration = true;
+        response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/install/${encodeURIComponent(themeId)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      }
     }
 
     if (!response.ok) {
       const error = `Failed to track install: ${response.status}`;
       console.warn(LOG_PREFIX_STORE, error);
       return { success: false, data: null, error };
+    }
+
+    if (needsRegistration) {
+      await markKeyRegistered();
     }
 
     const data = await response.json();
@@ -82,17 +101,45 @@ export async function submitRating(themeId: string, rating: number): Promise<Api
   }
 
   try {
-    const odid = await getOdid();
-    const response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/rate/${encodeURIComponent(themeId)}`, {
+    const signed = await signRating(themeId, rating);
+    let needsRegistration = !(await isKeyRegistered());
+
+    const body: Record<string, unknown> = {
+      payload: signed.payload,
+      signature: signed.signature,
+    };
+
+    if (needsRegistration) {
+      body.publicKey = signed.publicKey;
+    }
+
+    let response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/rate/${encodeURIComponent(themeId)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rating, odid }),
+      body: JSON.stringify(body),
     });
+
+    if (response.status === 400 && !needsRegistration) {
+      const errorData = await response.json().catch(() => null);
+      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+        body.publicKey = signed.publicKey;
+        needsRegistration = true;
+        response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/rate/${encodeURIComponent(themeId)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      }
+    }
 
     if (!response.ok) {
       const error = `Failed to submit rating: ${response.status}`;
       console.warn(LOG_PREFIX_STORE, error);
       return { success: false, data: null, error };
+    }
+
+    if (needsRegistration) {
+      await markKeyRegistered();
     }
 
     return { success: true, data: await response.json() };

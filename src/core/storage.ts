@@ -4,6 +4,12 @@ import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
 
 /**
+ * Keys that should NEVER be deleted by clearCache or any bulk delete operation.
+ * These keys contain critical user data that must persist across cache clears.
+ */
+export const PROTECTED_STORAGE_KEYS = ["userIdentity", "identityRegistered", "userThemeRatings"] as const;
+
+/**
  * Typed wrapper for chrome.storage.local.get that casts results to expected type.
  */
 export async function getLocalStorage<T>(keys: string | string[] | null): Promise<T> {
