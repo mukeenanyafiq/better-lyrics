@@ -1,14 +1,16 @@
 import {
   AUTO_SWITCH_ENABLED_LOG,
   FULLSCREEN_BUTTON_SELECTOR,
-  GENERAL_ERROR_LOG, LYRICS_CLASS,
+  GENERAL_ERROR_LOG,
+  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
   PAUSING_LYRICS_SCROLL_LOG,
   SONG_SWITCHED_LOG,
   TAB_CONTENT_CLASS,
   TAB_HEADER_CLASS,
-  TAB_RENDERER_SELECTOR, USER_SCROLLING_CLASS,
+  TAB_RENDERER_SELECTOR,
+  USER_SCROLLING_CLASS,
 } from "@constants";
 import { AppState, handleModifications, reloadLyrics, type PlayerDetails } from "@core/appState";
 import { onAutoSwitchEnabled, onFullScreenDisabled } from "@modules/settings/settings";

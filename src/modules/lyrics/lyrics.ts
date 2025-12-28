@@ -24,7 +24,7 @@ import { getSongMetadata, getSongAlbum, type SegmentMap } from "./requestSniffer
 import * as RequestSniffer from "./requestSniffer/requestSniffer";
 import * as RequestSniffing from "./requestSniffer/requestSniffer";
 import * as Translation from "./translation";
-import {clearCache as clearTranslationCache }  from "./translation";
+import { clearCache as clearTranslationCache } from "./translation";
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;

@@ -15,7 +15,7 @@ import { AppState } from "@core/appState";
 import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { log } from "@utils";
-import type {Lyric} from "@modules/lyrics/providers/shared";
+import type { Lyric } from "@modules/lyrics/providers/shared";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
 
@@ -307,22 +307,23 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       let lastActiveLyric = activeElems[activeElems.length - 1];
 
       let lyricPositions: number[] = activeElems
-          .filter((lineData, index) => {
-            // Ignore lyrics close to finishing unless it last active lyric
-            return lyricScrollTime <  lineData.time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S || index == activeElems.length - 1;
-          })
-          // We subtract selectedLyricHeight / 2 to center the selected lyric line vertically within the offset region,
-          // so the lyric is not aligned at the very top of the offset but is visually centered.
-          .map(lyricData => lyricData.position + lyricData.height / 2);
+        .filter((lineData, index) => {
+          // Ignore lyrics close to finishing unless it last active lyric
+          return (
+            lyricScrollTime < lineData.time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S ||
+            index == activeElems.length - 1
+          );
+        })
+        // We subtract selectedLyricHeight / 2 to center the selected lyric line vertically within the offset region,
+        // so the lyric is not aligned at the very top of the offset but is visually centered.
+        .map(lyricData => lyricData.position + lyricData.height / 2);
 
-
-
-      let avgPos = lyricPositions.reduce((accumulator, currentValue) => accumulator + currentValue, 0) / lyricPositions.length;
+      let avgPos =
+        lyricPositions.reduce((accumulator, currentValue) => accumulator + currentValue, 0) / lyricPositions.length;
 
       if (lyricPositions.length > 1) {
         console.log(lyricPositions, avgPos, lyricPositions.length);
       }
-
 
       // Base position
       let scrollPos = avgPos - scrollPosOffset;
@@ -347,8 +348,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         animEngineState.nextScrollAllowedTime = 0;
       }
 
-      if (Math.abs(scrollTop - scrollPos) > 2 && Date.now() > animEngineState.nextScrollAllowedTime &&
-          (animEngineState.wasUserScrolling || newLyricSelected)) {
+      if (
+        Math.abs(scrollTop - scrollPos) > 2 &&
+        Date.now() > animEngineState.nextScrollAllowedTime &&
+        (animEngineState.wasUserScrolling || newLyricSelected)
+      ) {
         if (smoothScroll) {
           lyricsElement.style.transitionTimingFunction = "";
           lyricsElement.style.transitionProperty = "";
