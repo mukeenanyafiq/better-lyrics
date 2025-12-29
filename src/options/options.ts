@@ -1,6 +1,7 @@
 // Function to save user options
 import Sortable from "sortablejs";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
+import { initializeCLyricsModal } from "./clyrics/index";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -402,6 +403,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initStoreUI();
   setupYourThemesButton();
+
+  initializeCLyricsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });

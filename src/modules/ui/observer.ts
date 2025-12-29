@@ -217,6 +217,14 @@ export function initializeLyrics(): void {
     const currentVideoDetails = detail.song + " " + detail.artist;
 
     if (currentVideoId !== AppState.lastVideoId || currentVideoDetails !== AppState.lastVideoDetails) {
+      chrome.storage.local.set({
+        lastPlayed: {
+          videoId: detail.videoId,
+          duration: detail.duration,
+          song: detail.song,
+          artist: detail.artist
+        }
+      });
       AppState.areLyricsTicking = false;
       AppState.lastVideoId = currentVideoId;
       AppState.lastVideoDetails = currentVideoDetails;
@@ -250,7 +258,7 @@ export function initializeLyrics(): void {
         const root = getComputedStyle(document.documentElement);
         const albumArtQuality = root.getPropertyValue("--ytmusic-album-art-img-size") || "600";
         setAlbumArtSize(albumArtQuality);
-      }, 5000);
+      }, 3000);
     }
 
     if (AppState.lyricInjectionFailed) {

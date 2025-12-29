@@ -11,7 +11,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="../src/options/options.css" />
-		<link rel="stylesheet" href="./clyrics/clyrics.css" />
+		<link rel="stylesheet" href="../src/options/clyrics/clyrics.css" />
 	</head>
 	<body>
 		<!-- TOPBAR -->
@@ -52,9 +52,9 @@
 			<div class="metadata">
 				<span>
 					<strong id="metadata-name">Snowman</strong>
-					<strong id="metadata-duration"> • 04:30<br /></strong>
+					<strong id="metadata-duration"> · 04:30<br /></strong>
 					<span id="metadata-artist">Sia</span>
-					<span id="metadata-album"> • Everyday is Christmas (Deluxe Edition)</span>
+					<span id="metadata-album"> · Everyday is Christmas (Deluxe Edition)</span>
 				</span>
 			</div>
 		</div>
@@ -193,7 +193,7 @@
 						<div class="line-timeline">
 							<span>
 								<strong class="code">[♪] 00:06.216</strong>
-								<span class="code">• 4.145s</span>
+								<span class="code">· 4.145s</span>
 							</span>
 						</div>
 						<div class="words">
@@ -232,7 +232,7 @@
 						<div class="line-timeline">
 							<span>
 								<strong class="code">[BACKGROUND] 00:06.216</strong>
-								<span class="code">• 4.145s</span>
+								<span class="code">· 4.145s</span>
 							</span>
 						</div>
 						<div class="words">
@@ -282,61 +282,7 @@
 
 				<div class="modal-body-wrapped modal-body">
 					<div id="clyrics-modal-list"></div>
-					<div id="clyrics-new-lyric">
-						<div class="modal-section">
-							<div class="modal-section-header">
-								<h3 class="modal-section-title">Create a New Lyric</h3>
-								<button class="small-svg-btn">
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-										<path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/>
-									</svg>
-								</button>
-							</div>
-							<div class="clyrics-top-buttons">
-								<button id="return-clyrics-btn" class="icon-btn" data-tooltip="Return">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-										<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
-									</svg>
-								</button>
-								<button id="import-currently-btn" class="small-btn">Import from currently playing</button>
-							</div>
-							<span class="clyrics-span">
-								Your lyric will be saved and synchronized across all devices.
-								<br/>
-								<strong>However, your lyric will NOT be uploaded to Better Lyrics provider.</strong>
-							</span>
-								<div id="clyrics-track-name" class="clyrics-long-input">
-									<span class="clyrics-input-title"><strong>Track Name *</strong></span>
-									<input type="text" placeholder="Enter the name of the track" class="clyrics-input clyrics-card" />
-								</div>
-								<div id="clyrics-artist-name" class="clyrics-long-input">
-									<span class="clyrics-input-title"><strong>Artist Name *</strong></span>
-									<input type="text" placeholder="Enter the name of the track's artist" class="clyrics-input clyrics-card" />
-								</div>
-								<div id="clyrics-album-name" class="clyrics-long-input">
-									<span class="clyrics-input-title"><strong>Album Name</strong></span>
-									<input type="text" placeholder="Enter the name of the track's album" class="clyrics-input clyrics-card" />
-								</div>
-								<div id="clyrics-duration" class="clyrics-short-input">
-									<span class="clyrics-input-title"><strong>Duration</strong></span>
-									<input type="number" placeholder="Enter the duration of the track (in seconds)" class="clyrics-input clyrics-card" />
-								</div>
-								<div id="clyrics-lyric-file" class="clyrics-short-input">
-									<div class="clyrics-input-info">
-										<span class="clyrics-input-title"><strong>Lyric File</strong></span>
-										<span class="clyrics-input-description"><strong>(.lrc, .elrc, .ttml, .xml are supported)</strong></span>
-									</div>
-									<label for="clyrics-lyric-file-input" class="small-btn">Import</label>
-									<input type="file" id="clyrics-lyric-file-input" accept=".lrc,.elrc,.ttml,.xml" style="display: none;" />
-								</div>
-							<strong id="clyrics-required-section" class="clyrics-span" style="color: #ff8080">
-								Required section: Track Name and Artist Name
-							</strong>
-							<button id="create-clyric-btn" class="label-btn btn-confirm icon-btn" data-tooltip="Creates a new lyric">
-								<strong>Create</strong>
-							</button>
-						</div>
-					</div>
+					<div id="clyrics-new-lyric" style="display: none;"></div>
 				</div>
 			</div>
 		</div>
@@ -362,5 +308,5 @@
 		</div>
 	</body>
 	<script type="module" defer src="./clyrics/clyrics.js"></script>
-	<script type="module" defer src="../src/options/editor/features/clyrics.ts"></script>
+	<script type="module" defer src="../src/options/clyrics.ts"></script>
 </html>

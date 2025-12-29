@@ -15,10 +15,6 @@ import {
   setThemeName,
 } from "./features/themes";
 import {
-  closeCLyricsModal,
-  openCLyricsModal
-} from "./features/clyrics";
-import {
   deleteThemeBtn,
   editThemeBtn,
   openEditCSS,
@@ -27,9 +23,6 @@ import {
   themeModalOverlay,
   themeNameText,
   themeSelectorBtn,
-  clyricsModifyBtn,
-  clyricsModalClose,
-  clyricsModalOverlay,
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
 
@@ -181,24 +174,6 @@ export async function initializeEditor() {
   console.log(LOG_PREFIX_EDITOR, "Editor initialization complete");
 }
 
-export function initializeCLyricsModal() {
-  clyricsModifyBtn?.addEventListener("click", openCLyricsModal);
-
-  clyricsModalClose?.addEventListener("click", closeCLyricsModal);
-
-  clyricsModalOverlay?.addEventListener("click", e => {
-    if (e.target === clyricsModalOverlay) {
-      closeThemeModal();
-    }
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && clyricsModalOverlay?.classList.contains("active")) {
-      closeThemeModal();
-    }
-  });
-}
-
 export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
     await initializeEditor();
@@ -208,7 +183,6 @@ export function initialize() {
     initializeThemeActions();
     initializeFileOperations();
     initializeStorageListeners();
-    initializeCLyricsModal();
     initStoreThemeListener();
   });
 }

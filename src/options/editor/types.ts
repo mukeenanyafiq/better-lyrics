@@ -27,11 +27,3 @@ export interface ThemeCardOptions {
   isCustom: boolean;
   index: number;
 }
-
-export interface CLyricsCardOptions {
-  name: string;
-  artist: string;
-  album: string;
-  duration: number;
-  modified: number;
-}

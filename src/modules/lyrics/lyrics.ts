@@ -146,6 +146,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
   let lyrics: LyricSourceResult | null = null;
   let sourceMap = newSourceMap();
+
   // We depend on the cubey lyrics to fetch certain metadata, so we always call it even if it isn't the top priority
   let providerParameters: ProviderParameters = {
     song,
@@ -158,6 +159,16 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     alwaysFetchMetadata: swappedVideoId,
     signal,
   };
+
+  chrome.storage.local.set({
+    lastPlayed: {
+      videoId,
+      duration,
+      song,
+      artist,
+      album
+    }
+  });
 
   let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
     if (!AppState.areLyricsLoaded && lyrics) {

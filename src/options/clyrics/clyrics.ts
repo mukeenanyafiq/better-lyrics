@@ -1,12 +1,14 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
-import type { CLyricsCardOptions } from "../types";
-import { clyricsNewLyrics, clyricsModalList, clyricsModalOverlay } from "../ui/dom";
+import type { CLyricsCardOptions } from "./types";
+import { clyricsNewLyrics, clyricsModalList, clyricsModalOverlay } from "./index";
+import { AppState } from "@/core/appState";
 
 let initializedForm = false;
 
-export async function formNewLyrics(): Promise<void> {
+async function formNewLyrics(): Promise<void> {
   if (!clyricsNewLyrics || initializedForm) return;
   initializedForm = true;
+  let registeredInputs = {} as Record<string, HTMLInputElement>;
 
   clyricsNewLyrics.innerHTML = "";
   clyricsNewLyrics.className = "modal-section";
@@ -38,14 +40,22 @@ export async function formNewLyrics(): Promise<void> {
     if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
   });
 
-  /// Import from currently playing button
-  const importCurrentButton = document.createElement("button");
-  importCurrentButton.className = "small-btn";
-  importCurrentButton.textContent = "Import from currently playing";
+  modalTopButtons.appendChild(returnButton);
 
-  importCurrentButton.addEventListener("click", () => {
+  /// Import from last played button
+  const importLastButton = document.createElement("button");
+  importLastButton.className = "small-btn";
+  importLastButton.textContent = "Import from last played";
 
+  importLastButton.addEventListener("click", async () => {
+    const lastPlayed = await chrome.storage.local.get("lastPlayed");
+    for (const key in lastPlayed) {
+      if (!registeredInputs[key]) { continue; }
+      registeredInputs[key].value = lastPlayed[key] as string;
+    }
   });
+
+  modalTopButtons.appendChild(importLastButton);
 
   clyricsNewLyrics.appendChild(modalTopButtons);
 
@@ -59,6 +69,7 @@ export async function formNewLyrics(): Promise<void> {
   // Inputs
   const clyricsNewInputs = {
     "video-id": {
+      id: "videoId",
       required: false,
       type: "text",
       length: "long",
@@ -68,6 +79,7 @@ export async function formNewLyrics(): Promise<void> {
     },
 
     "track-name": {
+      id: "song",
       required: true,
       type: "text",
       length: "long",
@@ -77,6 +89,7 @@ export async function formNewLyrics(): Promise<void> {
     },
 
     "artist-name": {
+      id: "artist",
       required: true,
       type: "text",
       length: "long",
@@ -86,6 +99,7 @@ export async function formNewLyrics(): Promise<void> {
     },
 
     "album-name": {
+      id: "album",
       required: false,
       type: "text",
       length: "long",
@@ -95,6 +109,7 @@ export async function formNewLyrics(): Promise<void> {
     },
 
     "duration": {
+      id: "duration",
       required: false,
       type: "number",
       length: "short",
@@ -174,6 +189,8 @@ export async function formNewLyrics(): Promise<void> {
       inputter.id = "clyrics-lyric-file-input";
       inputter.accept = ".lrc,.elrc,.ttml,.xml";
       inputter.style.display = "none";
+      
+      element.appendChild(inputter);
     } else {
       //// Input Any Type
       const inputter = document.createElement("input");
@@ -181,6 +198,13 @@ export async function formNewLyrics(): Promise<void> {
       inputter.placeholder = input.placeholder;
       inputter.classList.add("clyrics-input");
       inputter.classList.add("clyrics-card");
+      if (input.type == "number") { inputter.min = "1"; }
+      
+      if ("id" in input && input.id) {
+        registeredInputs[input.id] = inputter;
+      }
+
+      element.appendChild(inputter);
     }
 
     clyricsNewLyrics.appendChild(element);
@@ -201,7 +225,7 @@ export async function formNewLyrics(): Promise<void> {
   clyricsNewLyrics.appendChild(createBtn);
 }
 
-export async function populateCLyrics(): Promise<void> {
+async function populateCLyrics(): Promise<void> {
   if (!clyricsModalList) return;
 
   clyricsModalList.innerHTML = "";
@@ -231,7 +255,14 @@ export async function populateCLyrics(): Promise<void> {
   newLyric.id = "create-new-clyric"
   newLyric.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/></svg>'
 
+  newLyric.addEventListener("click", () => {
+    if (clyricsModalList) clyricsModalList.style.display = "none";
+    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "";
+  });
+
   yourLyricsHeader.appendChild(newLyric);
+
+  clyricsModalList.appendChild(yourLyricsHeader);
 
   const yourLyricsItems = document.createElement("div");
   yourLyricsItems.className = "clyrics-modal-items";
@@ -281,7 +312,7 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   
   const metadata = document.createElement("div");
   metadata.className = "clyrics-input-span";
-  metadata.textContent = `Duration: ${formatTime(options.duration, true)} • Modified: ${new Date(options.modified).toLocaleString()}`;
+  metadata.textContent = `Duration: ${formatTime(options.duration, true)} · Modified: ${new Date(options.modified).toLocaleString()}`;
   
   const name = document.createElement("div");
   name.className = "clyrics-input-title";
@@ -289,7 +320,7 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   
   const artistAlbum = document.createElement("div");
   artistAlbum.className = "clyrics-input-description";
-  artistAlbum.textContent = `${options.artist} • ${options.album}`;
+  artistAlbum.textContent = `${options.artist} · ${options.album}`;
   
   info.appendChild(metadata);
   info.appendChild(name);
@@ -311,7 +342,6 @@ export async function openCLyricsModal() {
       }
     });
   }
-  
 }
 
 export function closeCLyricsModal() {
@@ -320,6 +350,7 @@ export function closeCLyricsModal() {
     if (modal) {
       modal.classList.add("closing");
     }
+
     clyricsModalOverlay.classList.remove("active");
 
     setTimeout(() => {

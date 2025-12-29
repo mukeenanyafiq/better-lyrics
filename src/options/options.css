@@ -1115,6 +1115,12 @@ input.cm-textfield:focus-visible {
 	}
 }
 
+#theme-modal-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
 .theme-modal-items {
 	display: flex;
 	flex-wrap: wrap;
@@ -1352,93 +1358,6 @@ input.cm-textfield:focus-visible {
 	height: 0.875rem;
 }
 
-/* Custom Lyrics Modal */
-.clyrics-modal-items {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	gap: 0.5rem;
-}
-
-.clyrics-card {
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 0.5rem;
-	padding: 0.625rem 0.75rem;
-	transition: all 0.2s;
-	position: relative;
-	width: auto;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	/* flex: 0 0 auto; */
-}
-
-.clyrics-card-info {
-	display: flex;
-	gap: 0.125rem;
-	flex-direction: column;
-	justify-content: flex-start;
-}
-
-.clyrics-card-buttons {
-	display: flex;
-	gap: 0.5rem;
-	flex-direction: row;
-}
-
-.clyrics-top-buttons {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.clyrics-input-title {
-	font-size: 1.125rem;
-}
-
-.clyrics-input-description {
-	opacity: 0.5;
-	font-size: .75rem;
-}
-
-.clyrics-input-span {
-	opacity: 0.5;
-	font-size: .625rem;
-}
-
-.clyrics-input-info {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
-.clyrics-long-input {
-	display: flex;
-	gap: 4px;
-	flex-direction: column;
-	align-items: flex-start;
-	justify-content: flex-start;
-}
-
-.clyrics-short-input {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.clyrics-span {
-	font-size: 0.8rem;
-}
-
-.clyrics-input {
-	border-radius: 0.25rem;
-	padding: 0.5rem 0.5rem;
-	width: auto;
-	align-self: stretch;
-}
-
 .modal-overlay {
 	position: fixed;
 	top: 0;
@@ -1552,7 +1471,6 @@ input.cm-textfield:focus-visible {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-	margin-bottom: 2rem;
 }
 
 .modal-section:last-child {
