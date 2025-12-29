@@ -9,7 +9,7 @@ import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from 
 let gridAnimationController: AnimationController | null = null;
 
 import { showAlert, type AlertAction } from "../editor/ui/feedback";
-import { fetchAllStats, submitRating, trackInstall } from "./themeStoreApi";
+import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
 import { getDisplayName, hasCertificate } from "./keyIdentity";
 import { getTurnstileToken, cleanupTurnstile } from "./turnstile";
 import {
@@ -77,6 +77,12 @@ async function loadUserRatings(): Promise<void> {
     "userThemeRatings",
   ]);
   userRatingsCache = userThemeRatings || {};
+
+  const { success, data: serverRatings } = await fetchUserRatings();
+  if (success && Object.keys(serverRatings).length > 0) {
+    userRatingsCache = { ...userRatingsCache, ...serverRatings };
+    await chrome.storage.local.set({ userThemeRatings: userRatingsCache });
+  }
 }
 
 async function saveUserRating(themeId: string, rating: number): Promise<void> {

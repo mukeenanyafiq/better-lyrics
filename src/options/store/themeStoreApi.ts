@@ -4,6 +4,7 @@ import { fetchWithTimeout } from "./themeStoreService";
 import {
   signRating,
   signInstall,
+  signPayload,
   isKeyRegistered,
   markKeyRegistered,
   getCertificate,
@@ -176,5 +177,57 @@ export async function submitRating(
     const error = err instanceof Error ? err.message : "Network error";
     console.warn(LOG_PREFIX_STORE, "Failed to submit rating:", error);
     return { success: false, data: null, error };
+  }
+}
+
+export async function fetchUserRatings(): Promise<ApiResult<Record<string, number>>> {
+  try {
+    const signed = await signPayload({});
+    let needsRegistration = !(await isKeyRegistered());
+
+    const body: Record<string, unknown> = {
+      payload: signed.payload,
+      signature: signed.signature,
+    };
+
+    if (needsRegistration) {
+      body.publicKey = signed.publicKey;
+    }
+
+    let response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/user/ratings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (response.status === 400 && !needsRegistration) {
+      const errorData = await response.json().catch(() => null);
+      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+        body.publicKey = signed.publicKey;
+        needsRegistration = true;
+        response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/user/ratings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      }
+    }
+
+    if (!response.ok) {
+      const error = `Failed to fetch user ratings: ${response.status}`;
+      console.warn(LOG_PREFIX_STORE, error);
+      return { success: false, data: {}, error };
+    }
+
+    if (needsRegistration) {
+      await markKeyRegistered();
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Network error";
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch user ratings:", error);
+    return { success: false, data: {}, error };
   }
 }
