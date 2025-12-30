@@ -1,9 +1,79 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
-import type { CLyricsCardOptions } from "./types";
+import type { CLyricsOverview } from "./types";
 import { clyricsNewLyrics, clyricsModalList, clyricsModalOverlay } from "./index";
-import { AppState } from "@/core/appState";
+import { createCustomLyrics, listCustomLyrics } from "./clyricsManager";
 
 let initializedForm = false;
+
+async function populateCLyrics(): Promise<void> {
+  if (!clyricsModalList) return;
+
+  clyricsModalList.innerHTML = "";
+  clyricsModalList.className = "modal-section";
+
+  const customLyrics = await listCustomLyrics();
+
+  const yourLyricsHeader = document.createElement("div");
+  yourLyricsHeader.className = "modal-section-header"
+
+  const yourLyricsTitle = document.createElement("h3");
+  yourLyricsTitle.className = "modal-section-title";
+  yourLyricsTitle.textContent = `Your Lyrics (${customLyrics.length})`;
+  
+  yourLyricsHeader.appendChild(yourLyricsTitle);
+
+  const newLyric = document.createElement("button")
+  newLyric.className = "small-svg-btn"
+  newLyric.id = "create-new-clyric"
+  newLyric.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/></svg>'
+
+  newLyric.addEventListener("click", () => {
+    if (clyricsModalList) clyricsModalList.style.display = "none";
+    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "";
+  });
+
+  yourLyricsHeader.appendChild(newLyric);
+
+  clyricsModalList.appendChild(yourLyricsHeader);
+
+  const yourLyricsItems = document.createElement("div");
+  yourLyricsItems.className = "clyrics-modal-items";
+
+  if (customLyrics.length < 1) {
+    const card = document.createElement("div");
+    card.className = "clyrics-card"
+
+    const info = document.createElement("div");
+    info.className = "clyrics-card-info";
+    
+    const nothing = document.createElement("div");
+    nothing.className = "clyrics-input-title";
+    nothing.innerHTML = `<strong>You don't have any applied custom lyrics</strong>`;
+    
+    const note = document.createElement("div");
+    note.className = "clyrics-span";
+    note.textContent = `Create a new one or import one from your computer!`;
+    
+    info.appendChild(nothing);
+    info.appendChild(note);
+
+    card.appendChild(info);
+    yourLyricsItems.appendChild(card);
+  }
+
+  customLyrics.forEach(clyrics => {
+    const card = createCLyricsCard({
+      song: clyrics.song,
+      artist: clyrics.artist,
+      album: clyrics.album,
+      duration: clyrics.duration,
+      modified: clyrics.modified
+    });
+    yourLyricsItems.appendChild(card);
+  });
+
+  clyricsModalList.appendChild(yourLyricsItems);
+}
 
 async function formNewLyrics(): Promise<void> {
   if (!clyricsNewLyrics || initializedForm) return;
@@ -48,10 +118,12 @@ async function formNewLyrics(): Promise<void> {
   importLastButton.textContent = "Import from last played";
 
   importLastButton.addEventListener("click", async () => {
-    const lastPlayed = await chrome.storage.local.get("lastPlayed");
+    const rawData = await chrome.storage.local.get("lastPlayed") as Record<string, any>;
+    const lastPlayed = rawData.lastPlayed;
+    if (!lastPlayed) return;
     for (const key in lastPlayed) {
       if (!registeredInputs[key]) { continue; }
-      registeredInputs[key].value = lastPlayed[key] as string;
+      registeredInputs[key].value = lastPlayed[key];
     }
   });
 
@@ -75,7 +147,7 @@ async function formNewLyrics(): Promise<void> {
       length: "long",
       title: "(Music) YouTube Video ID",
       description: "Helps narrow down available lyrics for swift importing",
-      placeholder: "https://music.youtube.com/watch?v=videoid"
+      placeholder: "videoIdjlks"
     },
 
     "track-name": {
@@ -179,7 +251,7 @@ async function formNewLyrics(): Promise<void> {
       importIcon.appendChild(pathImportIcon);
 
       label.appendChild(importIcon);
-      label.innerHTML += "Import";
+      label.innerHTML += input.placeholder;
 
       element.appendChild(label);
 
@@ -219,91 +291,35 @@ async function formNewLyrics(): Promise<void> {
   createBtn.innerHTML = "<strong>Create</strong>";
 
   createBtn.addEventListener("click", () => {
-
+    createCustomLyrics({
+      song: registeredInputs.song.value,
+      artist: registeredInputs.artist.value,
+      album: registeredInputs.album.value,
+      duration: Number(registeredInputs.duration.value),
+    }, registeredInputs.videoId.value);
+    populateCLyrics();
+    if (clyricsModalList) clyricsModalList.style.display = "";
+    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
+    for (const input in registeredInputs) {
+      registeredInputs[input].value = "";
+    }
+    registeredInputs = {};
   });
-
-  clyricsNewLyrics.appendChild(createBtn);
-}
-
-async function populateCLyrics(): Promise<void> {
-  if (!clyricsModalList) return;
-
-  clyricsModalList.innerHTML = "";
-  clyricsModalList.className = "modal-section";
-
-  // const customLyrics = [{
-  //   name: "Snowman",
-  //   artist: "Sia",
-  //   album: "Everyday Is Christmas (Deluxe Edition)",
-  //   duration: 270,
-  //   modified: Date.now()
-  // }]
-
-  const customLyrics: any[] = []
-
-  const yourLyricsHeader = document.createElement("div");
-  yourLyricsHeader.className = "modal-section-header"
-
-  const yourLyricsTitle = document.createElement("h3");
-  yourLyricsTitle.className = "modal-section-title";
-  yourLyricsTitle.textContent = `Your Lyrics (${customLyrics.length})`;
   
-  yourLyricsHeader.appendChild(yourLyricsTitle);
+  clyricsNewLyrics.appendChild(createBtn);
 
-  const newLyric = document.createElement("button")
-  newLyric.className = "small-svg-btn"
-  newLyric.id = "create-new-clyric"
-  newLyric.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/></svg>'
+  // Create & Edit Button
+  const createEditBtn = document.createElement("button");
+  createEditBtn.id = "create-clyric-btn";
+  createEditBtn.classList.add("label-btn");
+  createEditBtn.classList.add("btn-confirm");
+  createEditBtn.classList.add("icon-btn");
+  createEditBtn.innerHTML = "<strong>Create & Edit</strong>";
 
-  newLyric.addEventListener("click", () => {
-    if (clyricsModalList) clyricsModalList.style.display = "none";
-    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "";
-  });
-
-  yourLyricsHeader.appendChild(newLyric);
-
-  clyricsModalList.appendChild(yourLyricsHeader);
-
-  const yourLyricsItems = document.createElement("div");
-  yourLyricsItems.className = "clyrics-modal-items";
-
-  if (customLyrics.length < 1) {
-    const card = document.createElement("div");
-    card.className = "clyrics-card"
-
-    const info = document.createElement("div");
-    info.className = "clyrics-card-info";
-    
-    const nothing = document.createElement("div");
-    nothing.className = "clyrics-input-title";
-    nothing.innerHTML = `<strong>You don't have any applied custom lyrics</strong>`;
-    
-    const note = document.createElement("div");
-    note.className = "clyrics-span";
-    note.textContent = `Create a new one or import one from your computer!`;
-    
-    info.appendChild(nothing);
-    info.appendChild(note);
-
-    card.appendChild(info);
-    yourLyricsItems.appendChild(card);
-  }
-
-  (customLyrics).forEach(clyrics => {
-    const card = createCLyricsCard({
-      name: clyrics.name,
-      artist: clyrics.artist,
-      album: clyrics.album,
-      duration: clyrics.duration,
-      modified: clyrics.modified
-    });
-    yourLyricsItems.appendChild(card);
-  });
-
-  clyricsModalList.appendChild(yourLyricsItems);
+  clyricsNewLyrics.appendChild(createEditBtn);
 }
 
-function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
+function createCLyricsCard(options: CLyricsOverview): HTMLElement {
   const card = document.createElement("div");
   card.className = "clyrics-card"
 
@@ -316,7 +332,7 @@ function createCLyricsCard(options: CLyricsCardOptions): HTMLElement {
   
   const name = document.createElement("div");
   name.className = "clyrics-input-title";
-  name.innerHTML = `<strong>${options.name}</strong>`
+  name.innerHTML = `<strong>${options.song}</strong>`
   
   const artistAlbum = document.createElement("div");
   artistAlbum.className = "clyrics-input-description";

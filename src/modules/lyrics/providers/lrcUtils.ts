@@ -41,9 +41,11 @@ export function parseTime(timeStr: string | number | undefined): number {
 }
 
 /**
- * Formats a time number in milliseconds to mm:ss or mm:ss.xx
+ * Formats a time number in milliseconds to `mm:ss` or `mm:ss.xxx` with `useMs` on `true`
+ * 
+ * @param isSec Decides whether the given `timeNum` are a rounded seconds, possibly one from `Date.now()`
  */
-export function formatTime(timeNum: number | undefined, isSec?: boolean, useMs?: boolean): string {
+export function formatTime(timeNum: number, isSec?: boolean, useMs?: boolean): string {
   if (!timeNum) return "0";
   if (isSec) timeNum *= 1000
 
@@ -57,7 +59,7 @@ export function formatTime(timeNum: number | undefined, isSec?: boolean, useMs?:
   };
   
   if (useMs) {
-    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(Math.floor(millisec /10))}`
+    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(Math.floor(millisec / 10))}`
   } else {
     return `${padZero(minutes)}:${padZero(seconds)}`
   }

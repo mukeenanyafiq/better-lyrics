@@ -1,28 +1,36 @@
-import type { Lyric, ProviderParameters, TrackInfoProvider } from "./shared";
-
-export interface TrackInfoCustom extends TrackInfoProvider {
-    lyrics: Lyric[] | null
-}
+import type { CLyricsData } from "@/options/clyrics/types";
+import type { ProviderParameters } from "./shared";
 
 export default async function customLyrics(providerParameters: ProviderParameters): Promise<void> {
     const result = await chrome.storage.sync.get(["customLyrics"]);
     const raw = result.customLyrics;
-    const custom: TrackInfoCustom[] = Array.isArray(raw) ? raw as TrackInfoCustom[] : [];
-
-    let tracks = custom;
-    if (providerParameters.album) {
-        tracks = tracks.filter(t => { return t.album == providerParameters.album; });
+    const custom: CLyricsData[] = Array.isArray(raw) ? raw as CLyricsData[] : [];
+    
+    if (custom.length < 1) {
+        providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = null;
+        providerParameters.sourceMap["custom-lyrics"].filled = true;
+        return;
+    }
+    
+    let clyric = custom.find(clyrics => clyrics.videoId == providerParameters.videoId)
+    
+    if (!clyric) {
+        let lyrics = custom;
+    
+        if (providerParameters.album) {
+            lyrics = lyrics.filter(t => { return t.album == providerParameters.album; });
+        }
+    
+        clyric = lyrics.find(t => {
+            return t.song == providerParameters.song &&
+                t.artist == providerParameters.artist &&
+                Math.abs(t.duration - providerParameters.duration) <= 2;
+        });
     }
 
-    const track = tracks.find(t => {
-        return t.song == providerParameters.song &&
-            t.artist == providerParameters.artist &&
-            Math.abs(t.duration - providerParameters.duration) <= 2;
-    });
-
-    if (track) {
+    if (clyric) {
         providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = {
-            lyrics: track.lyrics,
+            lyrics: clyric.lyrics,
             source: "Custom Lyrics",
             sourceHref: "",
             musicVideoSynced: false,

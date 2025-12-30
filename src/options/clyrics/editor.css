@@ -1,0 +1,871 @@
+* {
+    scrollbar-color: hsl(0, 0%, 50%);
+}
+
+::-webkit-scrollbar {
+    border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(0, 0%, 50%);
+    border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(0, 0%, 75%); 
+}
+
+body {
+    margin: 0;
+    padding: 0 .5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+button {
+    transition: .1s;
+    margin: 0;
+    width: auto;
+}
+
+/* TOPBAR */
+.topbar {
+    padding: 0 .5rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 3rem;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+
+/** TOP LEFT BAR **/
+.top-left {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: 2rem;
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    translate: 0 -50%;
+}
+
+#actions-expand-btn {
+    display: none;
+}
+
+.action-buttons {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.icon {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+/** TOPBAR TAB BUTTONS **/
+.tab-buttons {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    height: 2rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: hidden;
+}
+
+.label {
+    color: #ffffff;
+    text-align: center;
+    font-size: .875rem;
+    line-height: 20px;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-first-btn {
+    border-radius: .5rem .25rem .25rem .5rem;
+}
+
+.tab-secondary-btn {
+    border-radius: .25rem;
+}
+
+.tab-last-btn {
+    border-radius: .25rem .5rem .5rem .25rem;
+}
+
+.tab-btns {
+    background: rgba(255, 255, 255, .1);
+    padding: .625rem 1.25rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.active-btn {
+    background: rgba(255, 255, 255, .15);
+    box-shadow: inset 0px 0.75px 0px 0px rgba(255, 255, 255, 0.1);
+}
+
+.metadata {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: right;
+    font-size: .75rem;
+    font-weight: 400;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+}
+
+.metadata > span {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .25rem;
+}
+
+/* TOOLS */
+.tools {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: .5rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: .0625rem;
+    padding: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: auto;
+}
+
+.tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.add-line {
+    background: rgba(255, 255, 255, 0.075);
+    border-radius: .5rem;
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.add-line-agents {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 4rem;
+    position: relative;
+}
+
+.add-line-agents-btn {
+    border-radius: .5rem;
+    padding: 0 .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#add-line-background {
+    background-color: rgba(0, 127, 255, 0.25);
+}
+
+#add-line-together {
+    background-color: rgba(255, 0, 0, 0.25);
+}
+
+.plus-middle {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: visible;
+}
+
+.plus-side {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    position: relative;
+    overflow: visible;
+}
+
+.add-line-label-bottom {
+    color: #ffffff;
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    position: absolute;
+    left: 50%;
+    translate: -50%;
+    bottom: .25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-line-label-side {
+    color: #ffffff;
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-section-span {
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1rem;
+    /* font-weight: 500; */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator-row {
+    background: rgba(255, 255, 255, 0.25);
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 1px;
+    position: relative;
+}
+
+.separator-column {
+    background: rgba(255, 255, 255, 0.25);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: .25rem 0;
+    height: 1px;
+    position: relative;
+}
+
+.line-timing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.actions2 {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 4rem;
+    position: relative;
+}
+
+.actions3 {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.tool-input {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    gap: 1rem;
+}
+
+.tool-input-multiple {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: .25rem;
+}
+
+.tool-input-multiple > .input {
+    width: 4rem;
+    flex: 1;
+}
+
+.tool-property {
+    color: #ffffff;
+    text-align: left;
+    font-size: .8rem;
+    font-weight: 600;
+    position: relative;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.input {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 0 .375rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: 0.5px;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 150px;
+    position: relative;
+    overflow: hidden;
+}
+
+.input:focus {
+    outline: none;
+    transition: .1s;
+    border-color: rgba(255, 255, 255, 0.75);
+}
+
+.input[type=number]::-webkit-inner-spin-button,
+.input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.line-properties {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: .375rem;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 150px;
+    position: relative;
+}
+
+.checkbox {
+    transition: .1s;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: .25rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: 0.5px;
+    align-self: stretch;
+    flex-shrink: 0;
+    align-items: center;
+    padding: .125rem;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+
+.checkbox:not(.checked) > svg {
+    opacity: 0;
+}
+
+.checkbox.checked {
+    background-color: hsl(0, 0%, 100%, .875);
+}
+
+.checkbox.checked > svg {
+    opacity: .7;
+}
+
+/* LYRIC LIENS */
+.lyric-lines {
+    padding: .3125rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+    overflow: auto;
+}
+
+.lyric-line {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: .5rem;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-width: .0625rem;
+    padding: .625rem .75rem .625rem .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .375rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.line > .frame-3 > .words > #new-word-line:not(:focus) {
+    transition: .1s;
+    opacity: 0;
+}
+
+.lyric-line:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.line:hover > .frame-3 > .words > #new-word-line {
+    opacity: 1;
+}
+
+.line {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: .25rem;
+}
+
+#new-word-line {
+    padding: .375rem 0.5rem 0.375rem 0.5rem;
+}
+
+.line-svg {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    position: relative;
+    overflow: visible;
+    aspect-ratio: 1;
+}
+
+.frame-3 {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex: 1;
+    position: relative;
+}
+
+.span-separator {
+    background: hsl(0, 0%, 100%, .5);
+    border-radius: 50%;
+    width: .25rem;
+    aspect-ratio: 1;
+}
+
+.line-timeline {
+    color: hsl(0, 0%, 100%, .5);
+    text-align: center;
+    font-size: .75rem;
+    gap: .375rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.line-romanization {
+    display: flex;
+    flex-direction: row;
+    gap: .3rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: .25rem 0;
+}
+
+.line-romans {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .375rem;
+}
+
+.line-roman {
+    white-space: normal;
+    padding-block: 1rem;
+    font-size: .75rem;
+    background: hsl(0, 0%, 100%, .05);
+    padding: .25rem .5rem;
+    border: 1px solid hsl(0, 0%, 100%, .1);
+    border-radius: 1rem;
+    color: color(display-p3 1 1 1 / .6);
+    line-height: 1.1;
+}
+
+.line-translate {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: .375rem;
+    align-self: stretch;
+}
+
+#line-translate-lang {
+    background: hsl(0, 0%, 100%, .1);
+    border-radius: .25rem;
+    padding: .25rem .375rem;
+    width: 20%;
+}
+
+#line-translate-input {
+    align-self: stretch;
+    font-weight: 500;
+    outline: none;
+    width: 100%;
+    padding: .25rem .375rem;
+    border-radius: .25rem;
+}
+
+.code {
+    font-family: "Jetbrains Mono", sans-serif;
+}
+
+.words {
+    display: flex;
+    flex-direction: row;
+    gap: .3125rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.word {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: .375rem;
+    padding: .375rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .625rem;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.word-text {
+    color: #ffffff;
+    text-align: center;
+    font-size: .875rem;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-space {
+    color: rgba(255, 255, 255, .375);
+}
+
+.text2 {
+    color: rgba(255, 255, 255, 0.25);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-new-line {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    position: relative;
+    box-shadow: inset 0rem .0675rem 0rem 0rem rgba(255, 255, 255, 0.1);
+    aspect-ratio: 1;
+}
+
+.plus {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: 50%;
+    translate: -50% -50%;
+    top: 50%;
+    overflow: visible;
+}
+
+/* TOOLBAR */
+.toolbar {
+    padding: .5rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    gap: .5rem;
+    height: 2rem;
+    position: relative;
+}
+
+.edit-modes {
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* TOOLTIP BUTTON */
+.left-tooltip-icon-btn:hover::after {
+    transform: translateX(-.3rem) translateY(0);
+}
+
+.left-tooltip-icon-btn::after {
+    bottom: auto;
+    left: 0;
+    translate: -100%;
+    transform: translateY(0);
+}
+
+.topright-tooltip-icon-btn:hover::after {
+    transform: translateX(-100%) translateY(0);
+}
+
+.topright-tooltip-icon-btn::after {
+    transform: translateX(-100%) translateY(4px);
+    left: 100%;
+}
+
+/* CONTEXT MENU */
+.list-buttons {
+    position: absolute;
+    transition: opacity .1s ease;
+    display: flex;
+    opacity: 1;
+    background-color: hsl(0, 0%, 12.5%);
+    padding: .5rem;
+    border-radius: .5rem;
+    border-color: hsl(0, 0%, 100%, .25);
+    border-width: .0625rem;
+    border-style: solid;
+    flex-direction: column;
+    box-shadow: 0 .25rem 2rem .25rem rgba(0, 0, 0, 0.15);
+    gap: .2rem;
+}
+
+.list-buttons.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.list-buttons:hover {
+    border-color: hsl(0, 0%, 100%, .5);
+}
+
+.list-btn {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 1rem;
+    padding: .375rem;
+    border-radius: .25rem;
+    background-color: transparent;
+    text-align: left;
+}
+
+.list-btn:disabled {
+    opacity: .25;
+    pointer-events: none;
+}
+
+/* Custom Lyrics Modal */
+.clyrics-modal-items {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.5rem;
+}
+
+.clyrics-card {
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.5rem;
+	padding: 0.625rem 0.75rem;
+	transition: all 0.2s;
+	position: relative;
+	width: auto;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	/* flex: 0 0 auto; */
+}
+
+.clyrics-card-info {
+	display: flex;
+	gap: 0.125rem;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.clyrics-card-buttons {
+	display: flex;
+	gap: 0.5rem;
+	flex-direction: row;
+}
+
+.clyrics-top-buttons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.clyrics-input-title {
+	font-size: 1.125rem;
+}
+
+.clyrics-input-description {
+	opacity: 0.5;
+	font-size: .75rem;
+}
+
+.clyrics-input-span {
+	opacity: 0.5;
+	font-size: .625rem;
+}
+
+.clyrics-input-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.clyrics-long-input {
+	display: flex;
+	gap: 4px;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+}
+
+.clyrics-short-input {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.clyrics-span {
+	font-size: 0.8rem;
+}
+
+.clyrics-input {
+	border-radius: 0.25rem;
+	padding: 0.5rem 0.5rem;
+	width: auto;
+	align-self: stretch;
+}
+
+/* MEDIA */
+@media screen and (width <= 800px) {
+    .metadata {
+        display: none;
+    }
+    .action-buttons {
+        display: none;
+    }
+    #actions-expand-btn {
+        display: flex;
+    }
+}
