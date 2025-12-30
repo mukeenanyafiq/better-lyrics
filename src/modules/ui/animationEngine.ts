@@ -17,7 +17,7 @@ import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modu
 import { log } from "@utils";
 import { ctx, resetDebugRender } from "./animationEngineDebug";
 const MIRCO_SCROLL_THRESHOLD_S = 0.5 as const;
-const EARLY_SCROLL_CONSIDER = 0.6 as const;
+const EARLY_SCROLL_CONSIDER = 0.63 as const;
 const QUEUE_SCROLL_THRESHOLD = 150 as const;
 const TIME_JUMP_THRESHOLD = 0.5 as const;
 
