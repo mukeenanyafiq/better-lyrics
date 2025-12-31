@@ -15,6 +15,7 @@
         "build:edge": "extension build --browser edge --polyfill",
         "build:firefox": "extension build --browser firefox --polyfill",
         "build:zip": "extension build --browser all --polyfill --zip",
+        "build:release": "tsx tooling/build-release-zip.ts",
         "preview": "extension preview --polyfill",
         "lint": "biome lint --write . && biome format --write .",
         "update-version": "tsx tooling/update-version.ts",
