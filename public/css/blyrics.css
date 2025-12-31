@@ -169,6 +169,7 @@
 	align-content: flex-start;
 	padding-left: 0.25em;
 	padding-right: 0.25em;
+	box-sizing: border-box;
 }
 
 .blyrics--line.blyrics--animating {
@@ -831,7 +832,7 @@
 }
 
 #blyrics-wrapper {
-	margin-top: 16px;
+	margin-top: 0px;
 }
 
 /* Animations */
