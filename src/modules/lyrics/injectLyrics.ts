@@ -13,7 +13,7 @@ import {
   romanizationLanguages,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
-  SYNC_DISABLED_LOG,
+  SYNC_DISABLED_LOG, TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
   WORD_CLASS,
@@ -33,9 +33,15 @@ import {
   translateText,
   translateTextIntoRomaji,
 } from "@modules/lyrics/translation";
-import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
+import {
+  ADD_EXTRA_PADDING_TOP,
+  animEngineState,
+  lyricsElementAdded,
+  TOP_OFFSET_RATIO
+} from "@modules/ui/animationEngine";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
 import { getRelativeBounds, log } from "@utils";
+import {recreateDebugCanvas} from "@modules/ui/animationEngineDebug";
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
   for (let i = fromIndex - 1; i >= 0; i--) {
@@ -54,7 +60,8 @@ function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefine
 const resizeObserver = new ResizeObserver(entries => {
   for (const entry of entries) {
     if (entry.target.id === LYRICS_WRAPPER_ID) {
-      if (AppState.lyricData && entry.target.clientWidth !== AppState.lyricData.lyricWidth) {
+      if (AppState.lyricData &&
+          (entry.target.clientWidth !== AppState.lyricData.lyricWidth || entry.target.clientHeight !== AppState.lyricData.lyricHeight)) {
         calculateLyricPositions();
       }
     }
@@ -98,6 +105,7 @@ export interface LyricsData {
   lines: LineData[];
   syncType: SyncType;
   lyricWidth: number;
+  lyricHeight: number;
   isMusicVideoSynced: boolean;
 }
 
@@ -562,6 +570,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     lines: lines,
     syncType: syncType,
     lyricWidth: lyricsContainer.clientWidth,
+    lyricHeight: lyricsContainer.clientHeight,
     isMusicVideoSynced: data.musicVideoSynced === true,
   };
 
@@ -585,7 +594,20 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 export function calculateLyricPositions() {
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+
+    if (ADD_EXTRA_PADDING_TOP) {
+      const tabRendererHeight = document.getElementById("tab-renderer")?.clientHeight;
+      if (tabRendererHeight) {
+        lyricsElement.style.paddingTop = `${tabRendererHeight * TOP_OFFSET_RATIO}px`;
+      } else {
+        lyricsElement.style.paddingTop = "";
+        log("Could not find tab renderer height, not adding extra padding top.")
+      }
+    }
+
+    let paddingTop = parseFloat(window.getComputedStyle(lyricsElement).paddingTop);
     const data = AppState.lyricData;
+
 
     data.lyricWidth = lyricsElement.clientWidth;
 
@@ -594,6 +616,8 @@ export function calculateLyricPositions() {
       line.position = bounds.y;
       line.height = bounds.height;
     });
+    animEngineState.wasUserScrolling = true; // trigger rescrolls
+    recreateDebugCanvas();
   }
 }
 

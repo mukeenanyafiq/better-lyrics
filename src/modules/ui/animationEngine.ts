@@ -23,7 +23,8 @@ const TIME_JUMP_THRESHOLD = 0.5 as const;
 
 const ENABLE_DEBUG_RENDER = true;
 
-const TOP_OFFSET_RATIO = 0.37; // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
+export const TOP_OFFSET_RATIO = 0.37; // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
+export const ADD_EXTRA_PADDING_TOP = true;
 
 interface AnimEngineState {
   skipScrolls: number;
@@ -320,10 +321,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
 
-    if (ENABLE_DEBUG_RENDER) {
-      resetDebugRender(scrollTop);
-    }
-
     if (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1) {
       if (activeElems.length == 0) {
         activeElems.push(lyricData.lines[0]);
@@ -368,88 +365,95 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       // Make sure we're not trying to scroll to negative values
       scrollPos = Math.max(0, scrollPos);
 
-      if (ENABLE_DEBUG_RENDER && ctx) {
-        ctx.strokeStyle = "green";
-        ctx.fillStyle = "green";
-        ctx?.fillText("visible top", 0, scrollTop);
-        ctx?.beginPath();
-        ctx?.moveTo(40, scrollTop);
-        ctx?.lineTo(1000, scrollTop);
-        ctx.stroke();
+      if (ENABLE_DEBUG_RENDER) {
+        let transform = window.getComputedStyle(lyricsElement).transform;
+        const matrix = new DOMMatrix(transform);
+        let yTransform = matrix.f;
+        let yTop = scrollTop - yTransform
+        resetDebugRender(yTop);
+        if (ctx) {
+          ctx.strokeStyle = "green";
+          ctx.fillStyle = "green";
+          ctx?.fillText("visible top", 0, scrollTop);
+          ctx?.beginPath();
+          ctx?.moveTo(40, scrollTop);
+          ctx?.lineTo(1000, scrollTop);
+          ctx.stroke();
 
-        ctx.strokeStyle = "blue";
-        ctx.fillStyle = "blue";
-        ctx?.fillText("visible bottom", 0, scrollTop + tabRendererHeight);
-        ctx?.beginPath();
-        ctx?.moveTo(40, scrollTop + tabRendererHeight);
-        ctx?.lineTo(1000, scrollTop + tabRendererHeight);
-        ctx.stroke();
+          ctx.strokeStyle = "blue";
+          ctx.fillStyle = "blue";
+          ctx?.fillText("visible bottom", 0, scrollTop + tabRendererHeight);
+          ctx?.beginPath();
+          ctx?.moveTo(40, scrollTop + tabRendererHeight);
+          ctx?.lineTo(1000, scrollTop + tabRendererHeight);
+          ctx.stroke();
 
-        ctx.strokeStyle = "yellow";
-        ctx.fillStyle = "yellow";
-        ctx?.fillText("target", 0, scrollTop + scrollPosOffset);
-        ctx?.beginPath();
-        ctx?.moveTo(40, scrollTop + scrollPosOffset);
-        ctx?.lineTo(1000, scrollTop + scrollPosOffset);
-        ctx.stroke();
+          ctx.strokeStyle = "yellow";
+          ctx.fillStyle = "yellow";
+          ctx?.fillText("target", 0, scrollTop + scrollPosOffset);
+          ctx?.beginPath();
+          ctx?.moveTo(40, scrollTop + scrollPosOffset);
+          ctx?.lineTo(1000, scrollTop + scrollPosOffset);
+          ctx.stroke();
 
-        function debugLyrics(
-          xOffset: number,
-          name: string,
-          activeElems: LineData[],
-          lyricPositions: number[],
-          lyricScrollTime: number
-        ) {
-          ctx!.strokeStyle = "red";
-          ctx!.fillStyle = "red";
-          ctx!.fillText(name, xOffset + 2, scrollTop + 45);
-          ctx!.fillText("scroll time: " + lyricScrollTime.toFixed(3), xOffset + 2, scrollTop + 60);
+          function debugLyrics(
+              xOffset: number,
+              name: string,
+              activeElems: LineData[],
+              lyricPositions: number[],
+              lyricScrollTime: number
+          ) {
+            ctx!.strokeStyle = "red";
+            ctx!.fillStyle = "red";
+            ctx!.fillText(name, xOffset + 2, yTop + 45);
+            ctx!.fillText("scroll time: " + lyricScrollTime.toFixed(3), xOffset + 2, yTop + 60);
 
-          activeElems.forEach(elm => {
-            let timeTillActive = elm.time - lyricScrollTime;
-            let endTime = elm.time + elm.duration;
-            let timeTillEnd = endTime - lyricScrollTime;
-            if (timeTillEnd < MIRCO_SCROLL_THRESHOLD_S) {
-              ctx!.strokeStyle = "gray";
-              ctx!.fillStyle = "gray";
-            } else if (timeTillActive > 0) {
-              ctx!.strokeStyle = "magenta";
-              ctx!.fillStyle = "magenta";
-            } else {
-              ctx!.strokeStyle = "orange";
-              ctx!.fillStyle = "orange";
-            }
+            activeElems.forEach(elm => {
+              let timeTillActive = elm.time - lyricScrollTime;
+              let endTime = elm.time + elm.duration;
+              let timeTillEnd = endTime - lyricScrollTime;
+              if (timeTillEnd < MIRCO_SCROLL_THRESHOLD_S) {
+                ctx!.strokeStyle = "gray";
+                ctx!.fillStyle = "gray";
+              } else if (timeTillActive > 0) {
+                ctx!.strokeStyle = "magenta";
+                ctx!.fillStyle = "magenta";
+              } else {
+                ctx!.strokeStyle = "orange";
+                ctx!.fillStyle = "orange";
+              }
 
-            ctx?.beginPath();
-            ctx?.moveTo(xOffset + 5, elm.position);
-            ctx?.lineTo(xOffset + 5, elm.position + elm.height);
-            ctx?.stroke();
-            ctx?.fillText(
-              "time: start=" + elm.time.toFixed(2) + " end=" + endTime.toFixed(2),
-              xOffset + 15,
-              elm.position
-            );
-            ctx?.fillText("till active: " + timeTillActive.toFixed(2), xOffset + 15, elm.position + 15);
-            ctx?.fillText("till end: " + timeTillEnd.toFixed(2), xOffset + 15, elm.position + 30);
-          });
+              ctx?.beginPath();
+              ctx?.moveTo(xOffset + 5, elm.position);
+              ctx?.lineTo(xOffset + 5, elm.position + elm.height);
+              ctx?.stroke();
+              ctx?.fillText(
+                  "time: start=" + elm.time.toFixed(2) + " end=" + endTime.toFixed(2),
+                  xOffset + 15,
+                  elm.position
+              );
+              ctx?.fillText("till active: " + timeTillActive.toFixed(2), xOffset + 15, elm.position + 15);
+              ctx?.fillText("till end: " + timeTillEnd.toFixed(2), xOffset + 15, elm.position + 30);
+            });
 
-          ctx!.strokeStyle = "pink";
-          ctx!.fillStyle = "pink";
-          lyricPositions.forEach(lyricPosition => {
-            ctx?.beginPath();
-            ctx?.arc(xOffset + 5, lyricPosition, 5, 0, 2 * Math.PI, false);
-            ctx?.fill();
-          });
+            ctx!.strokeStyle = "pink";
+            ctx!.fillStyle = "pink";
+            lyricPositions.forEach(lyricPosition => {
+              ctx?.beginPath();
+              ctx?.arc(xOffset + 5, lyricPosition, 5, 0, 2 * Math.PI, false);
+              ctx?.fill();
+            });
+          }
+
+          debugLyrics(0, "realtime", activeElems, lyricPositions, lyricScrollTime);
+          debugLyrics(
+              160,
+              "last scroll",
+              animEngineState.lastScrollDebugContext.activeElms,
+              animEngineState.lastScrollDebugContext.centers,
+              animEngineState.lastScrollDebugContext.lyricScrollTime
+          );
         }
-
-        debugLyrics(0, "realtime", activeElems, lyricPositions, lyricScrollTime);
-        debugLyrics(
-          160,
-          "last scroll",
-          animEngineState.lastScrollDebugContext.activeElms,
-          animEngineState.lastScrollDebugContext.centers,
-          animEngineState.lastScrollDebugContext.lyricScrollTime
-        );
       }
 
       if (scrollTop === 0 && !animEngineState.doneFirstInstantScroll) {

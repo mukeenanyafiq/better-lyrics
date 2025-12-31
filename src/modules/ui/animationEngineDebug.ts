@@ -4,14 +4,15 @@ const CANVAS_ID = "blyrics-lyric-debug-canvas";
 
 export let ctx: CanvasRenderingContext2D | null = null;
 function createDebugCanvas() {
-  let tabRenderer = document.querySelector("#tab-renderer");
+  let tabRenderer = document.querySelector("#tab-renderer") as HTMLElement;
   if (!tabRenderer) {
     console.error("Can't find tab renderer");
     return;
   }
+
   let prevCanvas = document.getElementById(CANVAS_ID);
   if (prevCanvas) {
-    document.removeChild(prevCanvas);
+    prevCanvas.remove();
   }
 
   let canvas = document.createElement("canvas");
@@ -60,4 +61,8 @@ export function resetDebugRender(scrollPos: number) {
   ctx.translate(0, -scrollPos);
 
   return ctx;
+}
+
+export function recreateDebugCanvas() {
+  ctx = null;
 }
