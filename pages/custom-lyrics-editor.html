@@ -63,23 +63,32 @@
 				</span>
 			</div>
 		</div>
-
+		
 		<!-- TOOLS -->
 		<div class="tools">
 			<div id="new-lyric-line" class="tool">
 				<div class="actions">
 					<button id="add-line" class="add-line active-btn">
 						<svg class="plus-middle" width="16" height="16" viewBox="0 0 16 16">
-							<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+							<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
 						</svg>
 						<span class="add-line-label-bottom">Line</span>
 					</button>
-					<button id="add-line-together" class="add-line active-btn">
-						<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
-							<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="var(--icon-default-default, #ffffff)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-						<span class="add-line-label-bottom">Together</span>
-					</button>
+					<div class="add-line-types">
+						<button id="add-line-instrumental" class="add-line-type-btn active-btn">
+							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							<span class="add-line-label-side">Instrumental</span>
+						</button>
+
+						<button id="add-line-together" class="add-line-type-btn active-btn">
+							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							<span class="add-line-label-side">Together</span>
+						</button>
+					</div>
 				</div>
 				<span class="tool-section-span">New Lyric Line</span>
 			</div>
@@ -92,16 +101,16 @@
 						<span class="tool-property">Start Time</span>
 						<div id="start-time-input" class="tool-input-multiple">
 							<input id="start-time-input-minutes" type="number" class="input" placeholder="min" />
-							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" />
-							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" max="999" />
+							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" />
+							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" />
 						</div>
 					</div>
 					<div id="duration" class="tool-input">
 						<span class="tool-property">Duration</span>
 						<div id="duration-input" class="tool-input-multiple">
 							<input id="duration-input-minutes" type="number" class="input" placeholder="min" />
-							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" />
-							<input id="duration-input-ms" type="number" class="input" placeholder="ms" max="999" />
+							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" />
+							<input id="duration-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" />
 						</div>
 					</div>
 				</div>
@@ -166,87 +175,83 @@
 		</div>
 
 		<!-- LYRIC LINES -->
-		<div class="lyric-lines">
-			<div id="no-lyric" style="
-				display: none;
-				flex-direction: column;
-				align-items: center;
-				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-				text-align: center;
-				gap: .5rem;"
-			>
-				
+		<div id="lyric-lines" class="lyric-lines">
+			<div class="no-lyrics" style="display: none">
 				<h1><strong>No Lyrics</strong></h1>
 				<span>Add a new lyric line from the top left or import the lyrics from a file or provider!</span>
 			</div>
 
 			<div class="lyric-line">
+				<!-- <div class="line-suggestions">
+					<div class="line-warning">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+							<path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/>
+						</svg>
+						<span>Start time is lower than the previous line. Move the line up or change the start time!</span>
+					</div>
+	
+					<div class="line-info">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+							<path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"/>
+						</svg>
+	
+						<span>Suggestion: Make the instrumental line only if there's a 5 seconds or more gap between the previous line and the next line</span>
+					</div>
+				</div> -->
+
 				<span class="line-timeline">
-					<strong id="line-type-start-time" class="code">[I] 00:06.216</strong>
+					<span id="line-start-time"><strong class="code">00:06.216</strong></span>
 					<div class="span-separator"></div>
 					<span id="line-duration" class="code">4.145s</span>
 					<div class="span-separator"></div>
-					<span id="line-voice" class="code">Voice 1</span>
+					<span id="line-voice" class="code">v1</span>
 				</span>
 
 				<div id="normal-line" class="line">
-					<svg class="line-svg" width="28" height="28" viewBox="0 0 28 28" >
-						<path d="M5.99998 8.66663H22M5.99731 14H13.9933M5.99998 19.3333H19.3266" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24">
+						<g fill="none">
+							<path fill="currentColor" d="M14 18a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 1 1 0 2H4a1 1 0 1 1 0-2zm-6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
+						</g>
 					</svg>
-					<div class="frame-3">
+					<div class="words-wrapper">
 						<div class="words">
-							<button class="word"><span class="word-text">Don't</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">cry,</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">Snowman,</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">not</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">in</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">front</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">of</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">me</span></button>
+							<!-- <button class="word"><span class="word-text">Don't</span></button>
+							<button class="word"><span class="word-space word-text">1x</span></button> -->
 							<input id="new-word-line" type="text" class="input" placeholder="Type a word or line"/>
 						</div>
 					</div>
 					<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
 						<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
-							<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="white" stroke-width="1.2"	stroke-linecap="round" stroke-linejoin="round" />
+							<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="currentColor" stroke-width="1.2" />
 						</svg>
 					</button>
 				</div>
 
-				<div class="separator-column"></div>
+				<!-- <div class="separator-column"></div>
 
 				<div id="background-line" class="line">
 					<svg class="line-svg" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
 						<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6h4m4 0h-4m0 0v12M4 11h3m3 0H7m0 0v7"/>
 					</svg>
-					<div class="frame-3">
+					<div class="words-wrapper">
 						<div class="words">
 							<button class="word"><span class="word-text">Don't</span></button>
 							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">cry,</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<button class="word"><span class="word-text">Snowman</span></button>
 							<input id="new-word-line" type="text" class="input" placeholder="Type a word or line"/>
 						</div>
 					</div>
-				</div>
+				</div> -->
 				
 				<div class="line-romanization">
 					<strong class="code">Romanization:</strong>
 					<div class="line-romans">
-						<button class="line-roman">dond crai snowmen</button>
+						<button class="line-roman">don krai s'nowmen</button>
+						<input id="new-roman-word" type="text" class="input line-roman" placeholder="Type a word or line"/>
 					</div>
 				</div>
 				
 				<div class="line-translate">
-					<input id="line-translate-input" placeholder="Don't cry, Snowman, not in front of me (Don't cry, Snowman)">
+					<input id="line-translate-input" />
 				</div>
 			</div>
 		</div>
@@ -295,7 +300,9 @@
 			<button id="open-lyrics-btn" class="list-btn">Open Lyrics<strong>(Ctrl+O)</strong></button>
 			<div class="separator-column"></div>
 			<button id="import-lyrics-btn" class="list-btn">Import Lyrics<strong>></strong></button>
-			<button id="export-lyrics-btn" class="list-btn" disabled>Export Lyrics<strong>></strong></button>
+			<button id="export-lyrics-btn" class="list-btn">Export Lyrics<strong>></strong></button>
+			<div class="separator-column"></div>
+			<button id="search-lyrics-btn" class="list-btn">Search Lyrics</button>
 		</div>
 
 		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;">
@@ -303,12 +310,15 @@
 			<button id="delete-word-btn" class="list-btn" disabled>Delete Word Line<strong>(Ctrl+Del)</strong></button>
 			<div class="separator-column"></div> -->
 			<button id="adjust-line-btn" class="list-btn">Adjust Line<strong>></strong></button>
+			<button id="instrumental-line-btn" class="list-btn">Instrumental Line<strong>✓</strong></button>
 			<button id="background-line-btn" class="list-btn">Background Line<strong>(B)</strong></button>
 			<div class="separator-column"></div>
 			<button id="duplicate-line-btn" class="list-btn">Duplicate Line<strong>(Ctrl+D)</strong></button>
 			<button id="delete-line-btn" class="list-btn" disabled>Delete Line<strong>(Del)</strong></button>
 			<button id="add-new-line-after-btn" class="list-btn">Add new line after<strong>(Ctrl+Plus)</strong></button>
 			<button id="add-new-line-before-btn" class="list-btn">Add new line before<strong>(Ctrl+Shift+Plus)</strong></button>
+			<div class="separator-column"></div>
+			<button id="line-properties-btn" class="list-btn">Line Properties<strong>(Alt+Enter)</strong></button>
 		</div>
 	</body>
 	<script type="module" defer src="./clyrics/editor.js"></script>

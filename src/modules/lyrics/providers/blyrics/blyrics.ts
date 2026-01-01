@@ -135,11 +135,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
   if (!hasTimingData) {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
-    return;
+    return null;
   }
 
   let isWordSynced = false;
@@ -217,16 +213,10 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     sourceHref: "https://boidu.dev/",
   };
 
-  if (isWordSynced) {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = result;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-  } else {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = result;
+  return {
+    isWordSynced,
+    result
   }
-
-  providerParameters.sourceMap["bLyrics-synced"].filled = true;
-  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
 }
 
 export default async function bLyrics(providerParameters: ProviderParameters): Promise<void> {
@@ -246,13 +236,30 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   if (!response.ok) {
     providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-
     providerParameters.sourceMap["bLyrics-synced"].filled = true;
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-
     return;
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  await fillTtml(responseString, providerParameters);
+  const filled = await fillTtml(responseString, providerParameters);
+
+  if (!filled) {
+    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["bLyrics-synced"].filled = true;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+    return;
+  }
+  
+  if (filled.isWordSynced) {
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = filled.result;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+  } else {
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = filled.result;
+  }
+  
+  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+  providerParameters.sourceMap["bLyrics-synced"].filled = true;
 }

@@ -214,7 +214,7 @@ button {
     aspect-ratio: 1;
 }
 
-.add-line-agents {
+.add-line-types {
     border-radius: .5rem;
     display: flex;
     flex-direction: column;
@@ -226,25 +226,18 @@ button {
     position: relative;
 }
 
-.add-line-agents-btn {
+.add-line-type-btn {
     border-radius: .5rem;
-    padding: 0 .5rem;
+    padding: 0 .5rem 0 .4rem;
     display: flex;
     flex-direction: row;
     gap: .25rem;
+    align-self: stretch;
     align-items: center;
     justify-content: flex-start;
     flex: 1;
     position: relative;
     overflow: hidden;
-}
-
-#add-line-background {
-    background-color: rgba(0, 127, 255, 0.25);
-}
-
-#add-line-together {
-    background-color: rgba(255, 0, 0, 0.25);
 }
 
 .plus-middle {
@@ -471,13 +464,22 @@ button {
     overflow: auto;
 }
 
+.no-lyrics {
+    display: flex;
+	flex-direction: column;
+    align-items: center;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+    gap: .5rem;
+}
+
 .lyric-line {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, .25);
     border-radius: .5rem;
     border-style: solid;
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: hsl(0, 0%, 100%, .25);
     border-width: .0625rem;
-    padding: .625rem .75rem .625rem .5rem;
+    padding: .625rem .525rem;
     display: flex;
     flex-direction: column;
     gap: .375rem;
@@ -489,28 +491,71 @@ button {
     overflow: hidden;
 }
 
-.line > .frame-3 > .words > #new-word-line:not(:focus) {
+.lyric-line-instrumental {
+    background: hsl(0, 0%, 100%, .375);
+    border-color: rgba(0, 0, 0, .25);
+}
+
+.lyric-line:hover {
+    border-color: hsl(0, 0%, 100%, .5);
+}
+
+.lyric-line:has(.line-info) {
+    border-color: hsl(200, 100%, 50%, .5);
+}
+
+.lyric-line:has(.line-warning) {
+    border-color: hsl(50, 100%, 50%, .5);
+}
+
+.line > .words-wrapper > .words > #new-word-line:not(:focus) {
     transition: .1s;
     opacity: 0;
 }
 
-.lyric-line:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-.line:hover > .frame-3 > .words > #new-word-line {
+.line:hover > .words-wrapper > .words > #new-word-line {
     opacity: 1;
 }
+
+.line-suggestions {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    gap: .5rem;
+    padding-bottom: .5rem;
+}
+
+.line-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+    align-self: stretch;
+    padding: .5rem;
+    border-radius: .25rem;
+    background: hsl(200, 100%, 30%);
+}
+
+.line-warning {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+    align-self: stretch;
+    padding: .5rem;
+    border-radius: .25rem;
+    background: hsl(50, 100%, 30%);
+}
+
+/* .line-warning > svg, .line-warning > span {
+    color: hsl(50, 100%, 50%);
+} */
 
 .line {
     display: flex;
     align-items: center;
     width: 100%;
     gap: .25rem;
-}
-
-#new-word-line {
-    padding: .375rem 0.5rem 0.375rem 0.5rem;
 }
 
 .line-svg {
@@ -522,7 +567,11 @@ button {
     aspect-ratio: 1;
 }
 
-.frame-3 {
+#new-word-line {
+    padding: .375rem 0.5rem 0.375rem 0.5rem;
+}
+
+.words-wrapper {
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -551,13 +600,19 @@ button {
     justify-content: center;
 }
 
+.lyric-line-instrumental > .line-timeline {
+    font-size: 1.25rem;
+    color: rgba(0, 0, 0, .75);
+}
+
+.lyric-line-instrumental > .line-timeline > div {
+    background: rgba(0, 0, 0, .75);
+}
+
 .line-romanization {
     display: flex;
-    flex-direction: row;
-    gap: .3rem;
-    align-items: flex-start;
-    justify-content: flex-start;
-    margin: .25rem 0;
+    flex-direction: column;
+    gap: .375rem;
 }
 
 .line-romans {
@@ -567,14 +622,14 @@ button {
 }
 
 .line-roman {
-    white-space: normal;
+    white-space: pre;
     padding-block: 1rem;
     font-size: .75rem;
     background: hsl(0, 0%, 100%, .05);
     padding: .25rem .5rem;
+    color: hsl(0, 0%, 100%, .5);
     border: 1px solid hsl(0, 0%, 100%, .1);
     border-radius: 1rem;
-    color: color(display-p3 1 1 1 / .6);
     line-height: 1.1;
 }
 
@@ -621,6 +676,7 @@ button {
 }
 
 .word {
+    white-space: pre;
     background: rgba(255, 255, 255, 0.1);
     border-radius: .375rem;
     padding: .375rem 0.5rem;
@@ -735,7 +791,7 @@ button {
     display: flex;
     opacity: 1;
     background-color: hsl(0, 0%, 12.5%);
-    padding: .5rem;
+    padding: .625rem .5rem;
     border-radius: .5rem;
     border-color: hsl(0, 0%, 100%, .25);
     border-width: .0625rem;
