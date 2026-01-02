@@ -618,7 +618,7 @@ button {
 .line-romans {
     display: flex;
     flex-wrap: wrap;
-    gap: .375rem;
+    gap: .25rem;
 }
 
 .line-roman {
@@ -791,11 +791,12 @@ button {
     display: flex;
     opacity: 1;
     background-color: hsl(0, 0%, 12.5%);
-    padding: .625rem .5rem;
+    padding: .5rem;
     border-radius: .5rem;
     border-color: hsl(0, 0%, 100%, .25);
     border-width: .0625rem;
     border-style: solid;
+    align-items: stretch;
     flex-direction: column;
     box-shadow: 0 .25rem 2rem .25rem rgba(0, 0, 0, 0.15);
     gap: .2rem;
@@ -814,10 +815,11 @@ button {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    font-size: 1rem;
+    /* font-size: 1rem; */
     padding: .375rem;
     border-radius: .25rem;
     background-color: transparent;
+    align-self: stretch;
     text-align: left;
 }
 

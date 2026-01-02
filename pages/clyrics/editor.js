@@ -1,27 +1,20 @@
-function formatTime(timeNum, whole) {
-    if (!timeNum) return whole ? `00:00.000` : `0.000`;
-
-    const totalSec = Math.floor(timeNum / 1000);
-    const minutes = Math.floor(totalSec / 60);
-    const seconds = totalSec % 60;
-    const millisec = timeNum % 1000;
-
-    const padZero = (num, length = 2) => {
-        return num.toString().padStart(length, "0");
-    };
-    
-    if (whole || minutes > 0) return `${padZero(minutes)}:${padZero(seconds)}.${padZero(millisec, 3)}`;
-    return `${seconds}.${padZero(millisec, 3)}`;
-}
+import { addNewLine } from "./editorDom.js";
 
 // Variables
-let didActions = [];
-let currentVer = 0;
+let historyStack = [];
+let historyVer = 0;
 
 let lyrics = [];
-let selectedLine = 0;
 
-const defaults = {
+let selectedLine = 0;
+let hoveringLine = 0;
+let hoveringWord = 0;
+
+// Storing context menu button and their functions when clicked
+let contextMenuB = [];
+
+// Global variables
+export const defaults = {
     svg: {
         plus: `<svg class="plus" width="16" height="16" viewBox="0 0 16 16"><path d="M8 3.333v9.334M3.334 8h9.333" stroke="currentColor" stroke-width="1.2"/></svg>`,
 
@@ -71,30 +64,74 @@ const defaults = {
     }
 }
 
-// Initiate elements
-/// Class
-const actionButtons = document.querySelectorAll(".action-btn");
-const checkboxes = document.querySelectorAll(".checkbox");
-const tabButtons = document.querySelectorAll(".tab-btn");
-/// Identifiers
-const newWords = document.querySelectorAll("#new-word-line");
-const newRomanWords = document.querySelectorAll("#new-roman-word");
-/// Identifier
-const actionFile = document.getElementById("action-file-menu");
-const lyricLines = document.getElementById("lyric-lines");
-const addLine = document.getElementById("add-line");
-const addLineInstrumental = document.getElementById("add-line-instrumental");
-const addLineTogether = document.getElementById("add-line-together");
-const contextMenu = document.getElementById("context-menu");
+export function formatTime(timeNum, whole) {
+    if (!timeNum) return whole ? `00:00.000` : `0.000`;
 
-// Data functions
-function addNewLine(parameters = {}, data = {}) {
-    function separator(cls) {
-        const separator = document.createElement("div");
-        separator.className = cls;
-        return separator;
+    const totalSec = Math.floor(timeNum / 1000);
+    const minutes = Math.floor(totalSec / 60);
+    const seconds = totalSec % 60;
+    const millisec = timeNum % 1000;
+
+    const padZero = (num, length = 2) => {
+        return num.toString().padStart(length, "0");
+    };
+    
+    if (whole || minutes > 0) return `${padZero(minutes)}:${padZero(seconds)}.${padZero(millisec, 3)}`;
+    return `${seconds}.${padZero(millisec, 3)}`;
+}
+
+export function logAction(type, value, args = {}) {
+    // contains valid actions and an extra required arguments listed on the array
+    const validActions = {
+        "new-line": ["line"],
+        "new-word-line": ["line", "type", "word"],
+        "new-roman-line": ["line", "word"],
+
+        "toggle-bg-line": ["line"],
+
+        "moved-line": ["line", "from", "to"],
+        "moved-word-line": ["line", "word", "from", "to"],
+        "moved-roman-line": ["line", "word", "from", "to"]
     }
 
+    const action = validActions[type]
+    if (!action) return;
+    action.forEach(action => {
+        if (!args[action]) return;
+    });
+
+    console.log(`Logged action ${type}`);
+    historyStack.push({
+        type: type,
+        value: value,
+        ...args
+    });
+
+    historyVer += 1;
+}
+
+// Initiate elements
+/// Class
+export const actionButtons = document.querySelectorAll(".action-btn");
+export const checkboxes = document.querySelectorAll(".checkbox");
+export const tabButtons = document.querySelectorAll(".tab-btn");
+/// Identifiers
+export const newWords = document.querySelectorAll("#new-word-line");
+export const newRomanWords = document.querySelectorAll("#new-roman-word");
+/// Identifier
+export const actionFile = document.getElementById("action-file-menu");
+export const lyricLines = document.getElementById("lyric-lines");
+export const addLine = document.getElementById("add-line");
+export const addLineInstrumental = document.getElementById("add-line-instrumental");
+export const addLineTogether = document.getElementById("add-line-together");
+export const contextMenu = document.getElementById("context-menu");
+
+// Data functions
+function save() {
+
+}
+
+function createNewLine(parameters = {}, data = {}) {
     const prevLine = lyrics[lyrics.length - 1];
     
     const struct = {
@@ -109,301 +146,16 @@ function addNewLine(parameters = {}, data = {}) {
         timedRomanization: data.timedRomanization,
     };
 
-    lyrics.push(struct);
-
-    // Create element
-    if (!lyricLines) return;
-
-    let hasBgWords = false;
-    const instrumenone = struct.isInstrumental ? "none" : "";
-    const wordParts = struct.parts.length > 0 ? struct.parts : [{
-        startTimeMs: struct.startTimeMs,
-        words: struct.words,
-        durationMs: struct.durationMs
-    }];
-    const romanizations = (struct.timedRomanization && struct.timedRomanization.length > 0) && struct.timedRomanization || (struct.romanization && [{
-        startTimeMs: struct.startTimeMs,
-        words: struct.romanization,
-        durationMs: struct.durationMs
-    }]) || [];
-
-    const lyricLine = document.createElement("div");
-    if (struct.isInstrumental) lyricLine.classList.add("lyric-line-instrumental");
-    lyricLine.classList.add("lyric-line");
-
-    /// Suggestions
-    const suggestions = document.createElement("div");
-    suggestions.className = "line-suggestions";
-    suggestions.style.display = "none";
-
-    // const suggestionWarn = document.createElement("div");
-    // suggestionWarn.className = "line-warning";
-    // suggestionWarn.innerHTML = defaults.svg.warning;    
-    // suggestionWarn.style.display = "none";
-    // suggestions.appendChild(suggestionWarn);
-
-    // const suggestionInfo = document.createElement("div");
-    // suggestionInfo.className = "line-info";
-    // suggestionInfo.innerHTML = defaults.svg.info;    
-    // suggestionInfo.style.display = "none";
-    // suggestions.appendChild(suggestionInfo);
-
-    lyricLine.appendChild(suggestions);
+    const index = lyrics.push(struct);
+    const line = addNewLine(struct);
     
-    /// Timeline
-    const timeLine = document.createElement("span");
-    timeLine.className = "line-timeline";
-
-    if (struct.isInstrumental) {
-        const instrumental = document.createElement("span");
-        instrumental.id = "line-instrumental";
-        instrumental.innerHTML = `<strong class="code">[INSTRUMENTAL]</strong>`;
-        timeLine.appendChild(instrumental);
-    }
-
-    const startTimeLine = document.createElement("span");
-    startTimeLine.id = "line-start-time";
-    startTimeLine.innerHTML = `<strong class="code">${formatTime(struct.startTimeMs, true)}</strong>`;
-    timeLine.appendChild(startTimeLine);
-
-    timeLine.appendChild(separator("span-separator"));
-
-    const durationTimeLine = document.createElement("span");
-    durationTimeLine.id = "line-duration";
-    durationTimeLine.className = "code";
-    durationTimeLine.textContent = `${formatTime(struct.durationMs)}s`;
-    timeLine.appendChild(durationTimeLine);
-
-    const belowSep = separator("span-separator");
-    belowSep.style.display = instrumenone;
-    timeLine.appendChild(belowSep);
-
-    const voiceLine = document.createElement("span");
-    voiceLine.id = "line-voice"
-    voiceLine.className = "code";
-    voiceLine.textContent = struct.agent;
-    voiceLine.style.display = instrumenone;
-    timeLine.appendChild(voiceLine);
-
-    lyricLine.appendChild(timeLine);
-
-    /// Normal Line
-    const normalLine = document.createElement("div");
-    normalLine.id = "normal-line";
-    normalLine.className = "line";
-    normalLine.style.display = instrumenone;
-    
-    //// SVG
-    switch (struct.agent) {
-        case "v1": normalLine.innerHTML = defaults.svg.leftAlign; break;
-        case "v2": normalLine.innerHTML = defaults.svg.rightAlign; break;
-        case "v2": normalLine.innerHTML = defaults.svg.rightAlign; break;
-        case "v1000": normalLine.innerHTML = defaults.svg.middleAlign; break;
-        default: normalLine.innerHTML = defaults.svg.justify; break;
-    }
-
-    //// Normal Words Wrapper
-    const normalWordsWrapper = document.createElement("div");
-    normalWordsWrapper.className = "words-wrapper";
-
-    const normalWords = document.createElement("div");
-    normalWords.className = "words";
-
-    wordParts.forEach(part => {
-        if (typeof part != "object" || part.words.length < 1) { return; }
-        const partWord = part.words;
-        if (part.isBackground) { hasBgWords = true; return; }
-        
-        const allSpaces = partWord.trim().length < 1;
-
-        const word = document.createElement("button");
-        word.className = "word";
-
-        const text = document.createElement("span");
-        text.className = "word-text";
-        if (allSpaces) text.classList.add("word-space");
-        text.textContent = allSpaces ? `${partWord.length}x` : partWord;
-        word.appendChild(text);
-
-        normalWords.appendChild(word);
-    });
-
-    const newNormalWord = document.createElement("input");
-    newNormalWord.id = "new-word-line";
-    newNormalWord.type = "text";
-    newNormalWord.className = "input";
-    newNormalWord.placeholder = "Type a word or line";
-    newNormalWord.addEventListener("keydown", e => {
-        const input = newNormalWord;
-
-        if (e.key != "Enter" || input.value.length < 1) { return; }
-        const allSpace = input.value.trim().length < 1
-        
-        const interactableWord = document.createElement("button");
-        interactableWord.className = "word";
-        
-        const word = document.createElement("span");
-        word.className = "word-text";
-        word.textContent = allSpace ? `${input.value.length}x` : input.value;
-        if (allSpace) { word.classList.add("word-space"); }
-
-        interactableWord.appendChild(word);
-        
-        didActions.push({
-            type: "enter-word",
-            input: input.value
-        });
-        
-        currentVer += 1;
-
-        input.value = "";
-        input.before(interactableWord);
-    });
-
-    normalWords.appendChild(newNormalWord);
-    normalWordsWrapper.appendChild(normalWords);
-    normalLine.appendChild(normalWordsWrapper);
-
-    const addNewLine = document.createElement("button");
-    addNewLine.setAttribute("data-tooltip", "Add new line");
-    addNewLine.className = "add-new-line icon-btn left-tooltip-icon-btn";
-    addNewLine.innerHTML = defaults.svg.plus;
-    normalLine.appendChild(addNewLine);
-
-    lyricLine.appendChild(normalLine);
-
-    /// Background separator
-    const bgSeparator = separator("separator-column");
-    bgSeparator.style.display = hasBgWords ? "" : "none";
-    lyricLine.appendChild(bgSeparator);
-
-    /// Background Line
-    const bgLine = document.createElement("div");
-    bgLine.className = "line";
-    bgLine.id = "background-line";
-    bgLine.style.display = hasBgWords ? "" : "none";
-
-    //// SVG
-    bgLine.innerHTML = defaults.svg.paragraph;
-
-    //// Background Words Wrapper
-    const bgWordsWrapper = document.createElement("div");
-    bgWordsWrapper.className = "words-wrapper";
-
-    const bgWords = document.createElement("div");
-    bgWords.className = "words";
-
-    wordParts.filter(val => val.isBackground && val.word && val.word.length < 1).forEach(part => {
-        const partWord = part.words;
-        const allSpaces = partWord.trim().length < 1;
-
-        const word = document.createElement("button");
-        word.className = "word";
-
-        const text = document.createElement("span");
-        text.className = "word-text";
-        if (allSpaces) text.classList.add("word-space");
-        text.textContent = allSpaces ? `${partWord.length}x` : partWord;
-        word.appendChild(text);
-
-        bgWords.appendChild(word);
-    });
-
-    const newBgWord = document.createElement("input");
-    newBgWord.id = "new-word-line";
-    newBgWord.type = "text";
-    newBgWord.className = "input";
-    newBgWord.placeholder = "Type a word or line";
-    newBgWord.addEventListener("keydown", e => {
-        const input = newBgWord;
-
-        if (e.key != "Enter" || input.value.length < 1) { return; }
-        const allSpace = input.value.trim().length < 1
-        
-        const interactableWord = document.createElement("button");
-        interactableWord.className = "word";
-        
-        const word = document.createElement("span");
-        word.className = "word-text";
-        word.textContent = allSpace ? `${input.value.length}x` : input.value;
-        if (allSpace) { word.classList.add("word-space"); }
-
-        interactableWord.appendChild(word);
-        
-        didActions.push({
-            type: "enter-word",
-            input: input.value
-        });
-        
-        currentVer += 1;
-
-        input.value = "";
-        input.before(interactableWord);
-    });
-
-    bgWords.appendChild(newBgWord);
-    bgWordsWrapper.appendChild(bgWords);
-    bgLine.appendChild(bgWordsWrapper);
-
-    lyricLine.appendChild(bgLine);
-
-    /// Romanizations
-    const romanization = document.createElement("div");
-    romanization.className = "line-romanization";
-    romanization.innerHTML = `<strong class="code">Romanization:</strong>`;
-
-    const romans = document.createElement("div");
-    romans.className = "line-romans";
-
-    romanizations.forEach(part => {
-        const partWord = part.words;
-        if (partWord.length < 1) { return; }
-
-        const roman = document.createElement("button");
-        roman.className = "line-roman";
-        roman.textContent = partWord.trim().length < 1 ? `${partWord.length}x` : partWord;
-
-        romans.appendChild(roman);
-    });
-
-    romanization.appendChild(romans);
-
-    const newRoman = document.createElement("input");
-    newRoman.id = "new-roman-word";
-    newRoman.type = "text";
-    newRoman.className = "input line-roman";
-    newRoman.placeholder = "Type a word or line";
-    newRoman.addEventListener("keydown", e => {
-        const input = newRoman;
-
-        if (e.key != "Enter" || input.value.length < 1) { return; }
-        
-        const roman = document.createElement("button");
-        roman.className = "line-roman";
-        roman.textContent = input.value.trim().length < 1 ? `${input.value.length}x` : input.value;
-        
-        // push to history
-        didActions.push({
-            type: "enter-roman-word",
-            input: input.value
-        });
-        
-        currentVer += 1;
-
-        // reset input and append the new roman word
-        input.value = "";
-        input.before(roman);
-    });
-
-    romans.appendChild(newRoman);
-
-    lyricLine.appendChild(romanization);
-
-    /// Place the lyric line on the element
-    lyricLines.appendChild(lyricLine);
+    line.addEventListener("mouseenter", () => { if (hoveringLine < 1) hoveringLine = index - 1; });
+    line.addEventListener("mouseleave", () => { if (hoveringLine > 0) hoveringLine = 0 });
+    line.addEventListener("click", () => { selectedLine = index - 1; });
 }
 
-// Actions
+// Handlers
+/// Actions
 function handleActionsMenu() {
     let actionMenuOpen = null;
     function closeActionMenu() {
@@ -418,8 +170,8 @@ function handleActionsMenu() {
             menu: actionFile,
             func: function(btn) {
                 actionMenuOpen = actionFile;
-                actionFile.style.top = `${btn.getBoundingClientRect().bottom + 4}`;
-                actionFile.style.left = `${btn.getBoundingClientRect().left}`;
+                actionFile.style.top = `${Math.round(btn.getBoundingClientRect().bottom + 4)}`;
+                actionFile.style.left = `${Math.round(btn.getBoundingClientRect().left)}`;
                 actionFile.style.display = "flex";
                 requestAnimationFrame(() => {
                     actionFile.style.opacity = "1";
@@ -438,7 +190,7 @@ function handleActionsMenu() {
     });
 }
 
-// Tab Buttons
+/// Tab Buttons
 function handleTabs() {
     tabButtons.forEach(button => {
         button.addEventListener("click", () => {
@@ -448,27 +200,21 @@ function handleTabs() {
     });
 }
 
-// Tools
+/// Tools
 function handleTools() {
     const parentData = {}
 
     /// New Line
     if (addLine) {
-        addLine.addEventListener("click", () => {
-            addNewLine();
-        });
+        addLine.addEventListener("click", () => createNewLine() );
     }
 
     if (addLineInstrumental) {
-        addLineInstrumental.addEventListener("click", () => {
-            addNewLine({ isInstrumental: true });
-        });
+        addLineInstrumental.addEventListener("click", () => createNewLine({ isInstrumental: true }) );
     }
 
     if (addLineTogether) {
-        addLineTogether.addEventListener("click", () => {
-            addNewLine({ isTogether: true });
-        });
+        addLineTogether.addEventListener("click", () => createNewLine({ isTogether: true }) );
     }
 
     /// Checkboxes
@@ -531,44 +277,41 @@ function handleTools() {
     });
 }
 
-// Lyric Line
+/// Lyric Line
 function handleLyricLine() {
-
+    lyricLines.matches("div:hover")
 }
 
-function handleNewWordInput() {
-    newWords.forEach(input => {
-        input.addEventListener("keydown", e => {
-            if (e.key != "Enter" || input.value.length < 1) { return; }
-            const allSpace = input.value.trim().length < 1
-            
-            const interactableWord = document.createElement("button");
-            interactableWord.className = "word";
-            
-            const word = document.createElement("span");
-            word.textContent = allSpace ? `${input.value.length}x` : input.value;
-            if (allSpace) { word.classList.add("word-space"); }
-            word.classList.add("word-text");
-    
-            interactableWord.appendChild(word);
-            
-            didActions.push({
-                type: "enter-word",
-                input: input.value
-            });
-            
-            currentVer += 1;
-    
-            input.value = "";
-            input.before(interactableWord);
-        });
-    });
-}
-
-// Context Menu
+/// Context Menu
 function handleContextMenu() {
+    if (!contextMenu) { console.warn("No context menu loaded. Refresh to reload handler"); return }
     let contextMenuOpen = false;
     
+    function loadContextMenu() {
+        const buttons = [ ...contextMenuB ];
+        buttons.forEach(btn => {
+            if (typeof btn != "object" || !btn.type) return;
+            if (btn.type == "button") {
+                const button = document.createElement("button");
+                button.className = "list-btn";
+                button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
+                button.disabled = btn.disabled;
+                if (typeof btn.func == "function") button.addEventListener("click", () => btn.func());
+                contextMenu.appendChild(button);
+            } else if (btn.type == "separator") {
+                const separator = document.createElement("div");
+                separator.className = "separator-column";
+                contextMenu.appendChild(separator);
+            } else if (btn.type == "span") {
+                const span = document.createElement("span");
+                span.className = "code";
+                span.style.opacity = .5;
+                span.innerHTML = btn.content;
+                contextMenu.appendChild(span);
+            }
+        })
+    }
+
     function closeContextMenu() {
         contextMenuOpen = false;
         contextMenu.style.opacity = "0";
@@ -577,10 +320,11 @@ function handleContextMenu() {
         contextMenu.style.left = "";
         contextMenu.style.right = "";
         contextMenu.classList.add("hidden");
+        contextMenu.innerHTML = "";
     }
     
     document.addEventListener("click", e => {
-        if (contextMenuOpen && !contextMenu.matches(":hover")) {
+        if (contextMenuOpen && !contextMenu.matches(`${contextMenu.tagName}:hover`)) {
             closeContextMenu();
         }
     });
@@ -589,6 +333,9 @@ function handleContextMenu() {
         if (contextMenuOpen) {
             closeContextMenu();
         } else {
+            if (contextMenuB.length < 1) { return; }
+            loadContextMenu();
+
             const rect = document.documentElement.getBoundingClientRect()
             contextMenuOpen = true;
             e.preventDefault();
@@ -605,34 +352,36 @@ function handleContextMenu() {
     });
 };
 
-// Keybind
+/// Keybind
 function handleKeybind() {
     const keybinds = {
-        "ctrl+z": function() {
-    
+        // Undo (Ctrl+Z)
+        undo: {
+            keys: ["Ctrl", "z"],
+            func: function() {
+
+            }
         }
-    }
+    };
     
     document.addEventListener("keydown", e => {
-        // let built = ""
-        // if (e.ctrlKey) built += "+ctrl"
-        // if (e.altKey) built += "+alt"
-        // if (e.metaKey) built += "+meta"
-        // if (e.shiftKey) built += "+shift"
-        // built = built.substring(1)
-        // built += `${built.length > 0 ? "+" : ""}` + e.key
+        let pressed = [];
+        if (e.ctrlKey) pressed.push("Ctrl");
+        if (e.altKey) pressed.push("Alt");
+        if (e.metaKey) pressed.push("Meta");
+        if (e.shiftKey) pressed.push("Shift");
+        pressed.push(e.key);
     
-        // Undo (Ctrl+Z)
-        console.log(e.key);
-    })
+        
+    });
 }
 
-// SET THEM ALL UP
+// Set up the handlers on load
 document.addEventListener("DOMContentLoaded", () => {
     handleActionsMenu();
     handleTabs();
     handleTools();
-    handleNewWordInput();
+    handleLyricLine();
     handleContextMenu();
     handleKeybind();
 });

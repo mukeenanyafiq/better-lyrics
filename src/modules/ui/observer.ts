@@ -23,7 +23,7 @@ import {
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
-import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, renderLoader, setAlbumArtSize } from "./dom";
+import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, renderLoader } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
 
@@ -239,7 +239,6 @@ export function initializeLyrics(): void {
 
       AppState.queueLyricInjection = true;
       AppState.queueAlbumArtInjection = true;
-      AppState.queueAlbumArtSizeChange = true;
       AppState.queueSongDetailsInjection = true;
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.hasPreloadedNextSong = false;
@@ -281,16 +280,6 @@ export function initializeLyrics(): void {
     if (AppState.queueAlbumArtInjection && AppState.shouldInjectAlbumArt === true) {
       AppState.queueAlbumArtInjection = false;
       addAlbumArtToLayout(currentVideoId);
-    }
-
-    if (AppState.queueAlbumArtSizeChange) {
-      AppState.queueAlbumArtSizeChange = false;
-      // we're making sure that the current track album cover does not get replaced by a previous track album cover
-      setTimeout(() => {
-        const root = getComputedStyle(document.documentElement);
-        const albumArtQuality = root.getPropertyValue("--ytmusic-album-art-img-size") || "600";
-        setAlbumArtSize(albumArtQuality);
-      }, 2000);
     }
 
     if (AppState.lyricInjectionFailed) {

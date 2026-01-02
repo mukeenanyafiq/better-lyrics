@@ -733,16 +733,17 @@ export function injectSongAttributes(title: string, artist: string): void {
 function setAlbumArtSize(size: string | number): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
   const origSrc = albumArt.src;
-  const origSize = albumArt.src.match(/\d+/);
-
-  // If the size is the same, discard the changes
-  if (origSize && origSize[0] == size) return;
 
   const img = new Image();
   img.src = albumArt.src;
-
+  
   if (/w\d+-h\d+/.test(albumArt.src)) {
-    img.src = albumArt.src.replace(/w\d+-h\d+/, `w${size}-h${size}`);
+    const replaced = albumArt.src.replace(/w\d+-h\d+/, `w${size}-h${size}`);
+
+    // If the size is the same, discard the changes
+    if (origSrc == replaced) return;
+
+    img.src = replaced;
   }
 
   img.onload = () => {
