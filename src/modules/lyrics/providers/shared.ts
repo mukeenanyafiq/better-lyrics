@@ -90,7 +90,8 @@ export interface TrackInfoProvider {
 
 export interface ProviderParameters extends TrackInfoProvider {
   videoId: string;
-  audioTrackData: AudioTrackData;
+  audioTrackData: AudioTrackData | null;
+  album: string | null;
   sourceMap: SourceMapType;
   alwaysFetchMetadata: boolean;
   signal: AbortSignal;

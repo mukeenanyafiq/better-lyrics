@@ -42,6 +42,7 @@ export interface AppStateType {
   isTranslateEnabled: boolean;
   isRomanizationEnabled: boolean;
   translationLanguage: string;
+  hasPreloadedNextSong: boolean;
 }
 
 export const AppState: AppStateType = {
@@ -68,6 +69,7 @@ export const AppState: AppStateType = {
   isTranslateEnabled: false,
   isRomanizationEnabled: false,
   translationLanguage: "en",
+  hasPreloadedNextSong: false,
 };
 
 export function reloadLyrics(): void {
