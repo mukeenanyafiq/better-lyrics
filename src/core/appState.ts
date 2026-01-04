@@ -1,4 +1,4 @@
-import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS, GENERAL_ERROR_LOG } from "@constants";
+import { GENERAL_ERROR_LOG } from "@constants";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
@@ -35,10 +35,6 @@ export interface AppStateType {
   loaderAnimationEndTimeout: number | undefined;
   lastLoadedVideoId: string | null;
   lyricAbortController: AbortController | null;
-  animationSettings: {
-    disableRichSynchronization: boolean;
-    lineSyncedWordDelayMs: number;
-  };
   isTranslateEnabled: boolean;
   isRomanizationEnabled: boolean;
   translationLanguage: string;
@@ -62,10 +58,6 @@ export const AppState: AppStateType = {
   loaderAnimationEndTimeout: undefined,
   lastLoadedVideoId: null,
   lyricAbortController: null,
-  animationSettings: {
-    disableRichSynchronization: false,
-    lineSyncedWordDelayMs: DEFAULT_LINE_SYNCED_WORD_DELAY_MS,
-  },
   isTranslateEnabled: false,
   isRomanizationEnabled: false,
   translationLanguage: "en",
