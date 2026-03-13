@@ -2,7 +2,7 @@
  * Parse time in hh:mm:ss.xx or offset-time with unit indicators "h", "m", "s", "ms" (e.g 432.25s)
  */
 export function parseTime(timeStr: string | number | undefined): number {
-  if (!timeStr) return 0;
+  if (!timeStr) return -1;
   if (typeof timeStr === "number") return timeStr;
 
   const offsetTimeMatch = timeStr.match(/^([\d.]+)(h|m|s|ms)$/);

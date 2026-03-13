@@ -161,6 +161,8 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   const agentMapping = extractAgentMapping(ttHead[0].metadata);
 
   const lines = ttBody.flatMap(e => e.div);
+  
+  const songDurationMs = parseTime(ttMeta["@_dur"]);
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
   if (!hasTimingData) {
@@ -173,10 +175,18 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   let isWordSynced = false;
 
-  lines.forEach(line => {
+  lines.forEach((line, index) => {
     let meta = line[":@"];
     let beginTimeMs = parseTime(meta?.["@_begin"]);
     let endTimeMs = parseTime(meta?.["@_end"]);
+
+    if (beginTimeMs < 0) {
+      beginTimeMs = index > 0 ? Array.from(lyrics.values())[index - 1].startTimeMs + Array.from(lyrics.values())[index - 1].durationMs : 0;
+    }
+
+    if (endTimeMs < 0) {
+      endTimeMs = index < lines.length - 1 ? beginTimeMs + 3000 : songDurationMs;
+    }
 
     let partParse = parseLyricPart(line.p, beginTimeMs);
     if (partParse.isWordSynced) {
@@ -281,7 +291,6 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = parseTime(ttMeta["@_dur"]);
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
