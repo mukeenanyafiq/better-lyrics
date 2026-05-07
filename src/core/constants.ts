@@ -8,6 +8,7 @@ export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
 export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const WORD_CLASS = "blyrics--word" as const;
+export const HAS_TRAILING_SPACE_CLASS = "blyrics--has-trailing-space" as const;
 export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
 export const ANIMATING_CLASS = "blyrics--animating" as const;
 export const PAUSED_CLASS = "blyrics--paused" as const;
@@ -16,6 +17,10 @@ export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
 export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
+export const UNISON_DOCK_CLASS = "blyrics-unison-dock" as const;
+export const UNISON_DOCK_DEFAULT_POSITION = "bottom-right" as const;
+export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
+export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
@@ -26,9 +31,9 @@ export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
-export const LYRICS_SPACING_ELEMENT_ID = "blyrics-spacing-element" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
+export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
@@ -40,15 +45,15 @@ export const NOTO_SANS_UNIVERSAL_LINK =
   "https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans+Armenian:wght@100..900&family=Noto+Sans+Bengali:wght@100..900&family=Noto+Sans+Devanagari:wght@100..900&family=Noto+Sans+Georgian:wght@100..900&family=Noto+Sans+Gujarati:wght@100..900&family=Noto+Sans+HK:wght@100..900&family=Noto+Sans+Hebrew:wght@100..900&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+Kannada:wght@100..900&family=Noto+Sans+Khmer:wght@100..900&family=Noto+Sans+Lao+Looped:wght@100..900&family=Noto+Sans+Lao:wght@100..900&family=Noto+Sans+Malayalam:wght@100..900&family=Noto+Sans+Marchen&family=Noto+Sans+Meetei+Mayek:wght@100..900&family=Noto+Sans+Multani&family=Noto+Sans+NKo&family=Noto+Sans+Old+Permic&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+Shavian&family=Noto+Sans+Sinhala:wght@100..900&family=Noto+Sans+Sunuwar&family=Noto+Sans+TC:wght@100..900&family=Noto+Sans+Takri&family=Noto+Sans+Tamil:wght@100..900&family=Noto+Sans+Telugu:wght@100..900&family=Noto+Sans+Thai+Looped:wght@100..900&family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans+Vithkuqi:wght@400..700&family=Noto+Sans+Warang+Citi&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" as const;
 
 // API URLs and Functions
-export const LYRICS_API_URL = "https://lyrics-api.boidu.dev/getLyrics" as const;
+export const HOMEPAGE_URL = "https://betterlyrics.org" as const;
+export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
+export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
+export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
-export const LRCLIB_API_URL = "https://lrclib.net/api/get" as const;
-export const LEGATO_API_URL = "https://lyrics-api.boidu.dev/kugou/getLyrics" as const;
-export const LRCLIB_UPLOAD_URL = "https://lrclibup.boidu.dev/" as const;
-export const LRCLIB_CLIENT_HEADER = "BetterLyrics Extension (https://github.com/better-lyrics/better-lyrics)" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
+export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
-export const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
+const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
 export const THEME_REGISTRY_URL = `${THEME_REGISTRY_BASE}/master` as const;
 export const TRANSLATE_LYRICS_URL = function (lang: string, text: string): string {
   return `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -99,6 +104,7 @@ export const LOG_PREFIX_CONTENT = "[BetterLyrics:Content]" as const;
 export const LOG_PREFIX_BACKGROUND = "[BetterLyrics:Background]" as const;
 export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
+export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
@@ -109,7 +115,6 @@ export const GENERAL_ERROR_LOG = "[BetterLyrics] Error:" as const;
 export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;
 export const LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found, injecting into the page" as const;
 export const NO_LYRICS_FOUND_LOG = "[BetterLyrics] No lyrics found for the current song" as const;
-export const LRCLIB_LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found from LRCLIB" as const;
 export const PROVIDER_SWITCHED_LOG = "[BetterLyrics] Switching to provider = " as const;
 
 // UI State Logs
@@ -125,7 +130,6 @@ export const LYRICS_TAB_NOT_DISABLED_LOG =
   "[BetterLyrics] (Safe to ignore) Lyrics tab is not disabled, unable to enable it" as const;
 export const SONG_SWITCHED_LOG = "[BetterLyrics] Song has been switched" as const;
 export const LOADER_TRANSITION_ENDED = "[BetterLyrics] Loader Transition Ended" as const;
-export const LOADER_ANIMATION_END_FAILED = "[BetterLyrics] Loader Animation Didn't End" as const;
 export const PAUSING_LYRICS_SCROLL_LOG = "[BetterLyrics] Pausing Lyrics Autoscroll Due to User Scroll" as const;
 
 // Feature State Logs
@@ -362,14 +366,35 @@ interface ProviderConfig {
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 1 },
-  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 2 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 3 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 4 },
-  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 5 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 6 },
-  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 7 },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 8 },
+  {
+    key: "unison-richsynced",
+    displayName: "Unison",
+    syncType: "syllable",
+    priority: 1,
+  },
+  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
+  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 3 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 4 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 5 },
+  {
+    key: "unison-synced",
+    displayName: "Unison",
+    syncType: "line",
+    priority: 6,
+  },
+  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 7 },
+  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 8 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 9 },
+  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 10 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 11 },
+  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 12 },
+  {
+    key: "unison-plain",
+    displayName: "Unison",
+    syncType: "unsynced",
+    priority: 13,
+  },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 14 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

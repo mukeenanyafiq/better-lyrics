@@ -1,10 +1,11 @@
 // Function to save user options
+
+import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import Sortable from "sortablejs";
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
-import { t, initI18n, getLanguageDisplayName } from "@core/i18n";
-import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { getIdentity, exportIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
 import { showModal } from "./editor/ui/feedback";
+import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -12,6 +13,7 @@ interface Options {
   isAlbumArtEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  isPassiveScrollEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -19,6 +21,10 @@ interface Options {
   preferredProviderList: string[];
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
+  uiLanguage: string;
+  isUnisonPinnedDockEnabled: boolean;
+  unisonPinnedDockPosition: string;
+  isUnisonAutoHideInFullscreenEnabled: boolean;
 }
 
 const saveOptions = (): void => {
@@ -44,6 +50,7 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -51,15 +58,29 @@ const getOptionsFromForm = (): Options => {
     preferredProviderList: preferredProviderList,
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
+    uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
+    isUnisonPinnedDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
+    unisonPinnedDockPosition: getSelectedUnisonPosition(),
+    isUnisonAutoHideInFullscreenEnabled: (
+      document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement
+    ).checked,
   };
 };
+
+function getSelectedUnisonPosition(): string {
+  const selected = document.querySelector<HTMLElement>("#unison-position-frame .position-cell[data-selected='true']");
+  return selected?.dataset.pos ?? UNISON_DOCK_DEFAULT_POSITION;
+}
 
 // Function to save options to Chrome storage
 const saveOptionsToStorage = (options: Options): void => {
   chrome.storage.sync.set(options, () => {
     chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id!, { action: "updateSettings", settings: options });
+        chrome.tabs.sendMessage(tab.id!, {
+          action: "updateSettings",
+          settings: options,
+        });
       });
     });
   });
@@ -145,7 +166,12 @@ const subscribeToCacheInfo = (): void => {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.cacheInfo) {
-      updateCacheInfo({ cacheInfo: changes.cacheInfo.newValue as { count: number; size: number } });
+      updateCacheInfo({
+        cacheInfo: changes.cacheInfo.newValue as {
+          count: number;
+          size: number;
+        },
+      });
     }
   });
 };
@@ -175,27 +201,39 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
+    isPassiveScrollEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
+      "unison-richsynced",
+      "binimum-richsynced",
+      "portato-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
+      "unison-synced",
+      "binimum-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
+      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
+    uiLanguage: "auto",
+    isUnisonPinnedDockEnabled: true,
+    unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
+    isUnisonAutoHideInFullscreenEnabled: true,
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
+  setupUnisonActionsModal();
 };
 
 // Function to set options in form elements
@@ -207,9 +245,16 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
+  (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
+  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isUnisonPinnedDockEnabled;
+  (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
+    items.isUnisonAutoHideInFullscreenEnabled;
+  setUnisonPositionInForm(items.unisonPinnedDockPosition);
+  syncUnisonModalDependentState(items.isUnisonPinnedDockEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -222,13 +267,19 @@ const setOptionsInForm = (items: Options): void => {
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
     "bLyrics-richsynced",
+    "unison-richsynced",
+    "binimum-richsynced",
+    "portato-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
+    "unison-synced",
+    "binimum-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
+    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -258,18 +309,44 @@ interface ProviderInfo {
 }
 
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
-  "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
-  "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
-  "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
+  "binimum-richsynced": { name: t("options_provider_binilyrics"), syncType: "syllable" },
+  "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
+  "musixmatch-richsync": {
+    name: t("options_provider_musixmatch"),
+    syncType: "word",
+  },
+  "musixmatch-synced": {
+    name: t("options_provider_musixmatch"),
+    syncType: "line",
+  },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
+  "yt-captions": {
+    name: t("options_provider_youtubeCaptions"),
+    syncType: "line",
+  },
+  "portato-richsynced": { name: t("options_provider_betterLyricsPortato"), syncType: "word" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
-  "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
-  "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
-  "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
+  "bLyrics-richsynced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "syllable",
+  },
+  "bLyrics-synced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "line",
+  },
+  "legato-synced": {
+    name: t("options_provider_betterLyricsLegato"),
+    syncType: "line",
+  },
   "yt-lyrics": { name: t("options_provider_youtube"), syncType: "unsynced" },
   "lrclib-plain": { name: t("options_provider_lrclib"), syncType: "unsynced" },
 });
 
-const getSyncTypeConfig = (): { [key in SyncType]: { label: string; icon: string; tooltip: string } } => ({
+const getSyncTypeConfig = (): {
+  [key in SyncType]: { label: string; icon: string; tooltip: string };
+} => ({
   syllable: {
     label: t("options_syncType_syllable"),
     tooltip: t("options_syncType_syllable_tooltip"),
@@ -359,11 +436,54 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   return liElem;
 }
 
+// -- Display Language Dropdown --------------------------
+
+function populateLanguageDropdown(): void {
+  const select = document.getElementById("uiLanguage") as HTMLSelectElement | undefined;
+  if (!select) return;
+
+  const browserLang = chrome.i18n.getUILanguage();
+  const autoOption = document.createElement("option");
+  autoOption.value = "auto";
+  autoOption.textContent = `${t("options_language_displayLanguageAuto")} (${browserLang})`;
+  select.appendChild(autoOption);
+
+  for (const locale of SUPPORTED_LOCALES) {
+    const option = document.createElement("option");
+    option.value = locale.code;
+    option.textContent = locale.nativeName;
+    select.appendChild(option);
+  }
+
+  select.addEventListener("change", () => {
+    saveOptions();
+    location.hash = "language-content";
+    location.reload();
+  });
+}
+
+function restoreActiveTab(): void {
+  if (!location.hash) return;
+
+  const target = `#${location.hash.slice(1)}`;
+  const targetBtn = document.querySelector(`.tab[data-target="${target}"]`);
+  const targetContent = document.querySelector(target);
+  if (!targetBtn || !targetContent) return;
+
+  document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+  targetBtn.classList.add("active");
+  targetContent.classList.add("active");
+}
+
 // Event listeners
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadLocaleOverride();
   initI18n();
+  populateLanguageDropdown();
   initTabScrollIndicators();
   restoreOptions();
+  restoreActiveTab();
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
@@ -379,7 +499,9 @@ tabButtons.forEach(button => {
     tabContents.forEach(content => content.classList.remove("active"));
 
     button.classList.add("active");
-    document.querySelector(button.getAttribute("data-target")!)!.classList.add("active");
+    const target = button.getAttribute("data-target")!;
+    document.querySelector(target)!.classList.add("active");
+    history.replaceState(null, "", target);
   });
 });
 
@@ -434,7 +556,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initLangExclusionsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/marketplace.html"),
+    });
   });
 
   initIdentityUI();
@@ -800,4 +924,60 @@ function filterLanguagePills(containerId: string, query: string): void {
     const matches = langName.includes(normalizedQuery) || langCode.includes(normalizedQuery);
     pill.classList.toggle("lang-pill-hidden", !matches);
   });
+}
+
+function setUnisonPositionInForm(position: string): void {
+  const frame = document.getElementById("unison-position-frame");
+  if (!frame) return;
+  frame.querySelectorAll<HTMLElement>(".position-cell").forEach(cell => {
+    if (cell.dataset.pos === position) {
+      cell.dataset.selected = "true";
+    } else {
+      delete cell.dataset.selected;
+    }
+  });
+}
+
+function syncUnisonModalDependentState(enabled: boolean): void {
+  const body = document.getElementById("unison-actions-modal-body");
+  if (!body) return;
+  body.dataset.pinnedDisabled = enabled ? "false" : "true";
+}
+
+function setupUnisonActionsModal(): void {
+  const openBtn = document.getElementById("unison-actions-btn");
+  const overlay = document.getElementById("unison-actions-modal-overlay");
+  const closeBtn = document.getElementById("unison-actions-modal-close");
+  const frame = document.getElementById("unison-position-frame");
+  const pinnedToggle = document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement | null;
+  const autoHideToggle = document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement | null;
+
+  if (!openBtn || !overlay || !closeBtn || !frame || !pinnedToggle || !autoHideToggle) return;
+
+  const closeModal = (): void => overlay.classList.remove("active");
+
+  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  closeBtn.addEventListener("click", closeModal);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) closeModal();
+  });
+
+  frame.addEventListener("click", e => {
+    const cell = (e.target as HTMLElement).closest<HTMLElement>(".position-cell");
+    if (!cell?.dataset.pos) return;
+    setUnisonPositionInForm(cell.dataset.pos);
+    saveOptions();
+  });
+
+  pinnedToggle.addEventListener("change", () => {
+    syncUnisonModalDependentState(pinnedToggle.checked);
+    saveOptions();
+  });
+
+  autoHideToggle.addEventListener("change", saveOptions);
 }
