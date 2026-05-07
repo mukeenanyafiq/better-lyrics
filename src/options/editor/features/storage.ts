@@ -1,13 +1,25 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { compressString, decompressString, isCompressed } from "@core/compression";
-import { loadChunkedStyles } from "@core/storage";
-import type { InstalledStoreTheme } from "../../store/types";
+import { getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
+import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
+import type { InstalledStoreTheme } from "@/options/store/types";
 import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { SaveResult } from "../types";
 import { syncIndicator } from "../ui/dom";
 import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName, themeSourceToEditorSource } from "./themes";
+
+interface CSSStorageData {
+  cssStorageType?: "sync" | "local" | "chunked";
+  customCSS?: string | null;
+  cssCompressed?: boolean;
+}
+
+interface ChunkMetadata {
+  customCSS_chunked?: boolean;
+  customCSS_chunkCount?: number;
+}
 
 async function getStorageUsage(): Promise<{ used: number; total: number }> {
   const bytesInUse = await chrome.storage.local.getBytesInUse();
@@ -62,7 +74,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
 
   console.log(LOG_PREFIX_EDITOR, `Splitting into ${chunks.length} chunks of ~${CHUNK_SIZE} bytes each`);
 
-  const oldMetadata = await chrome.storage.local.get(["customCSS_chunkCount"]);
+  const oldMetadata = await getLocalStorage<ChunkMetadata>(["customCSS_chunkCount"]);
   const oldChunkCount = oldMetadata.customCSS_chunkCount || 0;
 
   for (let i = 0; i < chunks.length; i++) {
@@ -99,7 +111,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
   console.log(LOG_PREFIX_EDITOR, `Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
 }
 
-export const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
+const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
   const cssSize = new Blob([css]).size;
   if (cssSize > LOCAL_STORAGE_SAFE_LIMIT) {
     return "chunked";
@@ -169,22 +181,22 @@ export const saveToStorageWithFallback = async (css: string, _isTheme = false, r
   }
 };
 
-export async function loadCustomCSS(): Promise<string> {
+async function loadCustomCSS(): Promise<string> {
   let css: string | null = null;
   let compressed = false;
 
   try {
-    const syncData = await chrome.storage.sync.get(["cssStorageType", "customCSS", "cssCompressed"]);
+    const syncData = await getSyncStorage<CSSStorageData>(["cssStorageType", "customCSS", "cssCompressed"]);
 
     if (syncData.cssStorageType === "chunked") {
       css = await loadChunkedStyles();
       compressed = syncData.cssCompressed || false;
     } else if (syncData.cssStorageType === "local") {
-      const localData = await chrome.storage.local.get(["customCSS", "cssCompressed"]);
-      css = localData.customCSS;
+      const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
+      css = localData.customCSS ?? null;
       compressed = localData.cssCompressed || false;
     } else {
-      css = syncData.customCSS;
+      css = syncData.customCSS ?? null;
       compressed = syncData.cssCompressed || false;
     }
   } catch (error) {
@@ -193,17 +205,17 @@ export async function loadCustomCSS(): Promise<string> {
       const chunkedStyles = await loadChunkedStyles();
       if (chunkedStyles) {
         css = chunkedStyles;
-        const syncData = await chrome.storage.sync.get("cssCompressed");
-        compressed = syncData.cssCompressed || false;
+        const syncCompressedData = await getSyncStorage<CSSStorageData>(["cssCompressed"]);
+        compressed = syncCompressedData.cssCompressed || false;
       } else {
-        const localData = await chrome.storage.local.get(["customCSS", "cssCompressed"]);
+        const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
         if (localData.customCSS) {
           css = localData.customCSS;
           compressed = localData.cssCompressed || false;
         } else {
-          const syncData = await chrome.storage.sync.get(["customCSS", "cssCompressed"]);
-          css = syncData.customCSS;
-          compressed = syncData.cssCompressed || false;
+          const fallbackSyncData = await getSyncStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
+          css = fallbackSyncData.customCSS ?? null;
+          compressed = fallbackSyncData.cssCompressed || false;
         }
       }
     } catch (fallbackError) {
@@ -258,6 +270,12 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
     LOG_PREFIX_EDITOR,
     `Broadcasting RICS to tabs, source length: ${ricsSource.length}, strategy: ${strategy}`
   );
+
+  if (!ricsCompiler.isValidRics(ricsSource)) {
+    const state = ricsCompiler.getLastCompilationState();
+    console.warn(LOG_PREFIX_EDITOR, "RICS validation failed, broadcasting anyway:", state?.errors);
+  }
+
   try {
     chrome.runtime
       .sendMessage({
@@ -276,7 +294,7 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
   }
 }
 
-export interface ApplyStoreThemeOptions {
+interface ApplyStoreThemeOptions {
   themeId: string;
   css: string;
   title: string;
@@ -292,6 +310,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
     editorStateManager.incrementSaveCount();
 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
+    await setActiveStoreTheme(themeId);
 
     const saveResult = await saveToStorageWithFallback(themeContent, true);
     if (!saveResult.success) {
@@ -312,7 +331,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
   }
 }
 
-export class StorageManager {
+class StorageManager {
   private isInitialized = false;
 
   initialize(): void {
@@ -343,7 +362,10 @@ export class StorageManager {
         for (const key of Object.keys(changes)) {
           if (key.startsWith("storeTheme:")) {
             const themeId = key.replace("storeTheme:", "");
-            await this.handleIndividualThemeUpdate(themeId, changes[key]);
+            await this.handleIndividualThemeUpdate(
+              themeId,
+              changes[key] as { oldValue?: InstalledStoreTheme; newValue?: InstalledStoreTheme }
+            );
           }
         }
       }
@@ -419,8 +441,8 @@ export class StorageManager {
       return;
     }
 
-    const syncData = await chrome.storage.sync.get("themeName");
-    const currentThemeName = syncData.themeName as string | undefined;
+    const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+    const currentThemeName = syncData.themeName;
 
     if (!currentThemeName?.startsWith("store:")) return;
 

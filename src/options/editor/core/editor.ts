@@ -5,11 +5,18 @@ import {
   closeBracketsKeymap,
   completionKeymap,
 } from "@codemirror/autocomplete";
-import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+  toggleBlockComment,
+  toggleComment,
+} from "@codemirror/commands";
 import { bracketMatching, foldGutter, foldKeymap, indentOnInput, indentUnit } from "@codemirror/language";
 import { lintGutter, lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
-import { EditorState, type Extension } from "@codemirror/state";
+import { EditorState, type Extension, Prec } from "@codemirror/state";
 import {
   crosshairCursor,
   drawSelection,
@@ -28,7 +35,14 @@ import { colorHighlighter, colorHighlighterStyles, ricsLanguage, ricsLinter } fr
 import { rainbowBrackets } from "../features/syntax";
 import { onChange } from "../features/themes";
 
-export interface EditorOptions {
+// -- Custom Keybindings ----------------------------
+
+const commentKeymap: readonly KeyBinding[] = [
+  { key: "Mod-/", run: toggleComment },
+  { key: "Mod-Shift-a", run: toggleBlockComment },
+];
+
+interface EditorOptions {
   enableSearch?: boolean;
 }
 
@@ -40,7 +54,7 @@ export const BRACKET_NESTING_LEVELS = 7;
 export const CHUNK_SIZE = 100 * 1024;
 export const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
 
-export const RICS_LINTER_DELAY = 150;
+const RICS_LINTER_DELAY = 150;
 
 export function createEditorState(initialContents: string, options: EditorOptions = {}) {
   const { enableSearch = false } = options;
@@ -66,6 +80,7 @@ export function createEditorState(initialContents: string, options: EditorOption
     highlightActiveLine(),
     highlightSelectionMatches(),
     ...searchExtensions,
+    Prec.high(keymap.of(commentKeymap)),
     keymap.of([
       { key: "Tab", run: acceptCompletion },
       indentWithTab,

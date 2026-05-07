@@ -1,3 +1,4 @@
+import { LOG_PREFIX_STORE, THEME_REGISTRY_URL } from "@constants";
 import type {
   LockfileEntry,
   PermissionStatus,
@@ -7,7 +8,6 @@ import type {
   ThemeValidationResult,
 } from "./types";
 
-const REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes/master";
 const DEFAULT_TIMEOUT_MS = 10000;
 
 export async function fetchWithTimeout(
@@ -29,13 +29,6 @@ export async function fetchWithTimeout(
   }
 }
 
-const REGISTRY_ORIGINS = [
-  "https://raw.githubusercontent.com/better-lyrics/*",
-  "https://better-lyrics-themes-api.boidu.dev/*",
-];
-
-const URL_INSTALL_ORIGINS = ["https://raw.githubusercontent.com/*", "https://api.github.com/*"];
-
 interface BranchCacheEntry {
   branch: string;
   timestamp: number;
@@ -43,6 +36,12 @@ interface BranchCacheEntry {
 
 const BRANCH_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const repoBranchCache = new Map<string, BranchCacheEntry>();
+
+const ALLOWED_IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp)$/i;
+
+function filterSafeImageFilenames(filenames: string[]): string[] {
+  return filenames.filter(f => ALLOWED_IMAGE_EXTENSIONS.test(f));
+}
 
 function getRawGitHubUrl(repo: string, branch: string, path: string, bustCache = true): string {
   const base = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
@@ -54,7 +53,8 @@ async function testBranchExists(repo: string, branch: string, testFile = "metada
     const url = `https://raw.githubusercontent.com/${repo}/${branch}/${testFile}`;
     const response = await fetchWithTimeout(url, { method: "HEAD" }, 5000);
     return response.ok;
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Branch test failed:", err);
     return false;
   }
 }
@@ -78,8 +78,8 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
       repoBranchCache.set(repo, { branch, timestamp: Date.now() });
       return branch;
     }
-  } catch {
-    // API failed, fall through to branch testing
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "GitHub API failed, falling back to branch testing:", err);
   }
 
   if (await testBranchExists(repo, "master", testFile)) {
@@ -95,41 +95,23 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
   return "main";
 }
 
-export async function checkRegistryPermissions(): Promise<PermissionStatus> {
-  const granted = await chrome.permissions.contains({ origins: REGISTRY_ORIGINS });
-  return { granted, canRequest: true };
-}
-
-export async function requestRegistryPermissions(): Promise<boolean> {
-  return chrome.permissions.request({ origins: REGISTRY_ORIGINS });
-}
-
 export async function checkUrlInstallPermissions(): Promise<PermissionStatus> {
-  const granted = await chrome.permissions.contains({ origins: URL_INSTALL_ORIGINS });
-  return { granted, canRequest: true };
+  return { granted: true, canRequest: true };
 }
 
 export async function requestUrlInstallPermissions(): Promise<boolean> {
-  return chrome.permissions.request({ origins: URL_INSTALL_ORIGINS });
-}
-
-export async function checkStorePermissions(): Promise<PermissionStatus> {
-  return checkRegistryPermissions();
-}
-
-export async function requestStorePermissions(): Promise<boolean> {
-  return requestRegistryPermissions();
+  return true;
 }
 
 function getRegistryFileUrl(themeId: string, file: string): string {
-  return `${REGISTRY_BASE}/themes/${themeId}/${file}`;
+  return `${THEME_REGISTRY_URL}/themes/${themeId}/${file}`;
 }
 
 function getLockfileUrl(): string {
-  return `${REGISTRY_BASE}/index.lock.json`;
+  return `${THEME_REGISTRY_URL}/index.lock.json`;
 }
 
-export async function fetchThemeLockfile(): Promise<ThemeLockfile> {
+async function fetchThemeLockfile(): Promise<ThemeLockfile> {
   const url = `${getLockfileUrl()}?t=${Date.now()}`;
   const response = await fetchWithTimeout(url, { cache: "no-store" });
 
@@ -158,7 +140,8 @@ async function fetchRegistryDescription(themeId: string): Promise<string | null>
     const response = await fetchWithTimeout(url, { cache: "no-store" });
     if (!response.ok) return null;
     return response.text();
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch registry CSS:", err);
     return null;
   }
 }
@@ -168,7 +151,8 @@ async function checkRegistryFileExists(themeId: string, file: string): Promise<b
   try {
     const response = await fetchWithTimeout(url, { method: "HEAD" }, 5000);
     return response.ok;
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to check registry file:", err);
     return false;
   }
 }
@@ -180,7 +164,8 @@ export async function fetchRegistryShaderConfig(themeId: string): Promise<Record
     const response = await fetchWithTimeout(url, { cache: "no-store" });
     if (!response.ok) return null;
     return response.json();
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch registry shader config:", err);
     return null;
   }
 }
@@ -201,10 +186,9 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
   const shaderUrl = metadata.hasShaders ? getRegistryFileUrl(themeId, "shader.json") : undefined;
 
   const imageUrls: string[] = [];
-  if (metadata.images && metadata.images.length > 0) {
-    for (const img of metadata.images) {
-      imageUrls.push(`${REGISTRY_BASE}/themes/${themeId}/images/${img}`);
-    }
+  const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
+  for (const img of safeImages) {
+    imageUrls.push(`${THEME_REGISTRY_URL}/themes/${themeId}/images/${img}`);
   }
 
   let coverUrl: string;
@@ -214,7 +198,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     coverUrl = imageUrls[0];
     allImageUrls = imageUrls;
   } else {
-    coverUrl = `${REGISTRY_BASE}/themes/${themeId}/cover.png`;
+    coverUrl = `${THEME_REGISTRY_URL}/themes/${themeId}/cover.png`;
     allImageUrls = [coverUrl];
   }
 
@@ -248,7 +232,10 @@ export async function fetchThemeCSS(repo: string, branchOverride?: string): Prom
   const branch = branchOverride ?? (await getDefaultBranch(repo));
 
   const ricsUrl = getRawGitHubUrl(repo, branch, "style.rics");
-  const ricsResponse = await fetchWithTimeout(ricsUrl, { cache: "no-store" }).catch(() => null);
+  const ricsResponse = await fetchWithTimeout(ricsUrl, { cache: "no-store" }).catch(err => {
+    console.warn(LOG_PREFIX_STORE, "RICS fetch failed, trying CSS:", err);
+    return null;
+  });
 
   if (ricsResponse?.ok) {
     return { css: await ricsResponse.text(), isRics: true };
@@ -268,7 +255,8 @@ async function checkFileExists(url: string): Promise<boolean> {
   try {
     const response = await fetchWithTimeout(url, { method: "HEAD" }, 5000);
     return response.ok;
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "File existence check failed:", err);
     return false;
   }
 }
@@ -287,12 +275,13 @@ export async function fetchThemeShaderConfig(
     const response = await fetchWithTimeout(url, { cache: "no-store" });
     if (!response.ok) return null;
     return response.json();
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch theme shader config:", err);
     return null;
   }
 }
 
-export async function fetchThemeDescription(repo: string, branchOverride?: string): Promise<string | null> {
+async function fetchThemeDescription(repo: string, branchOverride?: string): Promise<string | null> {
   const branch = branchOverride ?? (await getDefaultBranch(repo));
   const url = getRawGitHubUrl(repo, branch, "DESCRIPTION.md");
 
@@ -300,7 +289,8 @@ export async function fetchThemeDescription(repo: string, branchOverride?: strin
     const response = await fetchWithTimeout(url, { cache: "no-store" });
     if (!response.ok) return null;
     return response.text();
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch theme description:", err);
     return null;
   }
 }
@@ -323,10 +313,9 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
   const shaderUrl = metadata.hasShaders ? `${baseUrl}shader.json` : undefined;
 
   const imageUrls: string[] = [];
-  if (metadata.images && metadata.images.length > 0) {
-    for (const img of metadata.images) {
-      imageUrls.push(`${baseUrl}images/${img}`);
-    }
+  const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
+  for (const img of safeImages) {
+    imageUrls.push(`${baseUrl}images/${img}`);
   }
 
   let coverUrl: string;
@@ -351,6 +340,18 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
   };
 }
 
+export async function fetchSingleStoreTheme(themeId: string): Promise<StoreTheme | null> {
+  try {
+    const lockfile = await fetchThemeLockfile();
+    const entry = lockfile.themes.find(e => e.id === themeId);
+    if (!entry) return null;
+    return await fetchFullThemeFromRegistry(entry);
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, `Failed to fetch single store theme ${themeId}:`, err);
+    return null;
+  }
+}
+
 export async function fetchAllStoreThemes(): Promise<StoreTheme[]> {
   const lockfile = await fetchThemeLockfile();
   const themes: StoreTheme[] = [];
@@ -361,7 +362,7 @@ export async function fetchAllStoreThemes(): Promise<StoreTheme[]> {
     if (result.status === "fulfilled") {
       themes.push(result.value);
     } else {
-      console.warn("[ThemeStore] Failed to fetch theme:", result.reason);
+      console.warn(LOG_PREFIX_STORE, "Failed to fetch theme:", result.reason);
     }
   }
 
@@ -381,7 +382,8 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
       errors.push("Missing required file: metadata.json");
       return { valid: false, errors, missingFiles };
     }
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Metadata check failed:", err);
     missingFiles.push("metadata.json");
     errors.push("Missing required file: metadata.json");
     return { valid: false, errors, missingFiles };
@@ -426,7 +428,12 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
     const coverUrl = getRawGitHubUrl(repo, branch, "cover.png");
     const hasCover = await checkFileExists(coverUrl);
     if (!hasCover) {
-      errors.push("Theme must have either cover.png or images in metadata");
+      errors.push("Theme must have either cover.png or images in metadata (png, jpg, gif, webp)");
+    }
+  } else {
+    const invalidImages = metadata.images.filter(f => !ALLOWED_IMAGE_EXTENSIONS.test(f));
+    if (invalidImages.length > 0) {
+      errors.push(`Invalid image format: ${invalidImages.join(", ")} (allowed: png, jpg, gif, webp)`);
     }
   }
 
@@ -437,7 +444,7 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
   };
 }
 
-export interface ParsedGitHubUrl {
+interface ParsedGitHubUrl {
   repo: string;
   branch?: string;
 }

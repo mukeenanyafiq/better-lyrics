@@ -1,6 +1,9 @@
+import { LOG_PREFIX_STORE } from "@constants";
+import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
+  fetchSingleStoreTheme,
   fetchThemeCSS,
   fetchThemeMetadata,
   fetchThemeShaderConfig,
@@ -32,7 +35,7 @@ interface ThemeIndex {
 }
 
 async function getThemeIndex(): Promise<ThemeIndex> {
-  const result = await chrome.storage.local.get(THEME_INDEX_KEY);
+  const result = await getLocalStorage<{ [THEME_INDEX_KEY]?: ThemeIndex }>([THEME_INDEX_KEY]);
   return result[THEME_INDEX_KEY] || { themeIds: [] };
 }
 
@@ -45,12 +48,12 @@ function getThemeStorageKey(themeId: string): string {
 }
 
 async function migrateFromLegacyStorage(): Promise<void> {
-  const result = await chrome.storage.local.get(LEGACY_STORAGE_KEY);
-  const legacyThemes: InstalledStoreTheme[] = result[LEGACY_STORAGE_KEY];
+  const result = await getLocalStorage<{ [LEGACY_STORAGE_KEY]?: InstalledStoreTheme[] }>([LEGACY_STORAGE_KEY]);
+  const legacyThemes = result[LEGACY_STORAGE_KEY];
 
   if (!legacyThemes || legacyThemes.length === 0) return;
 
-  console.log(`[ThemeStoreManager] Migrating ${legacyThemes.length} themes from legacy storage`);
+  console.log(LOG_PREFIX_STORE, `Migrating ${legacyThemes.length} themes from legacy storage`);
 
   const themeIds: string[] = [];
 
@@ -59,14 +62,14 @@ async function migrateFromLegacyStorage(): Promise<void> {
       await chrome.storage.local.set({ [getThemeStorageKey(theme.id)]: theme });
       themeIds.push(theme.id);
     } catch (err) {
-      console.warn(`[ThemeStoreManager] Failed to migrate theme ${theme.id}:`, err);
+      console.warn(LOG_PREFIX_STORE, `Failed to migrate theme ${theme.id}:`, err);
     }
   }
 
   await setThemeIndex({ themeIds });
   await chrome.storage.local.remove(LEGACY_STORAGE_KEY);
 
-  console.log(`[ThemeStoreManager] Migration complete: ${themeIds.length} themes migrated`);
+  console.log(LOG_PREFIX_STORE, `Migration complete: ${themeIds.length} themes migrated`);
 }
 
 let migrationPromise: Promise<void> | null = null;
@@ -85,7 +88,7 @@ export async function getInstalledStoreThemes(): Promise<InstalledStoreTheme[]> 
   if (index.themeIds.length === 0) return [];
 
   const keys = index.themeIds.map(getThemeStorageKey);
-  const result = await chrome.storage.local.get(keys);
+  const result = await getLocalStorage<Record<string, InstalledStoreTheme | undefined>>(keys);
 
   const themes: InstalledStoreTheme[] = [];
   const validIds: string[] = [];
@@ -113,8 +116,9 @@ export async function isThemeInstalled(themeId: string): Promise<boolean> {
 
 export async function getInstalledTheme(themeId: string): Promise<InstalledStoreTheme | null> {
   await ensureMigrated();
-  const result = await chrome.storage.local.get(getThemeStorageKey(themeId));
-  return result[getThemeStorageKey(themeId)] || null;
+  const key = getThemeStorageKey(themeId);
+  const result = await getLocalStorage<Record<string, InstalledStoreTheme | undefined>>([key]);
+  return result[key] || null;
 }
 
 export async function installTheme(theme: StoreTheme, options: InstallOptions = {}): Promise<InstalledStoreTheme> {
@@ -194,7 +198,7 @@ export async function removeTheme(themeId: string): Promise<void> {
 }
 
 export async function getActiveStoreTheme(): Promise<string | null> {
-  const result = await chrome.storage.sync.get(ACTIVE_STORE_THEME_KEY);
+  const result = await getSyncStorage<{ [ACTIVE_STORE_THEME_KEY]?: string }>([ACTIVE_STORE_THEME_KEY]);
   return result[ACTIVE_STORE_THEME_KEY] || null;
 }
 
@@ -218,19 +222,46 @@ export async function applyStoreTheme(themeId: string): Promise<string> {
   return theme.css;
 }
 
-export function parseVersion(version: string): number[] {
+// -- Symlinked Theme Installs --------------------------
+
+export async function installSymlinkedThemeFromMarketplace(storeId: string): Promise<InstalledStoreTheme | null> {
+  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from marketplace: ${storeId}`);
+
+  const existing = await getInstalledTheme(storeId);
+  if (existing) {
+    console.log(LOG_PREFIX_STORE, `Symlinked theme already installed: ${storeId} v${existing.version}`);
+    return existing;
+  }
+
+  try {
+    const storeTheme = await fetchSingleStoreTheme(storeId);
+    if (!storeTheme) {
+      console.warn(LOG_PREFIX_STORE, `Symlinked theme not found in marketplace: ${storeId}`);
+      return null;
+    }
+
+    const installed = await installTheme(storeTheme, { source: "marketplace" });
+    console.log(LOG_PREFIX_STORE, `Installed symlinked theme: ${storeId} v${installed.version}`);
+    return installed;
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
+    return null;
+  }
+}
+
+function parseVersion(version: string): number[] {
   const cleanVersion = version.replace(/-.*$/, "");
   return cleanVersion.split(".").map(part => {
     const num = parseInt(part, 10);
     if (isNaN(num)) {
-      console.warn(`[ThemeStoreManager] Non-numeric version part "${part}" in "${version}", treating as 0`);
+      console.warn(LOG_PREFIX_STORE, `Non-numeric version part "${part}" in "${version}", treating as 0`);
       return 0;
     }
     return num;
   });
 }
 
-export function compareVersions(current: string, required: string): boolean {
+function compareVersions(current: string, required: string): boolean {
   const currentParts = parseVersion(current);
   const requiredParts = parseVersion(required);
 
@@ -251,7 +282,7 @@ export function isVersionCompatible(themeMinVersion: string, extensionVersion: s
   return compareVersions(extensionVersion, themeMinVersion);
 }
 
-export async function checkForThemeUpdates(
+async function checkForThemeUpdates(
   installed: InstalledStoreTheme[],
   storeThemes: StoreTheme[]
 ): Promise<Map<string, StoreTheme>> {
@@ -267,7 +298,7 @@ export async function checkForThemeUpdates(
   return updates;
 }
 
-export async function updateTheme(theme: StoreTheme): Promise<InstalledStoreTheme> {
+async function updateTheme(theme: StoreTheme): Promise<InstalledStoreTheme> {
   return installTheme(theme);
 }
 
@@ -284,14 +315,14 @@ export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<s
     try {
       await updateTheme(storeTheme);
       updatedIds.push(themeId);
-      console.log(`[ThemeStore] Auto-updated theme: ${storeTheme.title} to v${storeTheme.version}`);
+      console.log(LOG_PREFIX_STORE, `Auto-updated theme: ${storeTheme.title} to v${storeTheme.version}`);
 
       if (activeThemeId === themeId) {
         await applyStoreTheme(themeId);
-        console.log(`[ThemeStore] Re-applied active theme after update: ${storeTheme.title}`);
+        console.log(LOG_PREFIX_STORE, `Re-applied active theme after update: ${storeTheme.title}`);
       }
     } catch (err) {
-      console.warn(`[ThemeStore] Failed to auto-update theme ${themeId}:`, err);
+      console.warn(LOG_PREFIX_STORE, `Failed to auto-update theme ${themeId}:`, err);
     }
   }
 
@@ -325,7 +356,7 @@ export async function performUrlThemeUpdates(): Promise<string[]> {
         await applyStoreTheme(theme.id);
       }
     } catch (err) {
-      console.warn(`[ThemeStore] Failed to check/update URL theme ${theme.id}:`, err);
+      console.warn(LOG_PREFIX_STORE, `Failed to check/update URL theme ${theme.id}:`, err);
     }
   }
 
@@ -347,7 +378,7 @@ export async function refreshUrlThemesMetadata(): Promise<number> {
       });
       refreshedCount++;
     } catch (err) {
-      console.warn(`[ThemeStore] Failed to refresh URL theme ${theme.id}:`, err);
+      console.warn(LOG_PREFIX_STORE, `Failed to refresh URL theme ${theme.id}:`, err);
     }
   }
 

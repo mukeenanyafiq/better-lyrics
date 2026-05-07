@@ -3,6 +3,37 @@ import { log, truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
 
+/**
+ * Keys that should NEVER be deleted by clearCache or any bulk delete operation.
+ * These keys contain critical user data that must persist across cache clears.
+ */
+export const PROTECTED_STORAGE_KEYS = [
+  "userIdentity",
+  "identityRegistered",
+  "userThemeRatings",
+  "keyCertificate",
+] as const;
+
+/**
+ * Typed wrapper for chrome.storage.local.get that casts results to expected type.
+ */
+export async function getLocalStorage<T>(keys: string | string[] | null): Promise<T> {
+  return (await chrome.storage.local.get(keys as string[])) as unknown as T;
+}
+
+/**
+ * Typed wrapper for chrome.storage.sync.get that casts results to expected type.
+ */
+export async function getSyncStorage<T>(keys: string | string[] | null): Promise<T> {
+  return (await chrome.storage.sync.get(keys as string[])) as unknown as T;
+}
+
+interface TransientStorageItem {
+  type: "transient";
+  value: any;
+  expiry: number;
+}
+
 const COMPILE_TIMEOUT = 3000;
 const MAX_ITERATIONS = 10000;
 const HARD_TIMEOUT = 5000;
@@ -40,14 +71,17 @@ export function compileRicsToStyles(sourceCode: string): string {
 }
 
 export async function loadChunkedStyles(): Promise<string | null> {
-  const metadata = await chrome.storage.local.get(["customCSS_chunked", "customCSS_chunkCount"]);
+  const metadata = await getLocalStorage<{ customCSS_chunked?: boolean; customCSS_chunkCount?: number }>([
+    "customCSS_chunked",
+    "customCSS_chunkCount",
+  ]);
 
   if (!metadata.customCSS_chunked || !metadata.customCSS_chunkCount) {
     return null;
   }
 
   const chunkKeys = Array.from({ length: metadata.customCSS_chunkCount }, (_, i) => `customCSS_chunk_${i}`);
-  const chunksData = await chrome.storage.local.get(chunkKeys);
+  const chunksData = await getLocalStorage<Record<string, string>>(chunkKeys);
 
   const chunks: string[] = [];
   for (let i = 0; i < metadata.customCSS_chunkCount; i++) {
@@ -85,7 +119,7 @@ export function getStorage(
 export async function getTransientStorage(key: string): Promise<any | null> {
   try {
     const result = await chrome.storage.local.get(key);
-    const item = result[key];
+    const item = result[key] as TransientStorageItem | undefined;
 
     if (!item) return null;
 
@@ -150,7 +184,7 @@ function extractVideoIdFromCacheKey(key: string): string | null {
  *
  * @returns {Promise<{count: number, size: number}>} Cache statistics
  */
-export async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
+async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
   try {
     const result = await chrome.storage.local.get(null);
     const lyricsKeys = Object.keys(result).filter(key => key.startsWith("blyrics_"));
@@ -188,11 +222,15 @@ export async function saveCacheInfo(): Promise<void> {
 
 /**
  * Clears all cached lyrics data from local storage.
+ * Only removes keys with "blyrics_" prefix and explicitly excludes PROTECTED_STORAGE_KEYS.
  */
 export async function clearCache(): Promise<void> {
   try {
     const result = await chrome.storage.local.get(null);
-    const lyricsKeys = Object.keys(result).filter(key => key.startsWith("blyrics_"));
+    const lyricsKeys = Object.keys(result).filter(
+      key =>
+        key.startsWith("blyrics_") && !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
+    );
     await chrome.storage.local.remove(lyricsKeys);
     await saveCacheInfo();
   } catch (error) {
@@ -212,8 +250,8 @@ export async function purgeExpiredKeys(): Promise<void> {
 
     Object.keys(result).forEach(key => {
       if (key.startsWith("blyrics_")) {
-        const { expiryTime } = result[key];
-        if (expiryTime && now >= expiryTime) {
+        const item = result[key] as TransientStorageItem;
+        if (item.expiry && now >= item.expiry) {
           keysToRemove.push(key);
         }
       }
