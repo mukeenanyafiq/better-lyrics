@@ -3,7 +3,7 @@ name: Sync master to feature branches (no conflicts)
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   sync-branches:
