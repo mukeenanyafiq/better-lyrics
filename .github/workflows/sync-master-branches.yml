@@ -1,0 +1,58 @@
+name: Sync master to feature branches (no conflicts)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync main to all feature branches
+        id: sync
+        run: |
+          CONFLICTS_FOUND=0
+          FAILED_BRANCHES=""
+          
+          # Get all branches except master
+          git branch -r | grep -v 'origin/master' | grep -v 'HEAD' | sed 's|origin/||' | while read branch; do
+            echo "Processing: $branch"
+            git checkout $branch 2>/dev/null || continue
+            
+            # Try to merge main
+            if ! git merge origin/master --no-commit --no-ff 2>&1 | grep -q "CONFLICT"; then
+              git commit -m "Sync main into $branch" 2>/dev/null || echo "No changes to commit"
+              git push origin $branch && echo "✓ $branch synced successfully" || echo "✗ Failed to push $branch"
+            else
+              echo "⚠ Merge conflicts detected in $branch - aborting merge"
+              git merge --abort
+              echo "$branch" >> /tmp/failed_branches.txt
+              CONFLICTS_FOUND=1
+            fi
+          done
+          
+          if [ -f /tmp/failed_branches.txt ]; then
+            echo "FAILED_BRANCHES=$(cat /tmp/failed_branches.txt | tr '\n' ', ' | sed 's/,$//')" >> $GITHUB_OUTPUT
+          fi
+          echo "CONFLICTS_FOUND=$CONFLICTS_FOUND" >> $GITHUB_OUTPUT
+
+      - name: Report failures
+        if: steps.sync.outputs.CONFLICTS_FOUND == '1'
+        run: |
+          echo "⚠ Sync failed for branches with conflicts:"
+          echo "${{ steps.sync.outputs.FAILED_BRANCHES }}"
+          echo ""
+          echo "These branches have merge conflicts with main and need manual resolution."
+          exit 1
