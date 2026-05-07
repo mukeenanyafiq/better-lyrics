@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music 가사)",
+    "message": "Better Lyrics (YouTube Music용 가사)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 YouTube Music을 향상시킵니다",
+    "message": "YouTube Music을 아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 향상시킵니다",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -76,16 +76,80 @@
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "전체 화면에서 커서 자동 숨기기",
+    "message": "전체 화면에서 커서 자동으로 숨김",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐린 앨범 아트 배경 표시",
+    "message": "흐릿하게 처리한 앨범 아트를 배경으로 표시",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
     "message": "스타일리시한 애니메이션 표시",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_passiveScroll": {
+    "message": "Auto-scroll unsynced lyrics",
+    "description": "Auto-scroll unsynced lyrics setting label"
+  },
+  "options_display_unisonActions": {
+    "message": "Unison Actions",
+    "description": "Display-section row label for the Unison Actions modal trigger"
+  },
+  "options_unisonModal_title": {
+    "message": "Unison Actions",
+    "description": "Title of the Unison Actions modal"
+  },
+  "options_unisonModal_showPinned": {
+    "message": "Show pinned actions",
+    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+  },
+  "options_unisonModal_showPinned_hint": {
+    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "description": "Hint text under the Show pinned actions toggle"
+  },
+  "options_unisonModal_autoHide": {
+    "message": "Auto-hide in fullscreen",
+    "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
+  },
+  "options_unisonModal_autoHide_hint": {
+    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "description": "Hint text under the Auto-hide in fullscreen toggle"
+  },
+  "options_unisonModal_position": {
+    "message": "Position",
+    "description": "Label above the visual position picker in the Unison Actions modal"
+  },
+  "options_unisonModal_position_topLeft": {
+    "message": "Top left",
+    "description": "Tooltip for the top-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topCenter": {
+    "message": "Top center",
+    "description": "Tooltip for the top-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topRight": {
+    "message": "Top right",
+    "description": "Tooltip for the top-right cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomLeft": {
+    "message": "Bottom left",
+    "description": "Tooltip for the bottom-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomCenter": {
+    "message": "Bottom center",
+    "description": "Tooltip for the bottom-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomRight": {
+    "message": "Bottom right",
+    "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
+  "options_language_displayLanguage": {
+    "message": "표시된 언어",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "자동",
+    "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
     "message": "언어 설정",
@@ -112,7 +176,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
+    "message": "드래그하여 우선순위를 변경합니다. 상위에 위치한 소스를 먼저 불러옵니다. 체크를 해제하면 비활성화됩니다.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
@@ -120,7 +184,7 @@
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Better Lyrics의 외관을 사용자 정의합니다.",
+    "message": "Better Lyrics의 외관을 커스텀합니다.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
@@ -130,6 +194,14 @@
   "options_themes_chooseTheme": {
     "message": "테마 선택",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "변경",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "커스텀 테마",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "사용자 정의 스타일",
@@ -148,15 +220,15 @@
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "신원",
+    "message": "계정",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Better Lyrics를 위한 고유한 익명 신원입니다.",
+    "message": "Better Lyrics용 당신만의 익명 계정.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "내 신원",
+    "message": "나의 계정",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -188,19 +260,19 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "캐시가 성공적으로 지워졌습니다!",
+    "message": "캐시를 성공적으로 지웠습니다!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "캐시 지우기 실패!",
+    "message": "캐시를 지우는데 실패했습니다!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "지울 것이 없습니다!",
+    "message": "삭제할 것이 없습니다!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "신원 내보내기 실패",
+    "message": "계정 내보내기에 실패했습니다",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -208,19 +280,19 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "파일 저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "message": "파일을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "신원 파일 다운로드가 시작되었습니다.",
+    "message": "계정 파일 다운로드를 시작했습니다.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "신원을 성공적으로 가져왔습니다!",
+    "message": "계정을 성공적으로 가져왔습니다!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "신원 로딩 중 오류 발생",
+    "message": "계정 로딩 중에 오류가 발생하였습니다",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
@@ -228,11 +300,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "파일에서 가져오기",
+    "message": "파일 불러오기",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "파일로 내보내기",
+    "message": "파일 내보내기",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -248,11 +320,11 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "전체 편집기 경험을 위해, ",
+    "message": "편집기의 모든 기능을 이용하려면, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "이 편집기를 새 탭에서 여세요",
+    "message": "이 편집기를 새 탭에서 여세요.",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -260,11 +332,11 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "사용자 정의 테마 이름 변경",
+    "message": "커스텀 테마 이름 변경",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "사용자 정의 테마 삭제",
+    "message": "커스텀 테마 삭제",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
@@ -278,6 +350,14 @@
   "options_provider_betterLyricsLegato": {
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_betterLyricsPortato": {
+    "message": "Better Lyrics Portato",
+    "description": "Better Lyrics Portato provider name"
+  },
+  "options_provider_betterLyricsUnison": {
+    "message": "Better Lyrics Unison",
+    "description": "Better Lyrics Unison provider name"
   },
   "options_provider_musixmatch": {
     "message": "Musixmatch",
@@ -295,12 +375,16 @@
     "message": "YouTube 자막",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
   "options_syncType_syllable": {
     "message": "음절",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "노래에 맞춰 개별 음절을 하이라이트합니다. 음절 싱크가 최고의 경험을 제공합니다.",
+    "message": "노래에 맞춰 개별 음절을 강조합니다. 음절 싱크는 최고의 경험을 제공합니다.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +392,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "노래에 맞춰 개별 단어를 하이라이트합니다. 단어 싱크가 좋은 경험을 제공합니다.",
+    "message": "노래에 맞춰 각각의 단어를 강조합니다. 단어 싱크는 좋은 경험을 제공합니다.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -316,7 +400,7 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "노래에 맞춰 전체 줄을 하이라이트합니다. 줄 싱크가 기본적인 경험을 제공합니다.",
+    "message": "노래에 맞춰 전체 줄을 강조합니다. 줄 싱크는 기본적인 경험을 제공합니다.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
@@ -328,7 +412,7 @@
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "이 테마 평가",
+    "message": "이 테마 평가하기",
     "description": "Rate theme label"
   },
   "options_detail_install": {
@@ -360,7 +444,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "커뮤니티 테마를 발견하고 설치하세요",
+    "message": "커뮤니티 테마를 찾고 설치해보세요",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -400,7 +484,7 @@
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "오래된순",
+    "message": "오래된 순",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
@@ -416,7 +500,7 @@
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "미설치",
+    "message": "설치되지 않음",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
@@ -428,7 +512,7 @@
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "호환되는 것만",
+    "message": "호환 가능만 사용",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
@@ -436,7 +520,7 @@
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "테마 제출",
+    "message": "테마 올리기",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -444,23 +528,15 @@
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "재시도",
+    "message": "다시 시도",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
     "message": "필터와 일치하는 테마가 없습니다",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "권한 필요",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "테마를 탐색하고 설치하려면 Better Lyrics가 테마가 호스팅된 GitHub와 마켓플레이스 API에 액세스할 권한이 필요합니다.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
-    "message": "권한 부여",
+    "message": "권한 허용",
     "description": "Grant permission button"
   },
   "marketplace_install": {
@@ -488,11 +564,11 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URL에서 설치",
+    "message": "URL로 설치",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치하세요:",
+    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
@@ -508,7 +584,7 @@
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "추가 권한 필요",
+    "message": "추가 권한이 필요합니다",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
@@ -516,11 +592,11 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "사용자 정의 GitHub URL에서 테마를 설치하려면 마켓플레이스보다 더 넓은 액세스가 필요합니다. 이를 통해 Better Lyrics는:",
+    "message": "커스텀 GitHub URL을 통해 테마를 설치하려면 마켓플레이스보다 넓은 접근권한이 필요합니다. 이를 통해 Better Lyrics는 다음과 같은 작업을 할 수 있습니다:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "모든 GitHub 저장소에서 테마 파일 가져오기",
+    "message": "원하는 GitHub 저장소에서 테마 파일을 가져오기",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -532,7 +608,7 @@
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마는 필요하지 않습니다.",
+    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마에는 필요하지 않습니다.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
@@ -555,20 +631,12 @@
     "message": "URL에서 설치",
     "description": "Install from URL shortcut label"
   },
-  "marketplace_shortcutsPrevPage": {
-    "message": "이전 페이지",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "다음 페이지",
-    "description": "Next page shortcut label"
-  },
   "marketplace_shortcutsSort": {
     "message": "정렬",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "다시 누르면 역순",
+    "message": "한 번 더 누르면 역순으로",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -615,6 +683,10 @@
     "message": "설치 / 제거",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "테마 적용",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "이전 이미지",
     "description": "Previous image shortcut"
@@ -640,11 +712,11 @@
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "평가 제출 실패",
+    "message": "평가을 전송하는데 실패했습니다",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "셰이더 구성 가져오기 실패",
+    "message": "셰이더 설정을 가져오지 못했습니다",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
@@ -656,7 +728,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "$date$ 에 마지막으로 업데이트",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -666,7 +738,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 편집기",
+    "message": "Better Lyrics CSS 에디터",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
@@ -678,7 +750,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "테마 저장하기",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -686,7 +758,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 정보는",
+    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 내용은",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -694,20 +766,16 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "플레이그라운드",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "문서",
     "description": "Docs link text"
   },
   "lyrics_source": {
     "message": "소스: ",
     "description": "Lyrics source label"
-  },
-  "lyrics_addToLrclib": {
-    "message": "LRCLib에 가사 추가",
-    "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
     "message": "Genius에서 검색",
@@ -718,11 +786,11 @@
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "싱크 가사를 계속 검색 중...",
+    "message": "싱크 가사를 검색 중...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics가 싱크 가사를 찾을 수 없습니다",
+    "message": "Better Lyrics에서 싱크 가사를 찾지 못했습니다",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
@@ -734,39 +802,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "언어 제외 옵션",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "관리",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "언어 제외 옵션",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "로마자 표기",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "번역",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "언어 검색...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "토글하려면 클릭하세요. 제외된 언어는 로마자 표기가 되지 않습니다.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "토글하려면 클릭하세요. 제외된 언어는 번역되지 않습니다.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "$TYPE$을 기본값으로 재설정",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -776,7 +844,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "$TYPE$을 제외하고 재설정",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -786,19 +854,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "이렇게 하면 제외된 모든 언어가 지워집니다. 계속하시겠어요?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "초기화",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "취소",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$를 제외한 항목이 기본값으로 재설정되었습니다",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
@@ -806,5 +874,415 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "적용된 테마: $NAME$ (마켓플레이스)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "적용된 테마: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "by $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "by You",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "테마를 설치할 수 없습니다. 연결을 확인한 후 다시 시도하세요.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "마켓플레이스",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "내장됨",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "주의, 이 테마는 움직입니다!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "내장된 테마를 테마 마켓플레이스로 마이그레이션하고 있습니다. 이미 일부는 마켓플레이스 배지를 찾고 있습니다. 나머지는 향후 업데이트에서 GitHub와 Discord에서 CSS 백업을 통해 제공될 예정입니다.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "마켓플레이스 탐색",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "내장 테마",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "커스텀 테마",
+    "description": "Section title for custom themes in the theme chooser modal"
+  },
+  "lyrics_submitToUnison": {
+    "message": "Submit lyrics with Unison",
+    "description": "Button text for submitting lyrics to Unison"
+  },
+  "unison_pageTitle": {
+    "message": "Unison - Better Lyrics",
+    "description": "Page title for the Unison dashboard"
+  },
+  "unison_title": {
+    "message": "Unison",
+    "description": "Unison branding title"
+  },
+  "unison_subtitle": {
+    "message": "Community Lyrics",
+    "description": "Unison subtitle text"
+  },
+  "unison_search": {
+    "message": "Search lyrics",
+    "description": "Search button label"
+  },
+  "unison_searchPlaceholder": {
+    "message": "Search songs, artists, or lyrics...",
+    "description": "Search input placeholder"
+  },
+  "unison_submit": {
+    "message": "Submit Lyrics",
+    "description": "Submit lyrics button text"
+  },
+  "unison_submitSuccess": {
+    "message": "Lyrics submitted!",
+    "description": "Success message after submitting lyrics"
+  },
+  "unison_submitDescription": {
+    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "description": "Description text for the submission form"
+  },
+  "unison_composerHintPrefix": {
+    "message": "Use",
+    "description": "Text before Composer link in submit hint"
+  },
+  "unison_composerHintSuffix": {
+    "message": "to create word-synced lyrics from scratch.",
+    "description": "Text after Composer link in submit hint"
+  },
+  "unison_upvote": {
+    "message": "Upvote",
+    "description": "Upvote button tooltip"
+  },
+  "unison_downvote": {
+    "message": "Downvote",
+    "description": "Downvote button tooltip"
+  },
+  "unison_report": {
+    "message": "Report",
+    "description": "Report button tooltip"
+  },
+  "unison_reportSuccess": {
+    "message": "Reported",
+    "description": "Report success tooltip text"
+  },
+  "unison_report_wrong_song": {
+    "message": "Wrong song",
+    "description": "Report reason: wrong song"
+  },
+  "unison_report_bad_sync": {
+    "message": "Bad sync",
+    "description": "Report reason: bad synchronization"
+  },
+  "unison_report_offensive": {
+    "message": "Offensive",
+    "description": "Report reason: offensive content"
+  },
+  "unison_report_spam": {
+    "message": "Spam",
+    "description": "Report reason: spam"
+  },
+  "unison_report_other": {
+    "message": "Other",
+    "description": "Report reason: other"
+  },
+  "unison_confidence_low": {
+    "message": "Low Confidence",
+    "description": "Low confidence indicator"
+  },
+  "unison_confidence_medium": {
+    "message": "Medium Confidence",
+    "description": "Medium confidence indicator"
+  },
+  "unison_confidence_high": {
+    "message": "High Confidence",
+    "description": "High confidence indicator"
+  },
+  "unison_format_lrc": {
+    "message": "LRC",
+    "description": "LRC format badge"
+  },
+  "unison_format_ttml": {
+    "message": "TTML",
+    "description": "TTML format badge"
+  },
+  "unison_format_plain": {
+    "message": "Plain",
+    "description": "Plain text format badge"
+  },
+  "unison_autoDetect": {
+    "message": "Auto-detect",
+    "description": "Auto-detect format option"
+  },
+  "unison_noResults": {
+    "message": "No lyrics found. Try a different search.",
+    "description": "No search results message"
+  },
+  "unison_interactingAs": {
+    "message": "Interacting as",
+    "description": "Identity label prefix"
+  },
+  "unison_loadMore": {
+    "message": "Load more",
+    "description": "Load more button for feed pagination"
+  },
+  "unison_votes": {
+    "message": "votes",
+    "description": "Vote count label"
+  },
+  "unison_createInComposer": {
+    "message": "Create synced lyrics",
+    "description": "Create in Composer link text in dashboard"
+  },
+  "unison_song": {
+    "message": "Song",
+    "description": "Song field label"
+  },
+  "unison_artist": {
+    "message": "Artist",
+    "description": "Artist field label"
+  },
+  "unison_album": {
+    "message": "Album",
+    "description": "Album field label"
+  },
+  "unison_duration": {
+    "message": "Duration",
+    "description": "Duration field label"
+  },
+  "unison_videoId": {
+    "message": "Video ID",
+    "description": "Video ID field label"
+  },
+  "unison_lyrics": {
+    "message": "Lyrics",
+    "description": "Lyrics textarea label"
+  },
+  "unison_format": {
+    "message": "Format",
+    "description": "Format selector label"
+  },
+  "unison_openInYTMusic": {
+    "message": "Open in YouTube Music",
+    "description": "Link text to open song in YouTube Music"
+  },
+  "unison_back": {
+    "message": "Back",
+    "description": "Back button text in detail view"
+  },
+  "unison_noPreview": {
+    "message": "Paste or drop lyrics to see a preview",
+    "description": "Empty state text shown in submit preview before lyrics are entered"
+  },
+  "unison_preview": {
+    "message": "Preview",
+    "description": "Column title for parsed lyrics preview in detail view"
+  },
+  "unison_rawLyrics": {
+    "message": "Raw Lyrics",
+    "description": "Column title for raw lyrics source in detail view"
+  },
+  "unison_isrc": {
+    "message": "ISRC",
+    "description": "ISRC field label"
+  },
+  "unison_placeholder_song": {
+    "message": "e.g. Bohemian Rhapsody",
+    "description": "Placeholder for song input"
+  },
+  "unison_placeholder_artist": {
+    "message": "e.g. Queen",
+    "description": "Placeholder for artist input"
+  },
+  "unison_placeholder_album": {
+    "message": "e.g. A Night at the Opera",
+    "description": "Placeholder for album input"
+  },
+  "unison_placeholder_duration": {
+    "message": "e.g. 354",
+    "description": "Placeholder for duration input"
+  },
+  "unison_placeholder_videoId": {
+    "message": "e.g. dQw4w9WgXcQ",
+    "description": "Placeholder for video ID input"
+  },
+  "unison_placeholder_isrc": {
+    "message": "e.g. GBAYE0601498",
+    "description": "Placeholder for ISRC input"
+  },
+  "unison_placeholder_lyrics": {
+    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "description": "Placeholder for lyrics textarea"
+  },
+  "unison_durationHint": {
+    "message": "Song length in seconds",
+    "description": "Hint text below duration field label"
+  },
+  "unison_videoIdHint": {
+    "message": "11-character ID from the YouTube Music URL",
+    "description": "Hint text below video ID field label"
+  },
+  "unison_formatHint": {
+    "message": "Auto-detected from lyrics content",
+    "description": "Hint text below format field label"
+  },
+  "unison_isrcHintPrefix": {
+    "message": "Find it using an",
+    "description": "Text before ISRC finder link"
+  },
+  "unison_isrcHintLinkText": {
+    "message": "ISRC lookup tool",
+    "description": "Link text for ISRC finder"
+  },
+  "unison_tabFeed": {
+    "message": "Feed",
+    "description": "Feed tab label for recent submissions"
+  },
+  "unison_tabMySubmissions": {
+    "message": "My Submissions",
+    "description": "Feed tab label for user's own submissions"
+  },
+  "unison_noSubmissions": {
+    "message": "You haven't submitted any lyrics yet.",
+    "description": "Empty state for my submissions tab"
+  },
+  "unison_sync": {
+    "message": "Sync",
+    "description": "Sync type label in detail view"
+  },
+  "unison_language": {
+    "message": "Language",
+    "description": "Language label in detail view"
+  },
+  "unison_validationRequired": {
+    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "description": "Validation error when required fields are missing"
+  },
+  "unison_submitFailed": {
+    "message": "Submission failed",
+    "description": "Fallback error message when submission fails"
+  },
+  "report_lyrics_title": {
+    "message": "Report Lyrics",
+    "description": "Title for the report lyrics modal"
+  },
+  "report_lyrics_info": {
+    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "description": "Information about using the report lyrics modal"
+  },
+  "report_lyrics_wrong_song": {
+    "message": "Wrong song or version",
+    "description": "Reason for the report that the lyrics are for the wrong song or version"
+  },
+  "report_lyrics_bad_sync": {
+    "message": "Bad synchronization",
+    "description": "Reason for the report that the lyrics are too off on the part synchronization"
+  },
+  "report_lyrics_offensive": {
+    "message": "Offensive",
+    "description": "Reason for the report that the lyrics are offensive or too offensive"
+  },
+  "report_lyrics_spam": {
+    "message": "Spam or lyrics are irrelevant to the song",
+    "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
+  },
+  "report_lyrics_other": {
+    "message": "Other reason",
+    "description": "Reason for the report that the lyrics is bad in other reasons"
+  },
+  "report_lyrics_details_placeholder": {
+    "message": "Additional details about this report",
+    "description": "Placeholder for report lyrics details input"
+  },
+  "report_lyrics_submit": {
+    "message": "Submit",
+    "description": "Submit button for reporting lyrics"
+  },
+  "report_lyrics_cancel": {
+    "message": "Cancel",
+    "description": "Cancel button for reporting lyrics"
+  },
+  "report_lyrics_reporting": {
+    "message": "Reporting lyrics...",
+    "description": "Report lyrics on a reporting process"
+  },
+  "report_lyrics_success": {
+    "message": "Thanks for the heads up! We'll take a look soon.",
+    "description": "Shown after a lyrics report is successfully submitted"
+  },
+  "report_lyrics_already": {
+    "message": "We've got this one already. Thanks though!",
+    "description": "Shown when the user tries to report the same lyrics twice"
+  },
+  "report_lyrics_error": {
+    "message": "That didn't go through. Mind trying again?",
+    "description": "Shown when a lyrics report fails to submit"
+  },
+  "unison_tier_new": {
+    "message": "new",
+    "description": "Trust tier badge for low-reputation Unison submitters"
+  },
+  "unison_tier_trusted": {
+    "message": "trusted",
+    "description": "Trust tier badge for mid-reputation Unison submitters"
+  },
+  "unison_tier_veteran": {
+    "message": "veteran",
+    "description": "Trust tier badge for high-reputation Unison submitters"
+  },
+  "unison_tier_expert": {
+    "message": "expert",
+    "description": "Trust tier badge for top-reputation Unison submitters"
+  },
+  "unison_submitted_this": {
+    "message": "submitted this lyric",
+    "description": "Sub-label under the submitter name in the Unison footer card"
+  },
+  "unison_score_label": {
+    "message": "score",
+    "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
+  },
+  "unison_vote_singular": {
+    "message": "vote",
+    "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
+  },
+  "unison_vote_plural": {
+    "message": "votes",
+    "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }

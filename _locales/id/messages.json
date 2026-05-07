@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Meningkatkan YouTube Music dengan lirik indah tersinkronisasi waktu, mendukung multibahasa, terjemahan cepat dan lainnya",
+    "message": "Meningkatkan YouTube Music dengan lirik indah real-time, mendukung multibahasa, terjemahan cepat dan lainnya",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -87,6 +87,70 @@
     "message": "Tampilkan animasi bergaya",
     "description": "Show stylized animations setting label"
   },
+  "options_display_passiveScroll": {
+    "message": "Gulir otomatis lirik taksinkron",
+    "description": "Auto-scroll unsynced lyrics setting label"
+  },
+  "options_display_unisonActions": {
+    "message": "Tindakan Unison",
+    "description": "Display-section row label for the Unison Actions modal trigger"
+  },
+  "options_unisonModal_title": {
+    "message": "Tindakan Unison",
+    "description": "Title of the Unison Actions modal"
+  },
+  "options_unisonModal_showPinned": {
+    "message": "Tampilkan tindakan yang disematkan",
+    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+  },
+  "options_unisonModal_showPinned_hint": {
+    "message": "Tombol mengambang untuk memberikan suara setuju, tidak setuju, atau melaporkan lirik Unison",
+    "description": "Hint text under the Show pinned actions toggle"
+  },
+  "options_unisonModal_autoHide": {
+    "message": "Sembunyikan otomatis saat layar penuh",
+    "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
+  },
+  "options_unisonModal_autoHide_hint": {
+    "message": "Sembunyikan kontrol mengambang saat tidak aktif dalam mode layar penuh",
+    "description": "Hint text under the Auto-hide in fullscreen toggle"
+  },
+  "options_unisonModal_position": {
+    "message": "Posisi",
+    "description": "Label above the visual position picker in the Unison Actions modal"
+  },
+  "options_unisonModal_position_topLeft": {
+    "message": "Atas kiri",
+    "description": "Tooltip for the top-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topCenter": {
+    "message": "Atas tengah",
+    "description": "Tooltip for the top-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topRight": {
+    "message": "Atas kanan",
+    "description": "Tooltip for the top-right cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomLeft": {
+    "message": "Bawah kiri",
+    "description": "Tooltip for the bottom-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomCenter": {
+    "message": "Bawah tengah",
+    "description": "Tooltip for the bottom-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomRight": {
+    "message": "Bawah kanan",
+    "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
+  "options_language_displayLanguage": {
+    "message": "Bahasa Tampilan",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Otomatis",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
   "options_language_title": {
     "message": "Pengaturan Bahasa",
     "description": "Language settings section title"
@@ -131,6 +195,14 @@
     "message": "Pilih tema",
     "description": "Choose a theme button label"
   },
+  "options_themes_change": {
+    "message": "Ubah",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Tema Kustom",
+    "description": "Display name for unnamed custom themes"
+  },
   "options_themes_customStyles": {
     "message": "Gaya Kustom",
     "description": "Custom styles label"
@@ -156,7 +228,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Identitas Anda",
+    "message": "Identitas Kamu",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -188,7 +260,7 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache berhasil dikosongkan!",
+    "message": "Cache berhasil dibersihkan!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
@@ -196,7 +268,7 @@
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Tidak ada yang dibersihkan!",
+    "message": "Tidak ada yang perlu dibersihkan!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -204,15 +276,15 @@
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Simpan file identitas dialog terbuka.",
+    "message": "Dialog penyimpanan file identitas dibuka.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Gagal menyimpan file. Coba lagi.",
+    "message": "Gagal menyimpan file. Silakan coba lagi.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Unduh file identitas dimulai.",
+    "message": "Pengunduhan file identitas dimulai.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
@@ -248,11 +320,11 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Untuk pengalaman editor penuh, ",
+    "message": "Untuk pengalaman editor yang maksimal, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "buka editor ini di tab baru",
+    "message": "buka editor di tab baru",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -260,7 +332,7 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Namai ulang tema kustom",
+    "message": "Ubah nama tema kustom",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
@@ -279,12 +351,20 @@
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
+  "options_provider_betterLyricsPortato": {
+    "message": "Better Lyrics Portato",
+    "description": "Better Lyrics Portato provider name"
+  },
+  "options_provider_betterLyricsUnison": {
+    "message": "Better Lyrics Unison",
+    "description": "Better Lyrics Unison provider name"
+  },
   "options_provider_musixmatch": {
     "message": "Musixmatch",
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
-    "message": "LRCLIB",
+    "message": "LRClib",
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
@@ -292,15 +372,19 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "Subtitel YouTube",
     "description": "Youtube Captions provider name"
+  },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
     "message": "Sukukata",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Menyoroti individual suku kata secara langsung. Sinkron sukukata memberikan pengalaman terbaik.",
+    "message": "Menyorot tiap suku kata saat dinyanyikan. Sinkronisasi suku kata memberikan pengalaman terbaik.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +392,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Menyoroti individual kata secara langsung. Sinkron kata memberikan pengalaman baik.",
+    "message": "Menyorot setiap kata saat dinyanyikan. Sinkronisasi kata memberikan pengalaman yang baik.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -324,7 +408,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lirik tanpa informasi waktu. Lirik tak disinkron memberikan pengalaman minimal.",
+    "message": "Lirik tanpa informasi waktu. Lirik taksinkron memberikan pengalaman minimal.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
@@ -348,11 +432,11 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "dan impor filenya",
+    "message": "lalu impor ke",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Toko Tema",
+    "message": "Toko Tema Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
@@ -376,7 +460,7 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Urutkan dari",
+    "message": "Urut berdasarkan",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
@@ -420,7 +504,7 @@
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Pilihan",
+    "message": "Opsi",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
@@ -436,7 +520,7 @@
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Kirim tema",
+    "message": "Unggah tema",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -448,16 +532,8 @@
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Tidak ada tema yang cocok dengan filter",
+    "message": "Tidak ada tema yang cocok dengan filtermu",
     "description": "Empty state message"
-  },
-  "marketplace_permissionTitle": {
-    "message": "Izin Diperlukan",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Untuk menelusuri dan memasang tema, Better Lyrics memerlukan izin untuk mengakses GitHub dimana tema di simpan & API marketplace.",
-    "description": "Permission required message"
   },
   "marketplace_grantPermission": {
     "message": "Berikan Izin",
@@ -516,11 +592,11 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Memasang tema dari GitHub membutuhkan akses lebih luas daripada toko. Ini mengizinkan Better Lyrics untuk:",
+    "message": "Memasang tema dari URL GitHub kustom memerlukan akses yang lebih luas dibandingkan marketplace. Hal ini memungkinkan Better Lyrics untuk:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Ambil file tema dari repositori GitHub",
+    "message": "Mengambil file tema dari repositori GitHub",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -555,20 +631,12 @@
     "message": "Pasang dari URL",
     "description": "Install from URL shortcut label"
   },
-  "marketplace_shortcutsPrevPage": {
-    "message": "Halaman sebelumnya",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "Halaman berikutnya",
-    "description": "Next page shortcut label"
-  },
   "marketplace_shortcutsSort": {
     "message": "Urut",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "tekan lagi untuk alihkan arah",
+    "message": "tekan lagi untuk alihkan arah urutan",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -576,11 +644,11 @@
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "Berdasar unduhan",
+    "message": "Berdasarkan unduhan",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "Berdasar tanggal",
+    "message": "Berdasarkan tanggal",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
@@ -615,6 +683,10 @@
     "message": "Pasang / Hapus",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Terapkan tema",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Gambar sebelumnya",
     "description": "Previous image shortcut"
@@ -636,7 +708,7 @@
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Terapkan tema (setelah pemasangan)",
+    "message": "Terapkan tema (setelah dipasang)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
@@ -666,7 +738,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Editor CSS",
+    "message": "Editor Gaya Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
@@ -682,15 +754,15 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Panduan penataan gaya",
+    "message": "Panduan gaya",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: Ini adalah tab tersendiri, kamu bisa memindahkan editor ini ke jendela terpisah atau menggunakan layar terpisah di samping YouTube Music untuk melihat perubahanmu secara langsung. Untuk info lebih lanjut, kunjungi",
+    "message": "Tips: Ini adalah tab mandiri. Anda dapat memindahkan editor ini ke jendela terpisah atau menggunakan tampilan layar terbagi bersama YouTube Music untuk melihat perubahan secara real-time. Untuk info lebih lanjut, kunjungi",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Diberdayakan oleh",
+    "message": "Diberdaya oleh",
     "description": "Powered by label"
   },
   "editor_playground": {
@@ -705,10 +777,6 @@
     "message": "Sumber: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Tambahkan Lirik ke LRCLIB",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Cari di Genius",
     "description": "Search on Genius button text"
@@ -722,15 +790,15 @@
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics tidak bisa mencari lirik tersinkron",
+    "message": "Better Lyrics tidak menemukan lirik tersinkron",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[tutututu tutututu]",
+    "message": "[lalalalala.....]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Tidak ketemu lirik untuk lagu ini",
+    "message": "Lirik lagu ini nggak ketemu",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
@@ -758,7 +826,7 @@
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Klik untuk dialihkan. Bahasa yang dikecualikan tidak akan diromanisasi.",
+    "message": "Klik untuk alihkan. Bahasa yang dikecualikan tidak akan diromanisasi.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
@@ -766,7 +834,7 @@
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Atur ulang $TYPE$ ke Bawaan",
+    "message": "Atur ulang $TYPE$ ke default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -806,5 +874,415 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "Tema yang dipakai: $NAME$ (Toko)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Tema yang dipakai: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "oleh $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "oleh Kamu",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Tidak dapat mengunduh tema. Coba cek koneksimu dan coba lagi.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Toko",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Sepaket",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Siap siap, tema tema ini bakalan pindah!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "Kami akan memindahkan tema-tema bawaan ini ke Toko Tema. Sudah ada beberapa, lihat yang ada lencana Toko. Sisanya bakalan ikutan di pembaruan selanjutnya, dengan cadangan CSS di GitHub dan Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Jelajahi Toko",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Tema Bawaan",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Tema Kustom",
+    "description": "Section title for custom themes in the theme chooser modal"
+  },
+  "lyrics_submitToUnison": {
+    "message": "Kirim lirik lewat Unison",
+    "description": "Button text for submitting lyrics to Unison"
+  },
+  "unison_pageTitle": {
+    "message": "Unison - Better Lyrics",
+    "description": "Page title for the Unison dashboard"
+  },
+  "unison_title": {
+    "message": "Unison",
+    "description": "Unison branding title"
+  },
+  "unison_subtitle": {
+    "message": "Lirik Komunitas",
+    "description": "Unison subtitle text"
+  },
+  "unison_search": {
+    "message": "Cari lirik",
+    "description": "Search button label"
+  },
+  "unison_searchPlaceholder": {
+    "message": "Cari lagu, artis, atau lirik...",
+    "description": "Search input placeholder"
+  },
+  "unison_submit": {
+    "message": "Kirim Lirik",
+    "description": "Submit lyrics button text"
+  },
+  "unison_submitSuccess": {
+    "message": "Lirik terkirim!",
+    "description": "Success message after submitting lyrics"
+  },
+  "unison_submitDescription": {
+    "message": "Kirim lirik komunitas untuk lagu dari YouTube Musik. Tempelkan LRC (diberi cap waktu), TTML (XML), atau teks biasa. Format tersinkron di prioritaskan.",
+    "description": "Description text for the submission form"
+  },
+  "unison_composerHintPrefix": {
+    "message": "Gunakan",
+    "description": "Text before Composer link in submit hint"
+  },
+  "unison_composerHintSuffix": {
+    "message": "untuk membuat lirik tersinkron kata dari awal.",
+    "description": "Text after Composer link in submit hint"
+  },
+  "unison_upvote": {
+    "message": "Upvote",
+    "description": "Upvote button tooltip"
+  },
+  "unison_downvote": {
+    "message": "Downvote",
+    "description": "Downvote button tooltip"
+  },
+  "unison_report": {
+    "message": "Laporkan",
+    "description": "Report button tooltip"
+  },
+  "unison_reportSuccess": {
+    "message": "Terlaporkan",
+    "description": "Report success tooltip text"
+  },
+  "unison_report_wrong_song": {
+    "message": "Salah lagu",
+    "description": "Report reason: wrong song"
+  },
+  "unison_report_bad_sync": {
+    "message": "Sinkron buruk",
+    "description": "Report reason: bad synchronization"
+  },
+  "unison_report_offensive": {
+    "message": "Menyinggung",
+    "description": "Report reason: offensive content"
+  },
+  "unison_report_spam": {
+    "message": "Spam",
+    "description": "Report reason: spam"
+  },
+  "unison_report_other": {
+    "message": "Lainnya",
+    "description": "Report reason: other"
+  },
+  "unison_confidence_low": {
+    "message": "Kepercayaan Rendah",
+    "description": "Low confidence indicator"
+  },
+  "unison_confidence_medium": {
+    "message": "Kepercayaan Sedang",
+    "description": "Medium confidence indicator"
+  },
+  "unison_confidence_high": {
+    "message": "Kepercayaan Tinggi",
+    "description": "High confidence indicator"
+  },
+  "unison_format_lrc": {
+    "message": "LRC",
+    "description": "LRC format badge"
+  },
+  "unison_format_ttml": {
+    "message": "TTML",
+    "description": "TTML format badge"
+  },
+  "unison_format_plain": {
+    "message": "Biasa",
+    "description": "Plain text format badge"
+  },
+  "unison_autoDetect": {
+    "message": "Deteksi otomatis",
+    "description": "Auto-detect format option"
+  },
+  "unison_noResults": {
+    "message": "Tidak menemukan lirik. Coba cari yang lain.",
+    "description": "No search results message"
+  },
+  "unison_interactingAs": {
+    "message": "Berinteraksi sebagai",
+    "description": "Identity label prefix"
+  },
+  "unison_loadMore": {
+    "message": "Muat lebih banyak",
+    "description": "Load more button for feed pagination"
+  },
+  "unison_votes": {
+    "message": "suara",
+    "description": "Vote count label"
+  },
+  "unison_createInComposer": {
+    "message": "Buat lirik tersinkron",
+    "description": "Create in Composer link text in dashboard"
+  },
+  "unison_song": {
+    "message": "Lagu",
+    "description": "Song field label"
+  },
+  "unison_artist": {
+    "message": "Artis",
+    "description": "Artist field label"
+  },
+  "unison_album": {
+    "message": "Album",
+    "description": "Album field label"
+  },
+  "unison_duration": {
+    "message": "Durasi",
+    "description": "Duration field label"
+  },
+  "unison_videoId": {
+    "message": "ID Video",
+    "description": "Video ID field label"
+  },
+  "unison_lyrics": {
+    "message": "Lirik",
+    "description": "Lyrics textarea label"
+  },
+  "unison_format": {
+    "message": "Format",
+    "description": "Format selector label"
+  },
+  "unison_openInYTMusic": {
+    "message": "Buka di YouTube Musik",
+    "description": "Link text to open song in YouTube Music"
+  },
+  "unison_back": {
+    "message": "Kembali",
+    "description": "Back button text in detail view"
+  },
+  "unison_noPreview": {
+    "message": "Tempelkan atau taruh lirik untuk melihat pratinjau",
+    "description": "Empty state text shown in submit preview before lyrics are entered"
+  },
+  "unison_preview": {
+    "message": "Pratinjau",
+    "description": "Column title for parsed lyrics preview in detail view"
+  },
+  "unison_rawLyrics": {
+    "message": "Lirik Mentah",
+    "description": "Column title for raw lyrics source in detail view"
+  },
+  "unison_isrc": {
+    "message": "ISRC",
+    "description": "ISRC field label"
+  },
+  "unison_placeholder_song": {
+    "message": "contoh: Bohemian Rhapsody",
+    "description": "Placeholder for song input"
+  },
+  "unison_placeholder_artist": {
+    "message": "contoh: Queen",
+    "description": "Placeholder for artist input"
+  },
+  "unison_placeholder_album": {
+    "message": "contoh: A Night at the Opera",
+    "description": "Placeholder for album input"
+  },
+  "unison_placeholder_duration": {
+    "message": "contoh: 354",
+    "description": "Placeholder for duration input"
+  },
+  "unison_placeholder_videoId": {
+    "message": "contoh: dQw4w9WgXcQ",
+    "description": "Placeholder for video ID input"
+  },
+  "unison_placeholder_isrc": {
+    "message": "contoh: GBAYE0601498",
+    "description": "Placeholder for ISRC input"
+  },
+  "unison_placeholder_lyrics": {
+    "message": "Tempelkan lirik LRC, TTML, atau teks biasa disini. Kamu juga bisa tarik & taruh file.",
+    "description": "Placeholder for lyrics textarea"
+  },
+  "unison_durationHint": {
+    "message": "Durasi lagu dalam detik",
+    "description": "Hint text below duration field label"
+  },
+  "unison_videoIdHint": {
+    "message": "ID 11 karakter dari URL YouTube Musik",
+    "description": "Hint text below video ID field label"
+  },
+  "unison_formatHint": {
+    "message": "Terdeteksi otomatis dari isi lirik",
+    "description": "Hint text below format field label"
+  },
+  "unison_isrcHintPrefix": {
+    "message": "Cari melalui",
+    "description": "Text before ISRC finder link"
+  },
+  "unison_isrcHintLinkText": {
+    "message": "alat pencari ISRC",
+    "description": "Link text for ISRC finder"
+  },
+  "unison_tabFeed": {
+    "message": "Feed",
+    "description": "Feed tab label for recent submissions"
+  },
+  "unison_tabMySubmissions": {
+    "message": "Kiriman Milikku",
+    "description": "Feed tab label for user's own submissions"
+  },
+  "unison_noSubmissions": {
+    "message": "Kamu belum mengirim lirik apapun.",
+    "description": "Empty state for my submissions tab"
+  },
+  "unison_sync": {
+    "message": "Sinkron",
+    "description": "Sync type label in detail view"
+  },
+  "unison_language": {
+    "message": "Bahasa",
+    "description": "Language label in detail view"
+  },
+  "unison_validationRequired": {
+    "message": "Mohon di isi nama lagu, artis, ID video, dan lirik.",
+    "description": "Validation error when required fields are missing"
+  },
+  "unison_submitFailed": {
+    "message": "Kiriman gagal",
+    "description": "Fallback error message when submission fails"
+  },
+  "report_lyrics_title": {
+    "message": "Laporkan Lirik",
+    "description": "Title for the report lyrics modal"
+  },
+  "report_lyrics_info": {
+    "message": "Masukkan alasan kenapa lirik untuk lagu ini tidak cocok",
+    "description": "Information about using the report lyrics modal"
+  },
+  "report_lyrics_wrong_song": {
+    "message": "Salah lagu atau versi",
+    "description": "Reason for the report that the lyrics are for the wrong song or version"
+  },
+  "report_lyrics_bad_sync": {
+    "message": "Sinkronisasi buruk",
+    "description": "Reason for the report that the lyrics are too off on the part synchronization"
+  },
+  "report_lyrics_offensive": {
+    "message": "Menyinggung",
+    "description": "Reason for the report that the lyrics are offensive or too offensive"
+  },
+  "report_lyrics_spam": {
+    "message": "Spam atau lirik tidak relevan dengan lagunya",
+    "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
+  },
+  "report_lyrics_other": {
+    "message": "Alasan lain",
+    "description": "Reason for the report that the lyrics is bad in other reasons"
+  },
+  "report_lyrics_details_placeholder": {
+    "message": "Detail tambahan tentang laporan ini",
+    "description": "Placeholder for report lyrics details input"
+  },
+  "report_lyrics_submit": {
+    "message": "Kirim",
+    "description": "Submit button for reporting lyrics"
+  },
+  "report_lyrics_cancel": {
+    "message": "Batal",
+    "description": "Cancel button for reporting lyrics"
+  },
+  "report_lyrics_reporting": {
+    "message": "Melaporkan lirik...",
+    "description": "Report lyrics on a reporting process"
+  },
+  "report_lyrics_success": {
+    "message": "Terima kasih untuk laporannya! Akan kami lihat secepat mungkin.",
+    "description": "Shown after a lyrics report is successfully submitted"
+  },
+  "report_lyrics_already": {
+    "message": "Kami sudah dapat laporanmu, tapi terima kasih!",
+    "description": "Shown when the user tries to report the same lyrics twice"
+  },
+  "report_lyrics_error": {
+    "message": "Sepertinya nggak sampai. Boleh coba lagi?",
+    "description": "Shown when a lyrics report fails to submit"
+  },
+  "unison_tier_new": {
+    "message": "baru",
+    "description": "Trust tier badge for low-reputation Unison submitters"
+  },
+  "unison_tier_trusted": {
+    "message": "terpercaya",
+    "description": "Trust tier badge for mid-reputation Unison submitters"
+  },
+  "unison_tier_veteran": {
+    "message": "veteran",
+    "description": "Trust tier badge for high-reputation Unison submitters"
+  },
+  "unison_tier_expert": {
+    "message": "ahli",
+    "description": "Trust tier badge for top-reputation Unison submitters"
+  },
+  "unison_submitted_this": {
+    "message": "mengirim lirik ini",
+    "description": "Sub-label under the submitter name in the Unison footer card"
+  },
+  "unison_score_label": {
+    "message": "skor",
+    "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
+  },
+  "unison_vote_singular": {
+    "message": "suara",
+    "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
+  },
+  "unison_vote_plural": {
+    "message": "suara",
+    "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }

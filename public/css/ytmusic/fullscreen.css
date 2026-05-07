@@ -36,13 +36,7 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not
 > [slot="player-page"]
 .tab-header-container {
   display: none !important;
-}
-
-ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
-> [slot="player-page"]
-#side-panel {
-  transform: translateY(-7.5rem);
-}
+} 
 
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] .content.ytmusic-player-page {
   padding: 0 var(--ytmusic-player-page-horizontal-padding) 0;
@@ -208,4 +202,19 @@ ytmusic-player-bar[player-fullscreened]:not([blyrics-dfs]) #play-pause-button>.y
 ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"] {
   animation: none !important;
   width: 100%;
+}
+
+/* Top-anchored Unison dock: tab header is hidden in fullscreen, so no 48px buffer needed */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="top-"] {
+  top: 16px;
+}
+
+/* Pin bottom-anchored dock above the player bar always, avoids hover/wake-zone chase loop */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -24px);
+}
+
+/* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */
+#layout[player-fullscreened]:not([blyrics-dfs]) #side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-unison-dock[data-position="top-center"] {
+  --dock-y-shift: 52px;
 }
