@@ -1,9 +1,33 @@
 import { MODAL_CLASS, MODAL_OVERLAY_CLASS, REPORT_MODAL } from "@/core/constants";
-import { report, UnisonReportReason } from "../lyrics/providers/unison";
 import { t } from "@/core/i18n";
+import { report, UnisonReportReason } from "../lyrics/providers/unison";
 
-let modalInitiated: boolean = false;
 let selected: string | null = null;
+let isClosing = false;
+let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+
+const ANIM_DURATION = 200;
+const ANIM_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+const OVERLAY_KEYFRAMES: Keyframe[] = [{ opacity: 0 }, { opacity: 1 }];
+const MODAL_KEYFRAMES: Keyframe[] = [
+  { opacity: 0, transform: "scale(0.95) translateY(16px)" },
+  { opacity: 1, transform: "scale(1) translateY(0)" },
+];
+
+function animateModal(overlay: HTMLElement, modal: HTMLElement | null, direction: PlaybackDirection) {
+  const opts: KeyframeAnimationOptions = {
+    duration: ANIM_DURATION,
+    easing: ANIM_EASING,
+    fill: direction === "reverse" ? "forwards" : "backwards",
+    direction,
+  };
+  const pending: Promise<unknown>[] = [overlay.animate(OVERLAY_KEYFRAMES, opts).finished];
+  if (modal) {
+    pending.push(modal.animate(MODAL_KEYFRAMES, opts).finished);
+  }
+  return Promise.all(pending);
+}
 
 function addRadioCheckbox(modal: HTMLElement, id: string, text: string) {
   if (!modal) {
@@ -16,15 +40,13 @@ function addRadioCheckbox(modal: HTMLElement, id: string, text: string) {
   const button = document.createElement("button");
   button.className = `${MODAL_CLASS}--radio-button`;
 
-  button.addEventListener("click", () => {
+  radioCheckbox.addEventListener("click", () => {
     if (selected === id) {
       return;
     }
     const radios = Array.from(document.getElementsByClassName(`${MODAL_CLASS}--radio`));
-    document.startViewTransition(() => {
-      radios.forEach(el => el.classList.remove("blyrics-radio-selected"));
-      radioCheckbox.classList.add("blyrics-radio-selected");
-    });
+    radios.forEach(el => el.classList.remove("blyrics-radio-selected"));
+    radioCheckbox.classList.add("blyrics-radio-selected");
     selected = id;
   });
 
@@ -44,10 +66,9 @@ function addRadioCheckbox(modal: HTMLElement, id: string, text: string) {
 
 export function showReportModal(lyricsId: number) {
   const app = document.querySelector("ytmusic-app");
-  if (!app || typeof lyricsId !== "number" || modalInitiated) {
+  if (!app || typeof lyricsId !== "number" || document.getElementsByClassName(MODAL_OVERLAY_CLASS).length > 0) {
     return;
   }
-  modalInitiated = true;
 
   const overlay = document.createElement("div");
   overlay.classList.add(MODAL_OVERLAY_CLASS);
@@ -125,6 +146,7 @@ export function showReportModal(lyricsId: number) {
     const res = await report(lyricsId, selected, detailInput.value);
     if (res.ok) {
       info.textContent = t("report_lyrics_success");
+      selected = null;
     } else if (res.status === 409) {
       info.textContent = t("report_lyrics_already");
     } else {
@@ -147,13 +169,40 @@ export function showReportModal(lyricsId: number) {
   modal.appendChild(footer);
   overlay.appendChild(modal);
   app.appendChild(overlay);
+
+  escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      e.preventDefault();
+      closeReportModal();
+    }
+  };
+  document.addEventListener("keydown", escapeHandler, { capture: true });
+
+  animateModal(overlay, modal, "normal");
 }
 
-export function closeReportModal() {
-  modalInitiated = false;
-  const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0];
+async function closeReportModal() {
+  if (isClosing) {
+    return;
+  }
+  const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0] as HTMLElement | undefined;
   if (!overlay) {
     return;
   }
+
+  isClosing = true;
+  selected = null;
+  overlay.style.pointerEvents = "none";
+
+  if (escapeHandler) {
+    document.removeEventListener("keydown", escapeHandler, { capture: true });
+    escapeHandler = null;
+  }
+
+  const modal = overlay.querySelector(`.${MODAL_CLASS}`) as HTMLElement | null;
+  await animateModal(overlay, modal, "reverse");
+
   overlay.remove();
+  isClosing = false;
 }

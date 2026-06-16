@@ -4,18 +4,26 @@
  */
 
 import { FETCH_LYRICS_LOG, LOG_PREFIX, LYRICS_TAB_HIDDEN_LOG, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
-import { t } from "@core/i18n";
 import { AppState, type PlayerDetails } from "@core/appState";
+import { t } from "@core/i18n";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
 import { log } from "@utils";
-import type { CubeyLyricSourceResult } from "./providers/cubey";
-import type { LyricSourceResult, ProviderParameters } from "./providers/shared";
+import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
+import { animEngineState } from "@modules/ui/animationEngine";
+
+const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
+
+function isInstrumentalOnly(lyrics: Lyric[]): boolean {
+  if (lyrics.length !== 1) return false;
+  return /^\[?instrumental\s*only\]?$/i.test(lyrics[0].words.trim());
+}
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
@@ -109,6 +117,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.suppressZeroTime = 0;
+      animEngineState.lastEventCreationTime = -1;
+      animEngineState.lastPlayState = false;
+      animEngineState.lastTime = 0;
     }
 
     if (matchingSong) {
@@ -200,23 +211,23 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     });
 
     try {
-      let cubyLyrics = (await getLyrics(providerParameters, "musixmatch-richsync")) as CubeyLyricSourceResult;
-      if (cubyLyrics && cubyLyrics.album && cubyLyrics.album.length > 0 && album !== cubyLyrics.album) {
-        providerParameters.album = cubyLyrics.album;
+      let meta = await getLyrics(providerParameters, "metadata");
+      if (meta && meta.album && meta.album.length > 0) {
+        providerParameters.album = meta.album;
       }
-      if (cubyLyrics && cubyLyrics.song && cubyLyrics.song.length > 0 && song !== cubyLyrics.song) {
-        log("Using '" + cubyLyrics.song + "' for song instead of '" + song + "'");
-        providerParameters.song = cubyLyrics.song;
-      }
-
-      if (cubyLyrics && cubyLyrics.artist && cubyLyrics.artist.length > 0 && artist !== cubyLyrics.artist) {
-        log("Using '" + cubyLyrics.artist + "' for artist instead of '" + artist + "'");
-        providerParameters.artist = cubyLyrics.artist;
+      if (meta && meta.song && meta.song.length > 0 && song !== meta.song) {
+        log("Using '" + meta.song + "' for song instead of '" + song + "'");
+        providerParameters.song = meta.song;
       }
 
-      if (cubyLyrics && cubyLyrics.duration && duration !== cubyLyrics.duration) {
-        log("Using '" + cubyLyrics.duration + "' for duration instead of '" + duration + "'");
-        providerParameters.duration = cubyLyrics.duration;
+      if (meta && meta.artist && meta.artist.length > 0 && artist !== meta.artist) {
+        log("Using '" + meta.artist + "' for artist instead of '" + artist + "'");
+        providerParameters.artist = meta.artist;
+      }
+
+      if (meta && meta.duration && duration !== meta.duration) {
+        log("Using '" + meta.duration + "' for duration instead of '" + duration + "'");
+        providerParameters.duration = meta.duration;
       }
     } catch (err) {
       log(err);
@@ -233,6 +244,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         let sourceLyrics = await getLyrics(providerParameters, provider);
 
         if (sourceLyrics && sourceLyrics.lyrics && sourceLyrics.lyrics.length > 0) {
+          if (hideInstrumentalOnly.getBooleanValue() && isInstrumentalOnly(sourceLyrics.lyrics)) {
+            continue;
+          }
           ytLyricsEarlyInjectAbortController.abort("Lyrics are ready"); // May not be ideal when the stringSimilarity fails, but this should be rare anyways
           let ytLyrics = (await ytLyricsPromise) as YTLyricSourceResult;
 
@@ -366,20 +380,20 @@ export async function preFetchLyrics(
   };
 
   try {
-    let cubyLyrics = (await getLyrics(providerParameters, "musixmatch-richsync")) as CubeyLyricSourceResult;
-    if (cubyLyrics && cubyLyrics.album && cubyLyrics.album.length > 0 && album !== cubyLyrics.album) {
-      providerParameters.album = cubyLyrics.album;
+    let meta = await getLyrics(providerParameters, "metadata");
+    if (meta && meta.album && meta.album.length > 0 && album !== meta.album) {
+      providerParameters.album = meta.album;
     }
-    if (cubyLyrics && cubyLyrics.song && cubyLyrics.song.length > 0 && song !== cubyLyrics.song) {
-      providerParameters.song = cubyLyrics.song;
-    }
-
-    if (cubyLyrics && cubyLyrics.artist && cubyLyrics.artist.length > 0 && artist !== cubyLyrics.artist) {
-      providerParameters.artist = cubyLyrics.artist;
+    if (meta && meta.song && meta.song.length > 0 && song !== meta.song) {
+      providerParameters.song = meta.song;
     }
 
-    if (cubyLyrics && cubyLyrics.duration && duration !== cubyLyrics.duration) {
-      providerParameters.duration = cubyLyrics.duration;
+    if (meta && meta.artist && meta.artist.length > 0 && artist !== meta.artist) {
+      providerParameters.artist = meta.artist;
+    }
+
+    if (meta && meta.duration && duration !== meta.duration) {
+      providerParameters.duration = meta.duration;
     }
   } catch (err) {
     log(err);

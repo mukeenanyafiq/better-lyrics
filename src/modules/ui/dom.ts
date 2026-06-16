@@ -6,9 +6,12 @@ import {
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
-  LOADER_ANIMATION_END_FAILED,
+  HIDDEN_CLASS,
+  HOMEPAGE_DOMAIN,
+  HOMEPAGE_ICON_URL,
+  HOMEPAGE_URL,
   LOADER_TRANSITION_ENDED,
-  LRCLIB_UPLOAD_URL,
+  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -19,36 +22,44 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  SHADERS_AMO_URL,
+  SHADERS_CWS_URL,
+  SHADERS_DETECTION_SELECTOR,
+  type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  type SyncType,
-  HIDDEN_CLASS,
-  UNISON_API_URL,
+  UNISON_DOCK_CLASS,
 } from "@constants";
-import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
+import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
+import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
+import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
+  lyricsElementAdded,
   reflow,
   resetAnimEngineState,
   SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
+import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
+import type { UnisonLyricsRequest } from "@modules/unison/types";
+import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
+import { generatePetName } from "@/core/keyIdentity";
+import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
-import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
-import { byId, deleteVote, vote, type UnisonData } from "../lyrics/providers/unison";
-import { signPayload } from "@/core/keyIdentity";
 import { showReportModal } from "./reportLyrics";
 
-const votedIcons = {
-  upvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>`,
-  upvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M10.72 2.18a3.263 3.263 0 012.352 4.063l-.708 2.476a1 1 0 00.962 1.275h5.29c.848 0 1.624.48 2.003 1.238l.179.359a1.785 1.785 0 01-.6 2.279.446.446 0 00-.198.37v.07c0 .124.041.246.116.346a2.375 2.375 0 01-.41 3.278l-.5.399a.38.38 0 00-.123.416l.07.206c.217.653.1 1.372-.313 1.923a2.8 2.8 0 01-2.24 1.12l-3.914-.002a12 12 0 01-5.952-1.584l-.272-.155a2.002 2.002 0 00-.993-.265H3a1 1 0 01-1-1v-5.996a1 1 0 011.002-1L5.789 12a1 1 0 00.945-.67l3.02-8.628a.816.816 0 01.967-.523Z"></path></svg>`,
-  downvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>`,
-  downvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M11.313 2.002c2.088 0 4.14.546 5.953 1.583l.273.156a2 2 0 00.993.264H21a1 1 0 011 1V11a1 1 0 01-1.002 1l-2.787-.005a1 1 0 00-.946.67l-3.02 8.628a.815.815 0 01-.966.522 3.262 3.262 0 01-2.35-4.062l.707-2.477a1 1 0 00-.961-1.274h-5.29a2.24 2.24 0 01-2.004-1.238l-.18-.359a1.784 1.784 0 01.601-2.278.446.446 0 00.198-.37v-.07a.578.578 0 00-.116-.347 2.374 2.374 0 01.412-3.278l.498-.399a.379.379 0 00.123-.415l-.07-.207a2.1 2.1 0 01.313-1.923A2.798 2.798 0 017.4 2l3.913.002Z"></path></svg>`,
+const voteIcons = {
+  upvote: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><g fill="none"><path fill="currentColor" fill-opacity=".16" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28"/><path stroke="currentColor" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28ZM6.2 7H2.8a.8.8 0 0 0-.8.8v13.4a.8.8 0 0 0 .8.8h3.4a.8.8 0 0 0 .8-.8V7.8a.8.8 0 0 0-.8-.8Z"/></g></svg>`,
+  downvote: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><g fill="none"><path fill="currentColor" fill-opacity=".16" d="M7.895 16.31A4.4 4.4 0 0 0 7 15.6V3.266l8.509-1.223a4.1 4.1 0 0 1 2.82.616a4.25 4.25 0 0 1 1.756 2.335l1.763 5.753a3.48 3.48 0 0 1-.497 3.04c-.31.43-.716.781-1.183 1.023a3.3 3.3 0 0 1-1.509.367h-3.633q.326.83.496 1.706a9 9 0 0 1 .164 1.706c0 .904-.352 1.772-.979 2.412c-.626.64-1.476.999-2.362.999s-1.736-.36-2.362-1a3.45 3.45 0 0 1-.979-2.411c0-.598-.324-1.478-1.109-2.28"/><path stroke="currentColor" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M7.895 16.31A4.4 4.4 0 0 0 7 15.6V3.266l8.509-1.223a4.1 4.1 0 0 1 2.82.616a4.25 4.25 0 0 1 1.756 2.335l1.763 5.753a3.48 3.48 0 0 1-.497 3.04c-.31.43-.716.781-1.183 1.023a3.3 3.3 0 0 1-1.509.367h-3.633q.326.83.496 1.706a9 9 0 0 1 .164 1.706c0 .904-.352 1.772-.979 2.412c-.626.64-1.476.999-2.362.999s-1.736-.36-2.362-1a3.45 3.45 0 0 1-.979-2.411c0-.598-.324-1.478-1.109-2.28ZM6.2 17H2.8a.8.8 0 0 1-.8-.8V2.8a.8.8 0 0 1 .8-.8h3.4a.8.8 0 0 1 .8.8v13.4a.8.8 0 0 1-.8.8Z"/></g></svg>`,
+  report: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path fill="currentColor" fill-opacity=".16" d="M36 35H12V21c0-6.627 5.373-12 12-12s12 5.373 12 12z"/><path stroke-linecap="round" d="M8 42h32M4 13l3 1m6-10l1 3m-4 3L7 7"/></g></svg>`,
 };
+
+const VOTE_ACTIVE_CLASS = `${FOOTER_CLASS}__vote--active`;
 
 const syncTypeIcons: Record<SyncType, string> = {
   vary: `<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335c0-45.255 0-67.882 14.059-81.941S50.745 239 96 239h117c30.17 0 45.255 0 54.627 9.373S277 272.83 277 303v105c0 30.17 0 45.255-9.373 54.627S243.17 472 213 472H96c-45.255 0-67.882 0-81.941-14.059S0 421.255 0 376zm337-31c0-30.17 0-45.255 9.373-54.627S370.83 240 401 240h59c45.255 0 67.882 0 81.941 14.059S556 290.745 556 336v41c0 45.255 0 67.882-14.059 81.941S505.255 473 460 473h-59c-30.17 0-45.255 0-54.627-9.373S337 439.17 337 409z"/><rect y="552.271" width="1024" height="233" rx="48"/></svg>`,
@@ -74,6 +85,11 @@ function parseSvgString(svgString: string): SVGElement | null {
     return svg;
   }
   return null;
+}
+
+function appendIconTo(button: HTMLElement, svgString: string): void {
+  const svg = parseSvgString(svgString);
+  if (svg) button.appendChild(svg);
 }
 
 const providerDisplayInfo: Record<string, { name: string; syncType: SyncType }> = Object.fromEntries(
@@ -110,6 +126,145 @@ function createActionButton(options: ActionButtonOptions): HTMLElement {
   link.style.height = "100%";
   container.appendChild(link);
 
+  return container;
+}
+
+// -- Request Synced Version Button --------------------------
+
+interface RequestButtonMeta {
+  videoId: string;
+  song: string;
+  artist: string;
+}
+
+function thumbnailUrlFor(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+async function resolveArtworkUrl(videoId: string): Promise<string> {
+  const sniffed = await getSongMetadata(videoId);
+  if (sniffed?.thumbnail?.url) return getHighResImageUrl(sniffed.thumbnail);
+
+  const ytImg = document.querySelector<HTMLImageElement>("#thumbnail>#img");
+  if (ytImg?.src) return getHighResImageUrl({ url: ytImg.src, width: 0, height: 0 });
+
+  return thumbnailUrlFor(videoId);
+}
+
+function requestedLabel(requestCount: number): string {
+  if (requestCount <= 1) return t("lyrics_requestedFirst");
+  if (requestCount === 2) return t("lyrics_requestedOneOther");
+  return t("lyrics_requestedNOthers", String(requestCount - 1));
+}
+
+function errorLabelFor(status: number | undefined): string {
+  if (status === 429) return t("lyrics_requestErrorRateLimit");
+  if (status === undefined) return t("lyrics_requestErrorNetwork");
+  if (status >= 500) return t("lyrics_requestErrorServer");
+  return t("lyrics_requestErrorGeneric");
+}
+
+function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
+  const container = document.createElement("div");
+  container.className = `${FOOTER_CLASS}__container`;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.style.height = "100%";
+  button.style.background = "none";
+  button.style.border = "none";
+  button.style.color = "inherit";
+  button.style.font = "inherit";
+  button.style.cursor = "pointer";
+  button.style.padding = "0";
+
+  const setLabel = (text: string) => {
+    button.textContent = text;
+  };
+
+  const setDisabled = (disabled: boolean) => {
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "default" : "pointer";
+  };
+
+  let terminalState: "none" | "requested" | "landed" = "none";
+
+  const revertToIdle = () => {
+    setLabel(t("lyrics_requestSyncedVersion"));
+    setDisabled(false);
+  };
+
+  const showRequested = (requestCount: number) => {
+    terminalState = "requested";
+    setLabel(requestedLabel(requestCount));
+    setDisabled(true);
+  };
+
+  const showLanded = () => {
+    terminalState = "landed";
+    setLabel(t("lyrics_requestSyncedLanded"));
+    setDisabled(false);
+  };
+
+  const showErrorTemporarily = (text: string) => {
+    setLabel(text);
+    setDisabled(true);
+    window.setTimeout(() => {
+      if (terminalState === "none") revertToIdle();
+    }, 5000);
+  };
+
+  setLabel(t("lyrics_requestSyncedVersion"));
+  setDisabled(true);
+
+  getRequest(meta.videoId).then(entry => {
+    if (entry && terminalState === "none") {
+      showRequested(entry.requestCount);
+    } else if (terminalState === "none") {
+      setDisabled(false);
+    }
+  });
+
+  button.addEventListener("click", async () => {
+    if (terminalState === "landed") {
+      location.reload();
+      return;
+    }
+    if (terminalState === "requested") return;
+
+    setDisabled(true);
+
+    const submission: UnisonLyricsRequest = {
+      videoId: meta.videoId,
+      song: meta.song,
+      artist: meta.artist,
+      thumbnailUrl: await resolveArtworkUrl(meta.videoId),
+    };
+
+    const result = await requestLyrics(submission);
+
+    if (!result.success || !result.data) {
+      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+        videoId: meta.videoId,
+        status: result.status,
+        error: result.error,
+      });
+      showErrorTemporarily(errorLabelFor(result.status));
+      return;
+    }
+
+    const success = result.data;
+
+    if (success.status === "already_available") {
+      showLanded();
+      return;
+    }
+
+    await setRequest(meta.videoId, success.requestCount);
+    showRequested(success.requestCount);
+  });
+
+  container.appendChild(button);
   return container;
 }
 
@@ -203,7 +358,8 @@ export function addFooter(
   duration: number,
   providerKey?: string,
   videoId?: string,
-  ...args: any[]
+  unisonData?: UnisonData,
+  showRequestButton = false
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -213,10 +369,11 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration, videoId);
+  observeFooterForRecalc(footer);
+  createFooter(song, artist, album, duration, videoId, showRequestButton);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
-  sourceHref = sourceHref || "https://better-lyrics.boidu.dev/";
+  sourceHref = sourceHref || HOMEPAGE_URL;
 
   const info = providerKey ? providerDisplayInfo[providerKey] : null;
 
@@ -237,140 +394,351 @@ export function addFooter(
     }
     footerLink.appendChild(iconWrapper);
   } else {
-    footerLink.textContent = source || "boidu.dev";
+    footerLink.textContent = source || HOMEPAGE_DOMAIN;
   }
 
-  if (source === "Unison" && args[0]) {
-    const unisonData: UnisonData = args[0];
+  if (source === "Unison" && unisonData) {
+    AppState.currentUnisonData = unisonData;
+    footer.appendChild(createUnisonFooterCard(unisonData));
+    if (AppState.isUnisonPinnedDockEnabled) {
+      mountUnisonDock(unisonData, AppState.unisonPinnedDockPosition);
+    }
+  } else {
+    AppState.currentUnisonData = null;
+    unmountUnisonDock();
+  }
+}
 
-    const unisonContainer = document.createElement("div");
-    unisonContainer.className = `${FOOTER_CLASS}__container transparent`;
+const unisonControlsRegistry = {
+  upvotes: [] as HTMLButtonElement[],
+  downvotes: [] as HTMLButtonElement[],
+  scoreLineRefs: [] as ScoreLineRefs[],
+};
 
-    // Upvote lyrics
-    const unisonUpvote = document.createElement("button");
-    unisonUpvote.className = `${FOOTER_CLASS}__vote`;
-    unisonUpvote.innerHTML = unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote;
+let unisonDockObserver: IntersectionObserver | null = null;
+let layoutAttrObserver: MutationObserver | null = null;
+let dockHoverActive = false;
 
-    unisonUpvote.addEventListener("click", async () => {
-      if (unisonData.vote === 1) {
-        unisonUpvote.innerHTML = votedIcons.upvote;
-        const res = await deleteVote(unisonData.lyricsId);
-        if (!res.ok && res.status !== 404) {
-          unisonUpvote.innerHTML = votedIcons.upvoted;
-          return;
-        }
+function ensureLayoutAttrObserver(): void {
+  if (layoutAttrObserver) return;
+  const layout = document.getElementById("layout");
+  if (!layout) return;
+  layoutAttrObserver = new MutationObserver(() => {
+    if (!dockHoverActive) return;
+    if (!layout.hasAttribute("player-fullscreened")) return;
+    if (!layout.hasAttribute("show-fullscreen-controls")) {
+      layout.setAttribute("show-fullscreen-controls", "");
+    }
+  });
+  layoutAttrObserver.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
+}
 
-        let data = await byId(unisonData.lyricsId);
-        if (data) {
-          unisonData.effectiveScore = data.effectiveScore;
-          unisonData.votes = data.voteCount;
-          unisonData.vote = data.userVote;
+function disconnectLayoutAttrObserver(): void {
+  layoutAttrObserver?.disconnect();
+  layoutAttrObserver = null;
+}
 
-          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
-        }
-      } else {
-        unisonUpvote.innerHTML = votedIcons.upvoted;
-        const res = await vote(unisonData.lyricsId, true);
-        if (!res.ok && res.status !== 409) {
-          unisonUpvote.innerHTML = votedIcons.upvote;
-          return;
-        }
-        unisonDownvote.innerHTML = votedIcons.downvote;
+function showPlayerBarOnDockHover(): void {
+  dockHoverActive = true;
+  const layout = document.getElementById("layout");
+  if (layout?.hasAttribute("player-fullscreened")) {
+    layout.setAttribute("show-fullscreen-controls", "");
+  }
+}
 
-        let data = await byId(unisonData.lyricsId);
-        if (!data) {
-          return;
-        }
+function hidePlayerBarOnDockLeave(): void {
+  dockHoverActive = false;
+  document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
+}
 
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
+type DockSuppressionReason = "cardVisible" | "ad" | "loading";
+const dockSuppressionReasons = new Set<DockSuppressionReason>();
 
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+function applyDockSuppression(): void {
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0] as HTMLElement | undefined;
+  if (!dock) return;
+  dock.classList.toggle(`${UNISON_DOCK_CLASS}--hidden`, dockSuppressionReasons.size > 0);
+}
+
+function setUnisonDockSuppression(reason: DockSuppressionReason, suppressed: boolean): void {
+  const had = dockSuppressionReasons.has(reason);
+  if (suppressed === had) return;
+  if (suppressed) dockSuppressionReasons.add(reason);
+  else dockSuppressionReasons.delete(reason);
+  applyDockSuppression();
+}
+
+function refreshUnisonControls(unisonData: UnisonData): void {
+  for (const btn of unisonControlsRegistry.upvotes) {
+    btn.classList.toggle(VOTE_ACTIVE_CLASS, unisonData.vote === 1);
+  }
+  for (const btn of unisonControlsRegistry.downvotes) {
+    btn.classList.toggle(VOTE_ACTIVE_CLASS, unisonData.vote === -1);
+  }
+  for (const refs of unisonControlsRegistry.scoreLineRefs) {
+    setScoreLine(refs, unisonData.effectiveScore, unisonData.votes);
+  }
+}
+
+function clearUnisonControlsRegistry(): void {
+  unisonControlsRegistry.upvotes.length = 0;
+  unisonControlsRegistry.downvotes.length = 0;
+  unisonControlsRegistry.scoreLineRefs.length = 0;
+}
+
+type VoteUpdateData = NonNullable<Awaited<ReturnType<typeof byId>>>;
+
+function applyServerVoteData(unisonData: UnisonData, data: VoteUpdateData): void {
+  unisonData.effectiveScore = data.effectiveScore;
+  unisonData.votes = data.voteCount;
+  unisonData.vote = data.userVote;
+  refreshUnisonControls(unisonData);
+}
+
+function setOptimisticVote(unisonData: UnisonData, value: 1 | -1 | null): void {
+  unisonData.vote = value;
+  refreshUnisonControls(unisonData);
+}
+
+function buildUnisonVoteButton(unisonData: UnisonData, voteValue: 1 | -1): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.className = `${FOOTER_CLASS}__vote`;
+
+  appendIconTo(btn, voteValue === 1 ? voteIcons.upvote : voteIcons.downvote);
+  if (unisonData.vote === voteValue) btn.classList.add(VOTE_ACTIVE_CLASS);
+
+  const registry = voteValue === 1 ? unisonControlsRegistry.upvotes : unisonControlsRegistry.downvotes;
+  registry.push(btn);
+
+  btn.addEventListener("click", async e => {
+    e.stopPropagation();
+    const wasActive = unisonData.vote === voteValue;
+
+    if (wasActive) {
+      setOptimisticVote(unisonData, null);
+      const res = await deleteVote(unisonData.lyricsId);
+      if (!res.ok && res.status !== 404) {
+        setOptimisticVote(unisonData, voteValue);
+        return;
       }
-    });
+      const data = await byId(unisonData.lyricsId);
+      if (data) applyServerVoteData(unisonData, data);
+      return;
+    }
 
-    unisonContainer.appendChild(unisonUpvote);
+    const prevVote = unisonData.vote;
+    setOptimisticVote(unisonData, voteValue);
+    const res = await vote(unisonData.lyricsId, voteValue === 1);
+    if (!res.ok && res.status !== 409) {
+      setOptimisticVote(unisonData, prevVote);
+      return;
+    }
+    const data = await byId(unisonData.lyricsId);
+    if (!data) {
+      setOptimisticVote(unisonData, prevVote);
+      return;
+    }
+    applyServerVoteData(unisonData, data);
+  });
 
-    // Vote count and score
-    const unisonScore = document.createElement("div");
-    unisonScore.className = `${FOOTER_CLASS}__container`;
-    unisonScore.textContent = `${unisonData.effectiveScore} score (${unisonData.votes})`;
+  return btn;
+}
 
-    unisonContainer.appendChild(unisonScore);
+function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
+  const unisonContainer = document.createElement("div");
+  unisonContainer.className = `${FOOTER_CLASS}__unison`;
 
-    // Downvote lyrics
-    const unisonDownvote = document.createElement("button");
-    unisonDownvote.className = `${FOOTER_CLASS}__vote`;
-    unisonDownvote.innerHTML = unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote;
+  const unisonCard = document.createElement("div");
+  unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
 
-    unisonDownvote.addEventListener("click", async () => {
-      if (unisonData.vote === -1) {
-        unisonDownvote.innerHTML = votedIcons.downvote;
-        const res = await deleteVote(unisonData.lyricsId);
-        if (!res.ok && res.status !== 404) {
-          unisonDownvote.innerHTML = votedIcons.downvoted;
-          return;
+  if (unisonData.submitter) {
+    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter));
+    const divider = document.createElement("div");
+    divider.className = `${FOOTER_CLASS}__unison-divider`;
+    unisonCard.appendChild(divider);
+  }
+
+  const actionsBlock = document.createElement("div");
+  actionsBlock.className = `${FOOTER_CLASS}__unison-actions-block`;
+
+  const actionRow = document.createElement("div");
+  actionRow.className = `${FOOTER_CLASS}__unison-actions`;
+
+  const unisonUpvote = buildUnisonVoteButton(unisonData, 1);
+  const unisonDownvote = buildUnisonVoteButton(unisonData, -1);
+
+  const { scoreLine, scoreLineRefs } = createScoreLine();
+  unisonControlsRegistry.scoreLineRefs.push(scoreLineRefs);
+  setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
+
+  const unisonReport = createReportButton(unisonData.lyricsId);
+
+  actionRow.appendChild(unisonUpvote);
+  actionRow.appendChild(unisonDownvote);
+  actionRow.appendChild(unisonReport);
+
+  actionsBlock.appendChild(actionRow);
+  actionsBlock.appendChild(scoreLine);
+
+  unisonCard.appendChild(actionsBlock);
+  unisonContainer.appendChild(unisonCard);
+
+  unisonContainer.addEventListener("click", e => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    const url = new URL(chrome.runtime.getURL("pages/unison.html"));
+    url.searchParams.set("id", String(unisonData.lyricsId));
+    window.open(url.toString(), "_blank", "noopener,noreferrer");
+  });
+
+  return unisonContainer;
+}
+
+export function mountUnisonDock(unisonData: UnisonData, position: string): void {
+  if (document.getElementsByClassName(UNISON_DOCK_CLASS).length > 0) {
+    return;
+  }
+  const sidePanel = document.querySelector("#side-panel");
+  if (!sidePanel) return;
+
+  const dock = document.createElement("div");
+  dock.className = UNISON_DOCK_CLASS;
+  dock.dataset.position = position;
+
+  const inner = document.createElement("div");
+  inner.className = `${UNISON_DOCK_CLASS}__inner`;
+
+  inner.appendChild(buildUnisonVoteButton(unisonData, 1));
+  inner.appendChild(buildUnisonVoteButton(unisonData, -1));
+  inner.appendChild(createReportButton(unisonData.lyricsId));
+
+  inner.addEventListener("mouseenter", showPlayerBarOnDockHover);
+  inner.addEventListener("mouseleave", hidePlayerBarOnDockLeave);
+  ensureLayoutAttrObserver();
+
+  dock.appendChild(inner);
+  sidePanel.appendChild(dock);
+  applyDockSuppression();
+
+  const card = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}__unison-card`);
+  if (card) {
+    unisonDockObserver = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          setUnisonDockSuppression("cardVisible", entry.isIntersecting);
         }
-
-        let data = await byId(unisonData.lyricsId);
-        if (data) {
-          unisonData.effectiveScore = data.effectiveScore;
-          unisonData.votes = data.voteCount;
-          unisonData.vote = data.userVote;
-
-          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
-        }
-      } else {
-        unisonDownvote.innerHTML = votedIcons.downvoted;
-        const res = await vote(unisonData.lyricsId, false);
-        if (!res.ok && res.status !== 409) {
-          unisonDownvote.innerHTML = votedIcons.downvote;
-          return;
-        }
-        unisonUpvote.innerHTML = votedIcons.upvote;
-
-        let data = await byId(unisonData.lyricsId);
-        if (!data) {
-          return;
-        }
-
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
-      }
-    });
-
-    unisonContainer.appendChild(unisonDownvote);
-
-    // Report lyrics
-    const unisonReport = document.createElement("button");
-    unisonReport.className = `${FOOTER_CLASS}__vote`;
-
-    unisonReport.addEventListener("click", () => showReportModal(unisonData.lyricsId));
-
-    const unisonReportSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    unisonReportSVG.setAttribute("viewBox", "0 0 18 18");
-    unisonReportSVG.setAttribute("fill", "white");
-    unisonReportSVG.setAttribute("width", "20");
-    unisonReportSVG.setAttribute("height", "20");
-
-    const unisonReportSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    unisonReportSVGPath.setAttribute(
-      "d",
-      "m3 2.25-.11.055c-.392.196-.64.597-.64 1.036v12.41a.75.75 0 101.5 0v-4.87a5.451 5.451 0 014.687.087L9 11.25l.357.166A6.701 6.701 0 0015 11.25l.11-.055c.343-.171.575-.5.628-.873l.012-.163V3.344a.908.908 0 00-1.313-.812 5.45 5.45 0 01-4.874 0L9 2.25a6.7 6.7 0 00-6 0Zm5.33 1.342.564.282a6.95 6.95 0 005.356.356v5.715a5.2 5.2 0 01-4.58-.037l-.564-.282A6.95 6.95 0 003.75 9.27V3.555a5.2 5.2 0 014.58.037Z"
+      },
+      { threshold: 0.4 }
     );
-
-    unisonReportSVG.appendChild(unisonReportSVGPath);
-    unisonReport.appendChild(unisonReportSVG);
-
-    unisonContainer.appendChild(unisonReport);
-
-    // Append container
-    footer.appendChild(unisonContainer);
+    unisonDockObserver.observe(card);
   }
+}
+
+export function unmountUnisonDock(): void {
+  if (unisonDockObserver) {
+    unisonDockObserver.disconnect();
+    unisonDockObserver = null;
+  }
+  hidePlayerBarOnDockLeave();
+  disconnectLayoutAttrObserver();
+  dockSuppressionReasons.delete("cardVisible");
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
+  if (dock) dock.remove();
+}
+
+export function updateUnisonDockPosition(position: string): void {
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0] as HTMLElement | undefined;
+  if (dock) dock.dataset.position = position;
+}
+
+function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): HTMLElement {
+  const authorBlock = document.createElement("div");
+  authorBlock.className = `${FOOTER_CLASS}__unison-author`;
+
+  const authorRow = document.createElement("div");
+  authorRow.className = `${FOOTER_CLASS}__unison-author-row`;
+
+  const handleEl = document.createElement("strong");
+  handleEl.className = `${FOOTER_CLASS}__author-name`;
+  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
+
+  const tier = getTrustTier(submitter.reputation);
+  const tierEl = document.createElement("span");
+  tierEl.className = `${FOOTER_CLASS}__trust-tier`;
+  tierEl.dataset.tier = tier;
+  tierEl.textContent = t(`unison_tier_${tier}`);
+
+  authorRow.appendChild(handleEl);
+  authorRow.appendChild(tierEl);
+
+  const subLabel = document.createElement("div");
+  subLabel.className = `${FOOTER_CLASS}__unison-author-label`;
+  subLabel.textContent = t("unison_submitted_this");
+
+  authorBlock.appendChild(authorRow);
+  authorBlock.appendChild(subLabel);
+  return authorBlock;
+}
+
+function createScoreLine(): { scoreLine: HTMLElement; scoreLineRefs: ScoreLineRefs } {
+  const scoreLine = document.createElement("div");
+  scoreLine.className = `${FOOTER_CLASS}__unison-score-line`;
+  const scoreNum = document.createElement("strong");
+  const scoreLabel = document.createElement("span");
+  const scoreSeparator = document.createElement("span");
+  scoreSeparator.textContent = " · ";
+  const voteNum = document.createElement("strong");
+  const voteLabel = document.createElement("span");
+  scoreLine.appendChild(scoreNum);
+  scoreLine.appendChild(scoreLabel);
+  scoreLine.appendChild(scoreSeparator);
+  scoreLine.appendChild(voteNum);
+  scoreLine.appendChild(voteLabel);
+  return { scoreLine, scoreLineRefs: { scoreNum, scoreLabel, voteNum, voteLabel } };
+}
+
+function createReportButton(lyricsId: number): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = `${FOOTER_CLASS}__vote`;
+  button.addEventListener("click", e => {
+    e.stopPropagation();
+    showReportModal(lyricsId);
+  });
+
+  appendIconTo(button, voteIcons.report);
+  return button;
+}
+
+interface ScoreLineRefs {
+  scoreNum: HTMLElement;
+  scoreLabel: HTMLElement;
+  voteNum: HTMLElement;
+  voteLabel: HTMLElement;
+}
+
+function formatScoreNumber(score: number): string {
+  return Number.isInteger(score) ? score.toString() : score.toFixed(2);
+}
+
+function setScoreLine(refs: ScoreLineRefs, score: number, votes: number): void {
+  refs.scoreNum.textContent = formatScoreNumber(score);
+  refs.scoreLabel.textContent = ` ${t("unison_score_label")}`;
+  refs.voteNum.textContent = String(votes);
+  refs.voteLabel.textContent = ` ${votes === 1 ? t("unison_vote_singular") : t("unison_vote_plural")}`;
+}
+
+function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expert" {
+  if (reputation < 0.5) return "new";
+  if (reputation < 1.5) return "trusted";
+  if (reputation < 1.85) return "veteran";
+  return "expert";
+}
+
+function shouldRenderShadersPromo(): boolean {
+  return document.querySelector(SHADERS_DETECTION_SELECTOR) === null;
+}
+
+function getShadersStoreUrl(): string {
+  return navigator.userAgent.includes("Firefox") ? SHADERS_AMO_URL : SHADERS_CWS_URL;
 }
 
 /**
@@ -381,7 +749,14 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
+function createFooter(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string,
+  showRequestButton = false
+): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -390,7 +765,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
     footerContainer.className = `${FOOTER_CLASS}__container`;
 
     const footerImage = document.createElement("img");
-    footerImage.src = "https://better-lyrics.boidu.dev/icon-512.png";
+    footerImage.src = HOMEPAGE_ICON_URL;
     footerImage.alt = "Better Lyrics Logo";
     footerImage.width = 20;
     footerImage.height = 20;
@@ -417,18 +792,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
 
     discordLink.appendChild(discordImage);
 
-    const lrclibUrl = new URL(LRCLIB_UPLOAD_URL);
-    if (song) lrclibUrl.searchParams.append("title", song);
-    if (artist) lrclibUrl.searchParams.append("artist", artist);
-    if (album) lrclibUrl.searchParams.append("album", album);
-    if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
-    if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
     footerLink.target = "_blank";
-
-    const addLyricsContainer = createActionButton({
-      text: t("lyrics_addToLrclib"),
-      href: lrclibUrl.toString(),
-    });
 
     const geniusContainer = createActionButton({
       text: t("lyrics_searchOnGenius"),
@@ -485,7 +849,41 @@ function createFooter(song: string, artist: string, album: string, duration: num
 
     footer.appendChild(footerContainer);
     footer.appendChild(geniusContainer);
-    footer.appendChild(addLyricsContainer);
+    if (videoId) {
+      footer.appendChild(
+        createActionButton({
+          text: t("lyrics_submitToUnison"),
+          href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
+        })
+      );
+    }
+    if (videoId && showRequestButton) {
+      footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
+    }
+    chrome.storage.sync.get({ isShadersPromoEnabled: true }, settings => {
+      if (!discordLink.isConnected) return;
+      if (!settings.isShadersPromoEnabled) return;
+      if (!shouldRenderShadersPromo()) return;
+
+      const shadersButton = document.createElement("a");
+      shadersButton.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__shaders`;
+      shadersButton.href = getShadersStoreUrl();
+      shadersButton.target = "_blank";
+      shadersButton.rel = "noreferrer noopener";
+
+      const shadersImage = document.createElement("img");
+      shadersImage.src = chrome.runtime.getURL("images/icons/shaders.png");
+      shadersImage.alt = "Better Lyrics Shaders";
+      shadersImage.width = 20;
+      shadersImage.height = 20;
+      shadersButton.appendChild(shadersImage);
+
+      const shadersLabel = document.createElement("span");
+      shadersLabel.textContent = t("lyrics_getShaders");
+      shadersButton.appendChild(shadersLabel);
+
+      footer.insertBefore(shadersButton, discordLink);
+    });
     footer.appendChild(discordLink);
     footer.appendChild(pip);
 
@@ -507,6 +905,7 @@ function setLoaderState(state: LoaderState, text?: string): void {
   if (text !== undefined) {
     loader.style.setProperty("--blyrics-loader-text", `"${text}"`);
   }
+  setUnisonDockSuppression("loading", state !== "hidden");
 }
 
 /**
@@ -678,6 +1077,7 @@ export function showAdOverlay(): void {
   }
 
   adOverlay.setAttribute("active", "");
+  setUnisonDockSuppression("ad", true);
 }
 
 /**
@@ -688,6 +1088,7 @@ export function hideAdOverlay(): void {
   if (adOverlay) {
     adOverlay.removeAttribute("active");
   }
+  setUnisonDockSuppression("ad", false);
 }
 
 /**
@@ -843,18 +1244,6 @@ export function addNoLyricsButton(
   const buttonContainer = document.createElement("div");
   buttonContainer.className = "blyrics-no-lyrics-button-container";
 
-  const lrclibUrl = new URL(LRCLIB_UPLOAD_URL);
-  if (song) lrclibUrl.searchParams.append("title", song);
-  if (artist) lrclibUrl.searchParams.append("artist", artist);
-  if (album) lrclibUrl.searchParams.append("album", album);
-  if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
-  if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
-
-  const addLyricsButton = createActionButton({
-    text: t("lyrics_addToLrclib"),
-    href: lrclibUrl.toString(),
-  });
-
   const geniusSearch = createActionButton({
     text: t("lyrics_searchOnGenius"),
     href: getGeniusLink(song, artist),
@@ -862,16 +1251,37 @@ export function addNoLyricsButton(
     logoAlt: "Genius",
   });
 
-  buttonContainer.appendChild(addLyricsButton);
   buttonContainer.appendChild(geniusSearch);
+
+  if (videoId) {
+    buttonContainer.appendChild(
+      createActionButton({
+        text: t("lyrics_submitToUnison"),
+        href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
+      })
+    );
+    buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
+  }
+
   lyricsWrapper.appendChild(buttonContainer);
+}
+
+function buildUnisonSubmitUrl(song: string, artist: string, album: string, duration: number, videoId: string): URL {
+  const url = new URL(chrome.runtime.getURL("pages/unison.html"));
+  url.searchParams.set("submit", "true");
+  if (song) url.searchParams.set("song", song);
+  if (artist) url.searchParams.set("artist", artist);
+  if (album) url.searchParams.set("album", album);
+  if (duration) url.searchParams.set("duration", Math.round(duration).toString());
+  url.searchParams.set("videoId", videoId);
+  return url;
 }
 
 /**
  * Injects required head tags including font links and image preloads.
  */
 export async function injectHeadTags(): Promise<void> {
-  const imgURL = "https://better-lyrics.boidu.dev/icon-512.png";
+  const imgURL = HOMEPAGE_ICON_URL;
 
   const imagePreload = document.createElement("link");
   imagePreload.rel = "preload";
@@ -932,6 +1342,10 @@ export function cleanup(): void {
     blyricsFooter.remove();
   }
 
+  unmountUnisonDock();
+  clearUnisonControlsRegistry();
+  AppState.currentUnisonData = null;
+
   getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
 
   const buttonContainer = document.querySelector(".blyrics-no-lyrics-button-container");
@@ -979,8 +1393,20 @@ export function injectSongAttributes(title: string, artist: string): void {
  * @param artist - Artist name
  */
 function getGeniusLink(song: string, artist: string): string {
-  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-  return `https://genius.com/search?q=${searchQuery}`;
+  const query = encodeURIComponent(`!ducky site:genius.com ${artist.trim()} ${song.trim()}`);
+  return `https://duckduckgo.com/?q=${query}`;
+}
+
+let footerResizeObserver: ResizeObserver | null = null;
+
+function observeFooterForRecalc(footer: HTMLElement): void {
+  if (footerResizeObserver) {
+    footerResizeObserver.disconnect();
+  }
+  footerResizeObserver = new ResizeObserver(() => {
+    lyricsElementAdded();
+  });
+  footerResizeObserver.observe(footer);
 }
 
 export function setExtraHeight() {
@@ -1009,5 +1435,5 @@ export function setExtraHeight() {
     tabRendererHeight - lyricsHeight
   );
 
-  document.documentElement.style.setProperty("--blyrics-padding-bottom", extraHeight + "px");
+  document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
 }

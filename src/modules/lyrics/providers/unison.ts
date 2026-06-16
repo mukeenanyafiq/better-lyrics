@@ -1,8 +1,14 @@
-import { UNISON_API_URL } from "@/core/constants";
-import { fillTtml } from "./ttmlUtils";
-import type { LyricSourceResult, ProviderParameters } from "./shared";
-import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { LOG_PREFIX_UNISON, UNISON_API_URL } from "@/core/constants";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
+import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import type { LyricSourceResult, ProviderParameters } from "./shared";
+import { fillTtml } from "./ttmlUtils";
+
+interface SubmitterInfo {
+  keyId: string;
+  reputation: number;
+  displayName?: string;
+}
 
 interface UnisonResponse {
   id: number;
@@ -15,6 +21,7 @@ interface UnisonResponse {
   syncType: "richsync" | "linesync" | "plain";
   effectiveScore: number;
   voteCount: number;
+  submitter?: SubmitterInfo;
   /** A property only passed if `x-api-key` header is also passed */
   userVote: 1 | -1 | null;
 }
@@ -36,54 +43,69 @@ export interface UnisonData {
   votes: number;
   effectiveScore: number;
   lyricsId: number;
+  submitter?: SubmitterInfo;
 }
 
 export async function vote(lyricsId: number, upvote: boolean) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 })),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 })),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} vote failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function deleteVote(lyricsId: number) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-
-  const response = await fetch(url.toString(), {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({})),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({})),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} deleteVote failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function report(lyricsId: number, reason: UnisonReportReason | string, details?: string) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
-
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ reason, details })),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({ reason, details })),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} report failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId);
-  const response = await fetch(url.toString(), {
-    headers: { "x-key-id": (await getIdentity()).keyId },
-  });
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId);
+    const response = await fetch(url.toString(), {
+      headers: { "x-key-id": (await getIdentity()).keyId },
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return null;
+    }
+    return response.json().then(json => json.data);
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} byId failed`, err);
     return null;
   }
-  return response.json().then(json => json.data);
 }
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
@@ -92,7 +114,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   url.searchParams.append("v", providerParameters.videoId);
   url.searchParams.append("song", providerParameters.song);
   url.searchParams.append("artist", providerParameters.artist);
-  url.searchParams.append("duration", String(providerParameters.duration));
+  url.searchParams.append("duration", String(Math.round(providerParameters.duration)));
   if (providerParameters.album != null) {
     url.searchParams.append("album", providerParameters.album);
   }
@@ -125,33 +147,37 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   const result = {
     cacheAllowed: false,
     source: "Unison",
-    sourceHref: "https://boidu.dev/",
-    unisonData: {
-      vote: responseData.userVote,
-      votes: responseData.voteCount,
-      effectiveScore: responseData.effectiveScore,
-      lyricsId: responseData.id,
-    },
+    sourceHref: chrome.runtime.getURL("pages/unison.html"),
+  };
+
+  const unisonData: UnisonData = {
+    vote: responseData.userVote,
+    votes: responseData.voteCount,
+    effectiveScore: responseData.effectiveScore,
+    lyricsId: responseData.id,
+    submitter: responseData.submitter,
   };
 
   switch (responseData.format) {
     case "ttml":
-      const filled = await fillTtml(responseData.lyrics, providerParameters.duration);
-      if (filled) {
-        const unisonResult = { ...filled.result, ...result };
-        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled.isWordSynced ? unisonResult : null;
-        providerParameters.sourceMap["unison-synced"].lyricSourceResult = !filled.isWordSynced ? unisonResult : null;
-      } else {
-        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-        providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
-      }
+      await fillTtml(
+        responseData.lyrics,
+        providerParameters,
+        {
+          richsyncKey: "unison-richsynced",
+          syncedKey: "unison-synced",
+          ...result,
+        },
+        { unisonData }
+      );
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseData.lyrics, responseData.duration);
       const res = {
         ...result,
-        lyrics: lrc.result,
+        unisonData,
+        lyrics: lrc,
       };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
@@ -165,6 +191,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
         ? {
             ...result,
+            unisonData,
             lyrics: plain,
           }
         : null;

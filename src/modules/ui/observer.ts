@@ -93,15 +93,16 @@ function cleanupWakeLock(): void {
 
 type FullscreenCallback = () => void;
 
-function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
+const fullscreenEnterCallbacks: FullscreenCallback[] = [];
+const fullscreenExitCallbacks: FullscreenCallback[] = [];
+
+function ensureFullscreenObserver(): void {
+  if (fullscreenObserver) return;
+
   const appLayout = document.querySelector("ytmusic-app-layout");
   if (!appLayout) {
-    setTimeout(() => onFullscreenChange(onEnter, onExit), 1000);
+    setTimeout(ensureFullscreenObserver, 1000);
     return;
-  }
-
-  if (fullscreenObserver) {
-    fullscreenObserver.disconnect();
   }
 
   let wasFullscreen = appLayout.hasAttribute("player-fullscreened");
@@ -110,15 +111,25 @@ function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallb
     const isFullscreen = appLayout.hasAttribute("player-fullscreened");
 
     if (!wasFullscreen && isFullscreen) {
-      onEnter();
+      fullscreenEnterCallbacks.forEach(cb => cb());
     } else if (wasFullscreen && !isFullscreen) {
-      onExit();
+      fullscreenExitCallbacks.forEach(cb => cb());
     }
 
     wasFullscreen = isFullscreen;
   });
 
   fullscreenObserver.observe(appLayout, { attributes: true, attributeFilter: ["player-fullscreened"] });
+}
+
+export function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
+  fullscreenEnterCallbacks.push(onEnter);
+  fullscreenExitCallbacks.push(onExit);
+  ensureFullscreenObserver();
+}
+
+export function isPlayerFullscreened(): boolean {
+  return document.querySelector("ytmusic-app-layout")?.hasAttribute("player-fullscreened") ?? false;
 }
 
 export function setupWakeLockForFullscreen(): void {
@@ -187,7 +198,7 @@ export function disableInertWhenFullscreen(): void {
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
               currentTab = 1;
-              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+              if (AppState.areLyricsLoaded) {
                 AppState.areLyricsTicking = true;
               }
             }
@@ -226,7 +237,7 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none" && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
@@ -409,13 +420,13 @@ export function scrollEventHandler(): void {
     if (animEngineState.scrollResumeTime < Date.now()) {
       log(PAUSING_LYRICS_SCROLL_LOG);
     }
-    animEngineState.scrollResumeTime = Date.now() + 25000;
-    if (!animEngineState.wasUserScrolling) {
-      getResumeScrollElement().removeAttribute("autoscroll-hidden");
-      const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-      lyricsElement.classList.add(USER_SCROLLING_CLASS);
-      animEngineState.wasUserScrolling = true;
-    }
+    const isPassive = AppState.lyricData?.syncType === "none";
+    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
+    animEngineState.wasUserScrolling = true;
+
+    getResumeScrollElement().removeAttribute("autoscroll-hidden");
+    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+    lyricsElement.classList.add(USER_SCROLLING_CLASS);
   }
 }
 
